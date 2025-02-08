@@ -3,4 +3,4 @@ project(HUH)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(HUH main.cpp)
+add_executable(HUH)
