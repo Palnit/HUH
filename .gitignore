@@ -1,0 +1,8 @@
+cmake-build*/
+.cache/
+.idea/
+.git/
+imgui.ini
+*/build/*
+*eps-converted-to.pdf
+docs/chapters/build/*
