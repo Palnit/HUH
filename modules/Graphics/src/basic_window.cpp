@@ -12,6 +12,7 @@
 #include <imgui_impl_sdl2.h>
 #include <implot.h>
 
+namespace HUH {
 BasicWindow::BasicWindow(const char* title,
                          int x,
                          int y,
@@ -169,6 +170,7 @@ int BasicWindow::InitWindow() {
 
     SDL_GL_MakeCurrent(m_window, m_context);
     SDL_GL_SetSwapInterval(1);
+    SDL_ShowWindow(m_window);
 
     GLenum err = glewInit();
     if (err != GLEW_OK) {
@@ -203,4 +205,5 @@ int BasicWindow::InitWindow() {
     ImGui_ImplOpenGL3_Init();
 
     return 0;
+}
 }

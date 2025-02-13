@@ -1,5 +1,6 @@
 #include <HUH/Graphics/shader_program.h>
 
+namespace HUH {
 ShaderProgram::ShaderProgram() : m_program(0) {
 }
 
@@ -40,4 +41,5 @@ ShaderProgram::~ShaderProgram() {
     if (m_program) {
         glDeleteProgram(m_program);
     }
+}
 }

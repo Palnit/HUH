@@ -1,4 +1,5 @@
 #include <HUH/Graphics/vertex_array_object.h>
+namespace HUH {
 
 void VertexArrayObject::Bind() {
     if (!m_VAO) {
@@ -8,4 +9,5 @@ void VertexArrayObject::Bind() {
 }
 void VertexArrayObject::UnBind() {
     glBindVertexArray(0);
+}
 }

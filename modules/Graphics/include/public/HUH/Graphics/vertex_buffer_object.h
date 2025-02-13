@@ -2,7 +2,12 @@
 #define GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_VERTEXBUFFEROBJECT_H_
 
 #include <vector>
-#include "GL/glew.h"
+#include <GL/glew.h>
+#include <HUH/definitions.h>
+
+namespace HUH {
+
+class AttributeDescriptor;
 
 /*!
  * \class VertexBufferObject
@@ -13,9 +18,8 @@
  * \tparam T The template type of the stored data
  */
 template<typename T>
-class VertexBufferObject {
+class HUH_API VertexBufferObject {
 public:
-    class AttributeDescriptor;
 
     /*!
      * Default constructor generates the buffer
@@ -27,7 +31,7 @@ public:
      * Constructor generates the buffer and stores the usage type
      * \param usage The usage type
      */
-    VertexBufferObject(GLenum usage) : m_VBO(0), m_usage(usage){};
+    VertexBufferObject(GLenum usage) : m_VBO(0), m_usage(usage) {};
 
     /*!
      * Constructor that takes an array as it's initial data and a usage type
@@ -36,7 +40,7 @@ public:
      * \param usage The usage type
      */
     template<auto size>
-    VertexBufferObject(T (&elements)[size],
+    VertexBufferObject(T (& elements)[size],
                        GLenum usage) : m_VBO(0), m_usage(usage) {
         m_elements.insert(m_elements.end(),
                           elements,
@@ -90,7 +94,7 @@ public:
      * \param elements The array of elements
      */
     template<auto size>
-    void AddElement(T (&elements)[size]) {
+    void AddElement(T (& elements)[size]) {
         m_elements.insert(m_elements.end(),
                           elements,
                           elements + size);
@@ -147,68 +151,6 @@ public:
     }
 
     /*!
-     * \class AttributeDescriptor
-     * \brief Attribute description for a VBO
-     *
-     * It contains all data that describes a data type of VBO and the data OpenGL
-     * needs to be abel to handel it later in the shader pipeline
-     */
-    struct AttributeDescriptor {
-        /*!
-         * Constructor
-         * \param size The size of the data array
-         * \param stride The stride of the data
-         * \param type The type of the data
-         * \param normalized Should it be normalized or not
-         * \param offset The offset of the data
-         */
-        AttributeDescriptor(GLint size, GLsizei stride, GLenum type, GLboolean normalized, const GLvoid* offset)
-            : size(size),
-              stride(stride),
-              type(type),
-              normalized(normalized),
-              offset(offset) {
-        }
-
-        /*!
-         * Constructor
-         * \param size The size of the data array
-         * \param stride The stride of the data
-         * \param type The type of the data
-         * \param offset The offset of the data
-         */
-        AttributeDescriptor(GLint size,
-                            GLsizei stride,
-                            GLenum type,
-                            const GLvoid* offset)
-            : size(size),
-              stride(stride),
-              type(type),
-              normalized(GL_FALSE),
-              offset(offset) {
-        }
-
-        /*!
-         * Constructor
-         * \param size The size of the data array
-         * \param stride The stride of the data
-         * \param offset The offset of the data
-         */
-        AttributeDescriptor(GLint size, GLsizei stride, const GLvoid* offset)
-            : size(size),
-              stride(stride),
-              type(GL_FLOAT),
-              normalized(GL_FALSE),
-              offset(offset) {
-        }
-        GLint size;
-        GLenum type;
-        GLboolean normalized;
-        GLsizei stride;
-        const GLvoid* offset;
-    };
-
-    /*!
      * Returns all the descriptors of the vbo
      * \return A vector of descriptors
      */
@@ -224,4 +166,72 @@ private:
     std::vector<AttributeDescriptor> m_desc;
 };
 
+/*!
+ * \class AttributeDescriptor
+ * \brief Attribute description for a VBO
+ *
+ * It contains all data that describes a data type of VBO and the data OpenGL
+ * needs to be abel to handel it later in the shader pipeline
+ */
+struct HUH_API AttributeDescriptor {
+    /*!
+     * Constructor
+     * \param size The size of the data array
+     * \param stride The stride of the data
+     * \param type The type of the data
+     * \param normalized Should it be normalized or not
+     * \param offset The offset of the data
+     */
+    AttributeDescriptor(GLint size,
+                        GLsizei stride,
+                        GLenum type,
+                        GLboolean normalized,
+                        const GLvoid* offset)
+        : size(size),
+          stride(stride),
+          type(type),
+          normalized(normalized),
+          offset(offset) {
+    }
+
+    /*!
+     * Constructor
+     * \param size The size of the data array
+     * \param stride The stride of the data
+     * \param type The type of the data
+     * \param offset The offset of the data
+     */
+    AttributeDescriptor(GLint size,
+                        GLsizei stride,
+                        GLenum type,
+                        const GLvoid* offset)
+        : size(size),
+          stride(stride),
+          type(type),
+          normalized(GL_FALSE),
+          offset(offset) {
+    }
+
+    /*!
+     * Constructor
+     * \param size The size of the data array
+     * \param stride The stride of the data
+     * \param offset The offset of the data
+     */
+    AttributeDescriptor(GLint size, GLsizei stride, const GLvoid* offset)
+        : size(size),
+          stride(stride),
+          type(GL_FLOAT),
+          normalized(GL_FALSE),
+          offset(offset) {
+    }
+
+    GLint size;
+    GLenum type;
+    GLboolean normalized;
+    GLsizei stride;
+    const GLvoid* offset;
+};
+
+}
 #endif //GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_VERTEXBUFFEROBJECT_H_

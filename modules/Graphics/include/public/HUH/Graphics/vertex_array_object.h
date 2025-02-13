@@ -1,9 +1,12 @@
 #ifndef GPGPU_EDGE_DETECTOR_SRC_GENERAL_OPENGL_SDL_VERTEXARRAYOBJECT_H_
 #define GPGPU_EDGE_DETECTOR_SRC_GENERAL_OPENGL_SDL_VERTEXARRAYOBJECT_H_
 
-#include "GL/glew.h"
-#include "element_buffer_object.h"
-#include "vertex_buffer_object.h"
+#include <GL/glew.h>
+#include <HUH/Graphics/element_buffer_object.h>
+#include <HUH/Graphics/vertex_buffer_object.h>
+#include <HUH/definitions.h>
+
+namespace HUH {
 
 /*!
  * \class VertexArrayObject
@@ -12,7 +15,7 @@
  * It takes a VertexBufferObject class and an ElementBufferObject and takes
  * makes the OpenGl vertex attributes from the VBO and binds the EBO to it self
  */
-class VertexArrayObject {
+class HUH_API VertexArrayObject {
 public:
     /*!
      * Constructor that generates the vertex arrays
@@ -45,13 +48,13 @@ public:
     void AddVertexBuffer(VertexBufferObject<T>& VBO) {
         Bind();
         VBO.Bind();
-        for (unsigned int i = 0; i < VBO.GetDescriptors().size(); i++) {
+        for (const auto& Descriptor : VBO.GetDescriptors()) {
             glVertexAttribPointer(m_count,
-                                  VBO.GetDescriptors()[i].size,
-                                  VBO.GetDescriptors()[i].type,
-                                  VBO.GetDescriptors()[i].normalized,
-                                  VBO.GetDescriptors()[i].stride,
-                                  VBO.GetDescriptors()[i].offset);
+                                  Descriptor.size,
+                                  Descriptor.type,
+                                  Descriptor.normalized,
+                                  Descriptor.stride,
+                                  Descriptor.offset);
             glEnableVertexAttribArray(m_count);
             m_count++;
         }
@@ -74,5 +77,5 @@ private:
     GLuint m_VAO;
     GLuint m_count;
 };
-
+}
 #endif //GPGPU_EDGE_DETECTOR_SRC_GENERAL_OPENGL_SDL_VERTEXARRAYOBJECT_H_

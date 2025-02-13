@@ -12,7 +12,9 @@
 #include <imgui.h>
 #include <implot.h>
 
-#include <HUH/export.h>
+#include <HUH/definitions.h>
+
+namespace HUH{
 
 /*!
  * \class BasicWindow
@@ -24,7 +26,7 @@
  * variables while having the convenience to not pollute your code with
  * having to implement all keyboard functions even if you dont use them
  */
-class  BasicWindow {
+class BasicWindow {
 
 public:
     /*!
@@ -38,18 +40,17 @@ public:
      * is always appended
      */
 
-    HUH_EXPORT BasicWindow(const char* title,
-                int x,
-                int y,
-                int width,
-                int height,
-                uint32_t flags);
+    HUH_API BasicWindow(const char* title,
+                        int x,
+                        int y,
+                        int width,
+                        int height,
+                        uint32_t flags);
 
+    HUH_API ~BasicWindow();
 
-    HUH_EXPORT ~BasicWindow();
-
-    HUH_EXPORT int InitWindow();
-    HUH_EXPORT int run();
+    HUH_API int InitWindow();
+    HUH_API int run();
 
     /*!
      * Virtual function \n
@@ -143,5 +144,5 @@ protected:
     SDL_GLContext m_context;
     SDL_Event m_ev;
 };
-
+}
 #endif //BASIC_WINDOW_H_

@@ -2,7 +2,11 @@
 #define GPGPU_EDGE_DETECTOR_SRC_GENERAL_OPENGL_SDL_ELEMENTBUFFEROBJECT_H_
 
 #include <vector>
-#include "GL/glew.h"
+#include <GL/glew.h>
+#include <HUH/definitions.h>
+
+namespace HUH {
+
 /*!
  * \class ElementBufferObject
  * \brief A simple abstraction for OpenGl Element buffers
@@ -10,7 +14,7 @@
  * It contains a vector of unsigned int that it binds as its data when you simply
  * call bind and only replaces the data when any new data has been loaded
  */
-class ElementBufferObject {
+class HUH_API ElementBufferObject {
 public:
     /*!
      * Default constructor
@@ -32,7 +36,7 @@ public:
      * \param usage The way the data will be used
      */
     template<auto size>
-    ElementBufferObject(unsigned int (&elements)[size],
+    ElementBufferObject(unsigned int (& elements)[size],
                         GLenum usage) : m_EBO(0), m_usage(usage) {
         m_elements.insert(m_elements.end(),
                           elements,
@@ -74,7 +78,7 @@ public:
      * \param elements The array of elements
      */
     template<auto size>
-    void AddElement(unsigned int (&elements)[size]) {
+    void AddElement(unsigned int (& elements)[size]) {
         m_elements.insert(m_elements.end(),
                           elements,
                           elements + size);
@@ -95,7 +99,7 @@ public:
     /*!
      * UnBinds the buffer
      */
-    static void UnBind();
+    void UnBind();
 
 private:
     std::vector<unsigned int> m_elements;
@@ -103,5 +107,5 @@ private:
     GLenum m_usage;
     bool m_set = false;
 };
-
+}
 #endif //GPGPU_EDGE_DETECTOR_SRC_GENERAL_OPENGL_SDL_ELEMENTBUFFEROBJECT_H_

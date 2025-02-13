@@ -2,11 +2,15 @@
 #define GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_GENERIC_STRUCTS_H_
 
 #include <cstdint>
+#include <HUH/definitions.h>
+
+namespace HUH {
+
 /*!
  * A simple RGBA struct to easily get the memory data from a uint32_t into the 4
  * channels if reinterpret casted or c style casted
  */
-typedef struct RGBA {
+typedef struct HUH_API RGBA {
     uint8_t r;
     uint8_t g;
     uint8_t b;
@@ -23,7 +27,7 @@ typedef struct RGBA {
 /*!
  * Used to get the memory data into an RGBA struct doesn't require casting
  */
-typedef union Color {
+typedef union HUH_API Color {
     uint32_t raw;
     RGBA channels;
 } Color;
@@ -35,7 +39,7 @@ typedef union Color {
  * A time class from witch statically we can get time data about the application
  * from anywhere in the program
  */
-class Time {
+class HUH_API Time {
 public:
     Time() = delete;
     ~Time() = delete;
@@ -56,4 +60,5 @@ namespace ErrorHandling {
 void HandelSDLError(const char* type);
 
 }// namespace ErrorHandling
+}
 #endif//GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_GENERIC_STRUCTS_H_

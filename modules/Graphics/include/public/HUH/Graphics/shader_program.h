@@ -2,7 +2,10 @@
 #define GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_SHADER_PROGRAM_H_
 
 #include <vector>
-#include "GL/glew.h"
+#include <GL/glew.h>
+#include <HUH/definitions.h>
+
+namespace HUH {
 
 /*!
  * \class ShaderProgram
@@ -11,7 +14,7 @@
  * It can take different kinds of shaders to link them and latter when needed
  * bind the program
  */
-class ShaderProgram {
+class HUH_API ShaderProgram {
 public:
     /*!
      * Default constructor generates the OpenGl program
@@ -51,5 +54,5 @@ private:
     std::vector<GLuint> m_shaders;
     bool linked = false;
 };
-
+}
 #endif //GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_SHADER_PROGRAM_H_

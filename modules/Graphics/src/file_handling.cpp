@@ -5,8 +5,9 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+namespace HUH::FileHandling {
 
-SDL_Surface* FileHandling::LoadImage(const char* file) {
+SDL_Surface* LoadImage(const char* file) {
     SDL_Surface* LoadedImg = IMG_Load(file);
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
@@ -19,7 +20,7 @@ SDL_Surface* FileHandling::LoadImage(const char* file) {
     SDL_FreeSurface(LoadedImg);
     return NLoadedImg;
 }
-GLuint FileHandling::LoadShader(GLenum shaderType, const char* filename) {
+GLuint LoadShader(GLenum shaderType, const char* filename) {
     std::string shaderCode;
     std::ifstream shaderFile;
     shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -29,7 +30,7 @@ GLuint FileHandling::LoadShader(GLenum shaderType, const char* filename) {
         shaderStream << shaderFile.rdbuf();
         shaderFile.close();
         shaderCode = shaderStream.str();
-    } catch (std::ifstream::failure e) {
+    } catch (const std::ifstream::failure& e) {
         std::cout << "Error" << std::endl;
     }
     const char* shaderCodeCStr = shaderCode.c_str();
@@ -37,4 +38,5 @@ GLuint FileHandling::LoadShader(GLenum shaderType, const char* filename) {
     glShaderSource(shader, 1, &shaderCodeCStr, NULL);
     glCompileShader(shader);
     return shader;
+}
 }

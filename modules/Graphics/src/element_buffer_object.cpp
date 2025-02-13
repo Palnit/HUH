@@ -1,4 +1,5 @@
 #include <HUH/Graphics/element_buffer_object.h>
+namespace HUH {
 
 void ElementBufferObject::AddElement(unsigned int element) {
     m_elements.push_back(element);
@@ -33,4 +34,5 @@ ElementBufferObject::~ElementBufferObject() {
 }
 void ElementBufferObject::SetUsage(GLenum usage) {
     m_usage = usage;
+}
 }

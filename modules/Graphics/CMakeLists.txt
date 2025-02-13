@@ -1,12 +1,13 @@
+set(GRAPHICS_INC_PATH "include/public/HUH/Graphics")
 set(HEADER_FILES
-        include/public/HUH/Graphics/basic_window.h
-        include/public/HUH/Graphics/element_buffer_object.h
-        include/public/HUH/Graphics/file_handling.h
-        include/public/HUH/Graphics/generic_structs.h
-        include/public/HUH/Graphics/SDL_GLDebugMessageCallback.h
-        include/public/HUH/Graphics/shader_program.h
-        include/public/HUH/Graphics/vertex_array_object.h
-        include/public/HUH/Graphics/vertex_buffer_object.h
+        ${GRAPHICS_INC_PATH}/basic_window.h
+        ${GRAPHICS_INC_PATH}/element_buffer_object.h
+        ${GRAPHICS_INC_PATH}/file_handling.h
+        ${GRAPHICS_INC_PATH}/generic_structs.h
+        ${GRAPHICS_INC_PATH}/SDL_GLDebugMessageCallback.h
+        ${GRAPHICS_INC_PATH}/shader_program.h
+        ${GRAPHICS_INC_PATH}/vertex_array_object.h
+        ${GRAPHICS_INC_PATH}/vertex_buffer_object.h
 )
 set(SOURCE_FILES
         src/basic_window.cpp
@@ -18,8 +19,17 @@ set(SOURCE_FILES
         src/vertex_array_object.cpp
 )
 
+find_package(SDL2 CONFIG REQUIRED)
+find_package(SDL2_image CONFIG REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(implot CONFIG REQUIRED)
+
 add_library(HUH-Graphics SHARED ${HEADER_FILES} ${SOURCE_FILES})
 add_library(HUH::Graphics ALIAS HUH-Graphics)
+
 target_link_libraries(HUH-Graphics PUBLIC
         HUH
         $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
