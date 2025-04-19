@@ -7,7 +7,72 @@
 
 namespace HUH {
 
-class AttributeDescriptor;
+/*!
+ * \class AttributeDescriptor
+ * \brief Attribute description for a VBO
+ *
+ * It contains all data that describes a data type of VBO and the data OpenGL
+ * needs to be abel to handel it later in the shader pipeline
+ */
+struct HUH_API AttributeDescriptor {
+    /*!
+     * Constructor
+     * \param size The size of the data array
+     * \param stride The stride of the data
+     * \param type The type of the data
+     * \param normalized Should it be normalized or not
+     * \param offset The offset of the data
+     */
+    AttributeDescriptor(GLint size,
+                        GLsizei stride,
+                        GLenum type,
+                        GLboolean normalized,
+                        const GLvoid* offset)
+        : size(size),
+          stride(stride),
+          type(type),
+          normalized(normalized),
+          offset(offset) {
+    }
+
+    /*!
+     * Constructor
+     * \param size The size of the data array
+     * \param stride The stride of the data
+     * \param type The type of the data
+     * \param offset The offset of the data
+     */
+    AttributeDescriptor(GLint size,
+                        GLsizei stride,
+                        GLenum type,
+                        const GLvoid* offset)
+        : size(size),
+          stride(stride),
+          type(type),
+          normalized(GL_FALSE),
+          offset(offset) {
+    }
+
+    /*!
+     * Constructor
+     * \param size The size of the data array
+     * \param stride The stride of the data
+     * \param offset The offset of the data
+     */
+    AttributeDescriptor(GLint size, GLsizei stride, const GLvoid* offset)
+        : size(size),
+          stride(stride),
+          type(GL_FLOAT),
+          normalized(GL_FALSE),
+          offset(offset) {
+    }
+
+    GLint size;
+    GLenum type;
+    GLboolean normalized;
+    GLsizei stride;
+    const GLvoid* offset;
+};
 
 /*!
  * \class VertexBufferObject
@@ -166,72 +231,6 @@ private:
     std::vector<AttributeDescriptor> m_desc;
 };
 
-/*!
- * \class AttributeDescriptor
- * \brief Attribute description for a VBO
- *
- * It contains all data that describes a data type of VBO and the data OpenGL
- * needs to be abel to handel it later in the shader pipeline
- */
-struct HUH_API AttributeDescriptor {
-    /*!
-     * Constructor
-     * \param size The size of the data array
-     * \param stride The stride of the data
-     * \param type The type of the data
-     * \param normalized Should it be normalized or not
-     * \param offset The offset of the data
-     */
-    AttributeDescriptor(GLint size,
-                        GLsizei stride,
-                        GLenum type,
-                        GLboolean normalized,
-                        const GLvoid* offset)
-        : size(size),
-          stride(stride),
-          type(type),
-          normalized(normalized),
-          offset(offset) {
-    }
-
-    /*!
-     * Constructor
-     * \param size The size of the data array
-     * \param stride The stride of the data
-     * \param type The type of the data
-     * \param offset The offset of the data
-     */
-    AttributeDescriptor(GLint size,
-                        GLsizei stride,
-                        GLenum type,
-                        const GLvoid* offset)
-        : size(size),
-          stride(stride),
-          type(type),
-          normalized(GL_FALSE),
-          offset(offset) {
-    }
-
-    /*!
-     * Constructor
-     * \param size The size of the data array
-     * \param stride The stride of the data
-     * \param offset The offset of the data
-     */
-    AttributeDescriptor(GLint size, GLsizei stride, const GLvoid* offset)
-        : size(size),
-          stride(stride),
-          type(GL_FLOAT),
-          normalized(GL_FALSE),
-          offset(offset) {
-    }
-
-    GLint size;
-    GLenum type;
-    GLboolean normalized;
-    GLsizei stride;
-    const GLvoid* offset;
-};
 
 }
 #endif //GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_VERTEXBUFFEROBJECT_H_

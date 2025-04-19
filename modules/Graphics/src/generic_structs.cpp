@@ -1,5 +1,5 @@
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #include <HUH/Graphics/generic_structs.h>
 
 void HUH::ErrorHandling::HandelSDLError(const char* type) {

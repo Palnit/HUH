@@ -1,6 +1,6 @@
 #include <HUH/Graphics/file_handling.h>
 
-#include <SDL2/SDL_image.h>
+#include <SDL3_image/SDL_image.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -11,13 +11,13 @@ SDL_Surface* LoadImage(const char* file) {
     SDL_Surface* LoadedImg = IMG_Load(file);
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
-    uint32_t format = SDL_PIXELFORMAT_ABGR8888;
+    SDL_PixelFormat format = SDL_PIXELFORMAT_ABGR8888;
 #else
-    uint32_t format = SDL_PIXELFORMAT_RGBA8888;
+    SDL_PixelFormat format = SDL_PIXELFORMAT_RGBA8888;
 #endif
 
-    SDL_Surface* NLoadedImg = SDL_ConvertSurfaceFormat(LoadedImg, format, 0);
-    SDL_FreeSurface(LoadedImg);
+    SDL_Surface* NLoadedImg = SDL_ConvertSurface(LoadedImg, format);
+    SDL_DestroySurface(LoadedImg);
     return NLoadedImg;
 }
 GLuint LoadShader(GLenum shaderType, const char* filename) {

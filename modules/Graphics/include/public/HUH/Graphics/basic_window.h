@@ -1,16 +1,13 @@
 #ifndef BASIC_WINDOW_H_
 #define BASIC_WINDOW_H_
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_rwops.h>
+#include <SDL3/SDL.h>
 
 #include <GL/glew.h>
 
 #include <glm/glm.hpp>
 
 #include <imgui.h>
-#include <implot.h>
 
 #include <HUH/definitions.h>
 

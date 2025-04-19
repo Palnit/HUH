@@ -45,7 +45,7 @@
 
 #include <HUH/Graphics/SDL_GLDebugMessageCallback.h>
 
-#include <SDL2/SDL_log.h>
+#include <SDL3/SDL_log.h>
 
 // Callback function for printing debug statements
 void GLAPIENTRY SDL_GLDebugMessageCallback(GLenum source,

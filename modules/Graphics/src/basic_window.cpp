@@ -2,14 +2,14 @@
 #include <HUH/Graphics/generic_structs.h>
 #include <HUH/Graphics/SDL_GLDebugMessageCallback.h>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 
 #include <GL/glew.h>
 
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
-#include <imgui_impl_sdl2.h>
+#include <imgui_impl_sdl3.h>
 #include <implot.h>
 
 namespace HUH {
@@ -26,7 +26,7 @@ BasicWindow::BasicWindow(const char* title,
       m_height(height),
       m_flags(flags),
       m_running(true) {
-    SDL_LogSetPriority(SDL_LOG_CATEGORY_ERROR, SDL_LOG_PRIORITY_ERROR);
+    SDL_SetLogPriority(SDL_LOG_CATEGORY_ERROR, SDL_LOG_PRIORITY_ERROR);
 }
 int BasicWindow::run() {
     if (InitWindow()) {
@@ -36,54 +36,52 @@ int BasicWindow::run() {
         return 1;
     }
     double fpsCount = 0;
-    Uint64 fpsLastTime = SDL_GetTicks64();
+    Uint64 fpsLastTime = SDL_GetTicks();
     ImGuiIO& io = ImGui::GetIO();
     while (m_running) {
         while (SDL_PollEvent(&m_ev)) {
-            ImGui_ImplSDL2_ProcessEvent(&m_ev);
+            ImGui_ImplSDL3_ProcessEvent(&m_ev);
 
             bool isMouseCaptured = io.WantCaptureMouse;
             bool isKeyboardCaptured = io.WantCaptureKeyboard;
 
             switch (m_ev.type) {
-                case SDL_QUIT:
+                case SDL_EVENT_QUIT:
                     m_running = false;
                     break;
-                case SDL_KEYDOWN:
+                case SDL_EVENT_KEY_DOWN:
                     if (!isKeyboardCaptured)
                         KeyboardDown(m_ev.key);
                     break;
-                case SDL_KEYUP:
+                case SDL_EVENT_KEY_UP:
                     if (!isKeyboardCaptured)
                         KeyboardUp(m_ev.key);
                     break;
-                case SDL_MOUSEBUTTONDOWN:
+                case SDL_EVENT_MOUSE_BUTTON_DOWN:
                     if (!isMouseCaptured)
                         MouseDown(m_ev.button);
                     break;
-                case SDL_MOUSEBUTTONUP:
+                case SDL_EVENT_MOUSE_BUTTON_UP:
                     if (!isMouseCaptured)
                         MouseUp(m_ev.button);
                     break;
-                case SDL_MOUSEWHEEL:
+                case SDL_EVENT_MOUSE_WHEEL:
                     if (!isMouseCaptured)
                         MouseWheel(m_ev.wheel);
                     break;
-                case SDL_MOUSEMOTION:
+                case SDL_EVENT_MOUSE_MOTION:
                     if (!isMouseCaptured)
                         MouseMove(m_ev.motion);
                     break;
-                case SDL_WINDOWEVENT:
-                    if ((m_ev.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-                        || (m_ev.window.event == SDL_WINDOWEVENT_SHOWN)) {
-                        SDL_GetWindowSize(m_window, &m_width, &m_height);
-                        Resize();
-                    }
+                case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+                case SDL_EVENT_WINDOW_SHOWN:
+                    SDL_GetWindowSize(m_window, &m_width, &m_height);
+                    Resize();
                     break;
             }
         }
-        Time::DeltaTime = SDL_GetTicks64() - Time::ElapsedTime;
-        Time::ElapsedTime = SDL_GetTicks64();
+        Time::DeltaTime = SDL_GetTicks() - Time::ElapsedTime;
+        Time::ElapsedTime = SDL_GetTicks();
         double diff = (Time::ElapsedTime - fpsLastTime) * 0.001;
         fpsCount++;
         if (diff >= 1.0 / 30.0) {
@@ -96,7 +94,7 @@ int BasicWindow::run() {
         Render();
 
         ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
 
         ImGui::NewFrame();
 
@@ -113,10 +111,10 @@ BasicWindow::~BasicWindow() {
         SDL_DestroyWindow(m_window);
     }
     if (m_context != nullptr) {
-        SDL_GL_DeleteContext(m_context);
+        SDL_GL_DestroyContext(m_context);
     }
     ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
     SDL_Quit();
@@ -125,11 +123,6 @@ int BasicWindow::InitWindow() {
 
     if (SDL_Init(SDL_INIT_VIDEO) == -1) {
         ErrorHandling::HandelSDLError("SDL initialization");
-        return 1;
-    }
-
-    if (IMG_Init(IMG_INIT_JPG) == 0) {
-        ErrorHandling::HandelSDLError("SDL IMG initialization");
         return 1;
     }
 
@@ -148,13 +141,16 @@ int BasicWindow::InitWindow() {
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-
-    m_window = SDL_CreateWindow(m_title,
-                                m_x,
-                                m_y,
-                                m_width,
-                                m_height,
-                                m_flags | SDL_WINDOW_OPENGL);
+    SDL_PropertiesID props = SDL_CreateProperties();
+    SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, m_title);
+     SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, m_x);
+     SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, m_y);
+    SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, m_width);
+    SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, m_height);
+     SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER,
+                          SDL_WINDOW_OPENGL | m_flags);
+    m_window = SDL_CreateWindowWithProperties(props);
+    SDL_DestroyProperties(props);
 
     if (m_window == nullptr) {
         ErrorHandling::HandelSDLError("Window initialization");
@@ -201,7 +197,7 @@ int BasicWindow::InitWindow() {
         ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable;
 
     ImGui::StyleColorsDark();
-    ImGui_ImplSDL2_InitForOpenGL(m_window, m_context);
+    ImGui_ImplSDL3_InitForOpenGL(m_window, m_context);
     ImGui_ImplOpenGL3_Init();
 
     return 0;
