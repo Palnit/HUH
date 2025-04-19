@@ -1,14 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
 
-
-include(FetchContent)
-FetchContent_Declare(vcpkg
-        GIT_REPOSITORY "https://github.com/microsoft/vcpkg/"
-)
-FetchContent_MakeAvailable(vcpkg)
-
-set(CMAKE_TOOLCHAIN_FILE "${vcpkg_SOURCE_DIR}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "")
-
 project(HUH
         VERSION 0.1.1
         LANGUAGES CXX C
