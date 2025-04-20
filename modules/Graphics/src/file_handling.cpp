@@ -39,4 +39,21 @@ GLuint LoadShader(GLenum shaderType, const char* filename) {
     glCompileShader(shader);
     return shader;
 }
+SDL_Surface* LoadImageFromMemory(void* pointer, int size) {
+    SDL_IOStream* rwops = SDL_IOFromConstMem(pointer, size);
+
+    SDL_Surface* LoadedImg = IMG_Load_IO(rwops, 0);
+
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+    SDL_PixelFormat format = SDL_PIXELFORMAT_ABGR8888;
+#else
+    SDL_PixelFormat format = SDL_PIXELFORMAT_RGBA8888;
+#endif
+
+    SDL_Surface* image;
+    image = SDL_ConvertSurface(LoadedImg, format);
+
+    SDL_DestroySurface(LoadedImg);
+    return image;
 }
+}// namespace HUH::FileHandling

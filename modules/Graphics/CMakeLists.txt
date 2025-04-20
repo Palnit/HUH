@@ -8,6 +8,9 @@ set(HEADER_FILES
         ${GRAPHICS_INC_PATH}/shader_program.h
         ${GRAPHICS_INC_PATH}/vertex_array_object.h
         ${GRAPHICS_INC_PATH}/vertex_buffer_object.h
+        ${GRAPHICS_INC_PATH}/texture.h
+        ${GRAPHICS_INC_PATH}/camera.h
+        ${GRAPHICS_INC_PATH}/generic_math.h
 )
 set(SOURCE_FILES
         src/basic_window.cpp
@@ -17,6 +20,8 @@ set(SOURCE_FILES
         src/SDL_GLDebugMessageCallback.cpp
         src/shader_program.cpp
         src/vertex_array_object.cpp
+        src/texture.cpp
+        src/camera.cpp
 )
 
 find_package(SDL3 CONFIG REQUIRED)

@@ -1,9 +1,11 @@
 #ifndef GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_SHADER_PROGRAM_H_
 #define GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_SHADER_PROGRAM_H_
 
-#include <vector>
 #include <GL/glew.h>
 #include <HUH/definitions.h>
+
+#include <string>
+#include <vector>
 
 namespace HUH {
 
@@ -49,10 +51,18 @@ public:
 
     void CreateProgram();
 
+    template<typename Function, typename... Args>
+    void SetUniform(const std::string& name,
+                    Function&& function,
+                    Args&&... args) {
+        function(glGetUniformLocation(m_program, name.c_str()),
+                 std::forward<Args>(args)...);
+    }
+
 private:
     GLuint m_program;
     std::vector<GLuint> m_shaders;
     bool linked = false;
 };
-}
-#endif //GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_SHADER_PROGRAM_H_
+}// namespace HUH
+#endif//GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_SHADER_PROGRAM_H_

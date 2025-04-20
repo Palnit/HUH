@@ -25,6 +25,12 @@ HUH_API SDL_Surface*  LoadImage(const char* file);
  */
 HUH_API GLuint LoadShader(GLenum shaderType, const char* filename);
 
+/// Function to load data from memory
+/// @param pointer pointer to memory
+/// @param size size of memory
+/// @return the returned sdl_surface pointer
+HUH_API SDL_Surface* LoadImageFromMemory(void* pointer, int size);
+
 } // FileHandling
 
 #endif //GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_F_H_

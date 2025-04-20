@@ -1,8 +1,8 @@
 #ifndef GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_GENERIC_STRUCTS_H_
 #define GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_GENERIC_STRUCTS_H_
 
-#include <cstdint>
 #include <HUH/definitions.h>
+#include <cstdint>
 
 namespace HUH {
 
@@ -47,6 +47,12 @@ public:
     static inline uint64_t DeltaTime = 0;
     static inline double FPS = 0;
     static inline double Ms = 0;
+    static float ElapsedTimeF() {
+        return static_cast<float>(ElapsedTime) / 1000.0f;
+    };
+    static float DeltaTimeF() {
+        return static_cast<float>(DeltaTime) / 1000.0f;
+    };
 };
 
 /*!
@@ -60,5 +66,5 @@ namespace ErrorHandling {
 void HandelSDLError(const char* type);
 
 }// namespace ErrorHandling
-}
+}// namespace HUH
 #endif//GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_GENERIC_STRUCTS_H_

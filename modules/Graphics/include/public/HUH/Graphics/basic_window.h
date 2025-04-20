@@ -11,7 +11,7 @@
 
 #include <HUH/definitions.h>
 
-namespace HUH{
+namespace HUH {
 
 /*!
  * \class BasicWindow
@@ -97,7 +97,7 @@ public:
      * The new sizes of the window is stored int he protected variables m_width
      * and m_height
      */
-    virtual void Resize() {};
+    virtual void Resize() { glViewport(0, 0, m_width, m_height); };
 
     /*!
      * Virtual function \n
@@ -141,5 +141,5 @@ protected:
     SDL_GLContext m_context;
     SDL_Event m_ev;
 };
-}
-#endif //BASIC_WINDOW_H_
+}// namespace HUH
+#endif//BASIC_WINDOW_H_
