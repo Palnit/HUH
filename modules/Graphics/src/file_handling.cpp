@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 namespace HUH::FileHandling {
 
 SDL_Surface* LoadImage(const char* file) {
@@ -37,6 +38,22 @@ GLuint LoadShader(GLenum shaderType, const char* filename) {
     GLuint shader = glCreateShader(shaderType);
     glShaderSource(shader, 1, &shaderCodeCStr, NULL);
     glCompileShader(shader);
+    GLint isCompiled = 0;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
+    if (isCompiled == GL_FALSE) {
+        GLint maxLength = 0;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+
+        // The maxLength includes the NULL character
+        std::vector<GLchar> errorLog(maxLength);
+        glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
+        std::cout << errorLog.data() << std::endl;
+
+        // Provide the infolog in whatever manor you deem best.
+        // Exit with failure.
+        glDeleteShader(shader);// Don't leak the shader.
+        return shader;
+    }
     return shader;
 }
 SDL_Surface* LoadImageFromMemory(void* pointer, int size) {

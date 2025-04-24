@@ -1,9 +1,9 @@
 #ifndef GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_VERTEXBUFFEROBJECT_H_
 #define GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_VERTEXBUFFEROBJECT_H_
 
-#include <vector>
 #include <GL/glew.h>
 #include <HUH/definitions.h>
+#include <vector>
 
 namespace HUH {
 
@@ -32,8 +32,7 @@ struct HUH_API AttributeDescriptor {
           stride(stride),
           type(type),
           normalized(normalized),
-          offset(offset) {
-    }
+          offset(offset) {}
 
     /*!
      * Constructor
@@ -50,8 +49,7 @@ struct HUH_API AttributeDescriptor {
           stride(stride),
           type(type),
           normalized(GL_FALSE),
-          offset(offset) {
-    }
+          offset(offset) {}
 
     /*!
      * Constructor
@@ -64,8 +62,7 @@ struct HUH_API AttributeDescriptor {
           stride(stride),
           type(GL_FLOAT),
           normalized(GL_FALSE),
-          offset(offset) {
-    }
+          offset(offset) {}
 
     GLint size;
     GLenum type;
@@ -85,12 +82,10 @@ struct HUH_API AttributeDescriptor {
 template<typename T>
 class HUH_API VertexBufferObject {
 public:
-
     /*!
      * Default constructor generates the buffer
      */
-    VertexBufferObject() : m_VBO(0), m_usage(GL_STATIC_DRAW) {
-    }
+    VertexBufferObject() : m_VBO(0), m_usage(GL_STATIC_DRAW) {}
 
     /*!
      * Constructor generates the buffer and stores the usage type
@@ -105,11 +100,10 @@ public:
      * \param usage The usage type
      */
     template<auto size>
-    VertexBufferObject(T (& elements)[size],
-                       GLenum usage) : m_VBO(0), m_usage(usage) {
-        m_elements.insert(m_elements.end(),
-                          elements,
-                          elements + size);
+    VertexBufferObject(T (&elements)[size], GLenum usage)
+        : m_VBO(0),
+          m_usage(usage) {
+        m_elements.insert(m_elements.end(), elements, elements + size);
     }
 
     /*!
@@ -118,11 +112,10 @@ public:
      * \param list The initializer list
      * \param usage The usage type
      */
-    VertexBufferObject(std::initializer_list<T> list,
-                       GLenum usage) : m_VBO(0), m_usage(usage) {
-        m_elements.insert(m_elements.end(),
-                          list.begin(),
-                          list.end());
+    VertexBufferObject(std::initializer_list<T> list, GLenum usage)
+        : m_VBO(0),
+          m_usage(usage) {
+        m_elements.insert(m_elements.end(), list.begin(), list.end());
     }
 
     /*!
@@ -131,18 +124,14 @@ public:
     ~VertexBufferObject() {
         m_elements.clear();
         m_desc.clear();
-        if (m_VBO) {
-            glDeleteBuffers(1, &m_VBO);
-        }
+        if (m_VBO) { glDeleteBuffers(1, &m_VBO); }
     }
 
     /*!
      * Set the usage type of the buffer
      * \param usage The usage type
      */
-    void SetUsage(GLenum usage) {
-        m_usage = usage;
-    }
+    void SetUsage(GLenum usage) { m_usage = usage; }
 
     /*!
      * Add an element of type T to the data
@@ -159,10 +148,8 @@ public:
      * \param elements The array of elements
      */
     template<auto size>
-    void AddElement(T (& elements)[size]) {
-        m_elements.insert(m_elements.end(),
-                          elements,
-                          elements + size);
+    void AddElement(T (&elements)[size]) {
+        m_elements.insert(m_elements.end(), elements, elements + size);
         m_set = false;
     }
 
@@ -195,15 +182,11 @@ public:
      * Bind the VBO
      */
     void Bind() {
-        if (!m_VBO) {
-            glGenBuffers(1, &m_VBO);
-        }
+        if (!m_VBO) { glGenBuffers(1, &m_VBO); }
         glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
         if (!m_set) {
-            glBufferData(GL_ARRAY_BUFFER,
-                         sizeof(T) * m_elements.size(),
-                         m_elements.data(),
-                         m_usage);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(T) * m_elements.size(),
+                         m_elements.data(), m_usage);
             m_set = true;
         }
     }
@@ -211,17 +194,15 @@ public:
     /*!
      * UnBind the VBO
      */
-    static void UnBind() {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
+    static void UnBind() { glBindBuffer(GL_ARRAY_BUFFER, 0); }
 
     /*!
      * Returns all the descriptors of the vbo
      * \return A vector of descriptors
      */
-    const std::vector<AttributeDescriptor>& GetDescriptors() {
-        return m_desc;
-    }
+    const std::vector<AttributeDescriptor>& GetDescriptors() { return m_desc; }
+
+    void Clear() { m_elements.clear(); }
 
 private:
     std::vector<T> m_elements;
@@ -231,6 +212,5 @@ private:
     std::vector<AttributeDescriptor> m_desc;
 };
 
-
-}
-#endif //GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_VERTEXBUFFEROBJECT_H_
+}// namespace HUH
+#endif//GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_VERTEXBUFFEROBJECT_H_

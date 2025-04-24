@@ -20,13 +20,10 @@ public:
     /*!
      * Constructor that generates the vertex arrays
      */
-    VertexArrayObject() : m_VAO(0), m_count(0) {
-    }
+    VertexArrayObject() : m_VAO(0), m_count(0) {}
 
     ~VertexArrayObject() {
-        if (m_VAO) {
-            glDeleteBuffers(1, &m_VAO);
-        }
+        if (m_VAO) { glDeleteBuffers(1, &m_VAO); }
     }
 
     /*!
@@ -49,11 +46,8 @@ public:
         Bind();
         VBO.Bind();
         for (const auto& Descriptor : VBO.GetDescriptors()) {
-            glVertexAttribPointer(m_count,
-                                  Descriptor.size,
-                                  Descriptor.type,
-                                  Descriptor.normalized,
-                                  Descriptor.stride,
+            glVertexAttribPointer(m_count, Descriptor.size, Descriptor.type,
+                                  Descriptor.normalized, Descriptor.stride,
                                   Descriptor.offset);
             glEnableVertexAttribArray(m_count);
             m_count++;
@@ -73,9 +67,15 @@ public:
         EBO.UnBind();
     }
 
+    void Clear() {
+        if (m_VAO) { glDeleteBuffers(1, &m_VAO); }
+        m_VAO = 0;
+        m_count = 0;
+    }
+
 private:
     GLuint m_VAO;
     GLuint m_count;
 };
-}
-#endif //GPGPU_EDGE_DETECTOR_SRC_GENERAL_OPENGL_SDL_VERTEXARRAYOBJECT_H_
+}// namespace HUH
+#endif//GPGPU_EDGE_DETECTOR_SRC_GENERAL_OPENGL_SDL_VERTEXARRAYOBJECT_H_
