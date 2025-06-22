@@ -1,5 +1,6 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
+
+#include <HUH/definitions.h>
 #include <SDL3/SDL_events.h>
 
 #include <glm/glm.hpp>
@@ -7,7 +8,7 @@
 #include "generic_math.h"
 namespace HUH {
 
-class Camera {
+class HUH_API Camera {
 public:
     Camera(glm::vec3 eye = Math::ZeroVector,
            glm::vec3 at = Math::ForwardVector,
@@ -37,4 +38,3 @@ private:
     float m_aspect{1.0f};
 };
 }// namespace HUH
-#endif//CAMERA_H
