@@ -2,12 +2,12 @@ set(TEST_SOURCES
         src/vector_test.cpp
 )
 
-add_executable(Math_Module_Tests ${TEST_SOURCES})
+add_executable(Math_module_Tests ${TEST_SOURCES})
 
 find_package(GTest CONFIG REQUIRED)
 
 target_link_libraries(
-        Math_Module_Tests
+        Math_module_Tests
         HUH::Math
         GTest::gtest_main
 )
@@ -15,5 +15,5 @@ target_link_libraries(
 #add_test(Math_Module_Tests)
 
 include(GoogleTest)
-gtest_discover_tests(Math_Module_Tests)
+gtest_discover_tests(Math_module_Tests)
 

@@ -1,16 +1,15 @@
 #pragma once
 
 #include <oneapi/tbb.h>
-#include <tuple>
 #include <type_traits>
 
-#define VECTOR_PARALLEL_FOR(Body)                        \
-    oneapi::tbb::parallel_for(static_cast<size_t>(0), N, \
-                              [&](size_t i) { Body });
+#define VECTOR_PARALLEL_FOR(Body)                             \
+    oneapi::tbb::parallel_for(static_cast<std::size_t>(0), N, \
+                              [&](std::size_t i) { Body });
 
 namespace HUH {
 template<typename T,
-         size_t N,
+         std::size_t N,
          std::enable_if_t<std::is_arithmetic_v<T>, bool> = true,
          std::enable_if_t<(N > 1), bool> = true>
 class Vector {
@@ -36,13 +35,15 @@ public:
              std::enable_if_t<(std::is_same_v<T, U> && ...), bool> = true>
     Vector(T t, U... u) noexcept : data(t, u...) {}
 
-    template<size_t size, std::enable_if_t<size == N, bool> = true>
+    template<std::size_t size, std::enable_if_t<size == N, bool> = true>
     Vector(const T (&t)[size]) noexcept {
         std::memcpy(data, t, sizeof(T) * N);
     }
 
-    [[nodiscard]] T& operator[](size_t index) noexcept { return data[index]; }
-    [[nodiscard]] const T& operator[](size_t index) const noexcept {
+    [[nodiscard]] T& operator[](std::size_t index) noexcept {
+        return data[index];
+    }
+    [[nodiscard]] const T& operator[](std::size_t index) const noexcept {
         return data[index];
     }
 
@@ -86,47 +87,47 @@ public:
         return lhs;
     }
 
-    [[nodiscard]] static constexpr size_t Size() { return N; }
+    [[nodiscard]] static constexpr std::size_t Size() { return N; }
 };
 
-template<typename T, size_t size>
+template<typename T, std::size_t size>
 std::ostream& operator<<(std::ostream& os, const Vector<T, size>& vec) {
     os << "[ " << vec[0];
-    for (size_t i = 1; i < size; i++) { os << ", " << vec[i]; }
+    for (std::size_t i = 1; i < size; i++) { os << ", " << vec[i]; }
     os << "]";
     return os;
 }
 
-template<std::size_t I, typename T, size_t N>
+template<std::size_t I, typename T, std::size_t N>
 constexpr const std::tuple_element_t<I, Vector<T, N>>& get(
     const Vector<T, N>& Vec) noexcept {
     return Vec[I];
 }
 
-template<std::size_t I, typename T, size_t N>
+template<std::size_t I, typename T, std::size_t N>
 constexpr std::tuple_element_t<I, Vector<T, N>>& get(
     Vector<T, N>& Vec) noexcept {
     return Vec[I];
 }
 
-template<std::size_t I, typename T, size_t N>
+template<std::size_t I, typename T, std::size_t N>
 constexpr const std::tuple_element_t<I, Vector<T, N>>&& get(
     const Vector<T, N>&& Vec) noexcept {
     return std::move(Vec[I]);
 }
 
-template<std::size_t I, typename T, size_t N>
+template<std::size_t I, typename T, std::size_t N>
 constexpr std::tuple_element_t<I, Vector<T, N>>&& get(
     Vector<T, N>&& Vec) noexcept {
     return std::move(Vec[I]);
 }
 
-template<typename T, size_t N>
+template<typename T, std::size_t N>
 T* begin(Vector<T, N>& vec) {
     return vec.data;
 }
 
-template<typename T, size_t N>
+template<typename T, std::size_t N>
 T* end(Vector<T, N>& vec) {
     return vec.data + N;
 }
@@ -196,15 +197,15 @@ using Vector2i64 = Vector2<int64_t>;
 
 }// namespace HUH
 
-template<typename T, size_t N>
+template<typename T, std::size_t N>
 struct std::tuple_size<HUH::Vector<T, N>>
-    : public integral_constant<size_t, N> {};
+    : public integral_constant<std::size_t, N> {};
 
-template<std::size_t I, typename T, size_t N>
+template<std::size_t I, typename T, std::size_t N>
 struct std::tuple_element<I, HUH::Vector<T, N>> {
     using type = T;
 };
 
-#include <HUH/Math/vector/Vec2/vector2.inl.h>
-#include <HUH/Math/vector/Vec3/vector3.inl.h>
-#include <HUH/Math/vector/Vec4/vector4.inl.h>
+#include <HUH/Math/vector/vector2.inl.h>
+#include <HUH/Math/vector/vector3.inl.h>
+#include <HUH/Math/vector/vector4.inl.h>

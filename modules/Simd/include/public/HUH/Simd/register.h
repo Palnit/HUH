@@ -1,0 +1,12 @@
+#pragma once
+
+#include <type_traits>
+
+namespace HUH::Simd {
+template<typename T, std::size_t N>
+class Register {
+    static_assert(false, "Template type is not allowed");
+};
+}// namespace HUH::Simd
+
+#include "register/register_float4.h"

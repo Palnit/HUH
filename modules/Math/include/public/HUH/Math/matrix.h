@@ -4,15 +4,15 @@
 
 #include <HUH/Math/vector.h>
 
-#define MATRIX_PARALLEL_FOR_OVER_ROWS(Body)              \
-    oneapi::tbb::parallel_for(static_cast<size_t>(0), N, \
-                              [&](size_t i) { Body });
+#define MATRIX_PARALLEL_FOR_OVER_ROWS(Body)                   \
+    oneapi::tbb::parallel_for(static_cast<std::size_t>(0), N, \
+                              [&](std::size_t i) { Body });
 
 namespace HUH {
 
 template<typename T,
-         size_t N,
-         size_t M,
+         std::size_t N,
+         std::size_t M,
          std::enable_if_t<std::is_arithmetic_v<T>, bool> = true,
          std::enable_if_t<(N > 0) && (M > 0), bool> = true>
 class Matrix {
@@ -36,12 +36,12 @@ public:
         std::memcpy(data, data_tmp, sizeof(T) * N * M);
     }
 
-    template<size_t size, std::enable_if_t<size == N * M, bool> = true>
+    template<std::size_t size, std::enable_if_t<size == N * M, bool> = true>
     Matrix(const T (&t)[size]) noexcept : data(*t) {
         std::memcpy(data, t, sizeof(T) * N * M);
     }
 
-    template<size_t size, std::enable_if_t<size == N, bool> = true>
+    template<std::size_t size, std::enable_if_t<size == N, bool> = true>
     Matrix(const Vector<T, M> (&Rows)[size]) noexcept {
         std::memcpy(data, Rows, sizeof(T) * N * M);
     }
@@ -50,8 +50,8 @@ public:
         MATRIX_PARALLEL_FOR_OVER_ROWS(data[i] = v;)
     }
 
-    Vector<T, M>& operator[](size_t index) noexcept { return data[index]; }
-    const Vector<T, M>& operator[](size_t index) const noexcept {
+    Vector<T, M>& operator[](std::size_t index) noexcept { return data[index]; }
+    const Vector<T, M>& operator[](std::size_t index) const noexcept {
         return data[index];
     }
 
@@ -76,65 +76,65 @@ public:
     }
 
     // template<typename T2,
-    //          size_t N2,
-    //          size_t M2,
+    //          std::size_t N2,
+    //          std::size_t M2,
     //          std::enable_if_t<std::is_same_v<T, T2>, bool> = true,
     //          std::enable_if_t<N == M2, bool> = true>
     // Matrix<T, N2, M> operator*(Matrix lhs, const Matrix<T2, N2, M2>& rhs) {
     //     // oneapi::tbb::parallel_for(
-    //     //     oneapi::tbb::blocked_range3d<size_t>(0, N2, 0)) return lhs;
+    //     //     oneapi::tbb::blocked_range3d<std::size_t>(0, N2, 0)) return lhs;
     // }
 };
 
-template<typename T, size_t N, size_t M>
+template<typename T, std::size_t N, std::size_t M>
 std::ostream& operator<<(std::ostream& os, const Matrix<T, N, M>& mat) {
     os << "[ " << mat[0];
-    for (size_t i = 1; i < N; i++) { os << ", " << mat[i]; }
+    for (std::size_t i = 1; i < N; i++) { os << ", " << mat[i]; }
     os << "]";
     return os;
 }
 
-template<std::size_t I, typename T, size_t N, size_t M>
+template<std::size_t I, typename T, std::size_t N, std::size_t M>
 constexpr const std::tuple_element_t<I, Matrix<T, N, M>>& get(
     const Matrix<T, N, M>& Mat) noexcept {
     return Mat[I];
 }
 
-template<std::size_t I, typename T, size_t N, size_t M>
+template<std::size_t I, typename T, std::size_t N, std::size_t M>
 constexpr std::tuple_element_t<I, Matrix<T, N, M>>& get(
     Matrix<T, N, M>& Mat) noexcept {
     return Mat[I];
 }
 
-template<std::size_t I, typename T, size_t N, size_t M>
+template<std::size_t I, typename T, std::size_t N, std::size_t M>
 constexpr const std::tuple_element_t<I, Matrix<T, N, M>>&& get(
     const Matrix<T, N, M>&& Mat) noexcept {
     return std::move(Mat[I]);
 }
 
-template<std::size_t I, typename T, size_t N, size_t M>
+template<std::size_t I, typename T, std::size_t N, std::size_t M>
 constexpr std::tuple_element_t<I, Matrix<T, N, M>>&& get(
     Matrix<T, N, M>&& Mat) noexcept {
     return std::move(Mat[I]);
 }
 
-template<typename T, size_t N, size_t M>
+template<typename T, std::size_t N, std::size_t M>
 Vector<T, M>* begin(Matrix<T, N, M>& Mat) {
     return Mat.data;
 }
 
-template<typename T, size_t N, size_t M>
+template<typename T, std::size_t N, std::size_t M>
 Vector<T, M>* end(Matrix<T, N, M>& Mat) {
     return Mat.data + N;
 }
 
 }// namespace HUH
 
-template<typename T, size_t N, size_t M>
+template<typename T, std::size_t N, std::size_t M>
 struct std::tuple_size<HUH::Matrix<T, N, M>>
-    : public integral_constant<size_t, N> {};
+    : public integral_constant<std::size_t, N> {};
 
-template<std::size_t I, typename T, size_t N, size_t M>
+template<std::size_t I, typename T, std::size_t N, std::size_t M>
 struct std::tuple_element<I, HUH::Matrix<T, N, M>> {
     using type = HUH::Vector<T, M>;
 };
