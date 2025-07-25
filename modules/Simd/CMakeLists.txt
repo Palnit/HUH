@@ -3,7 +3,7 @@ set(SIMD_INC_PATH "include/public/HUH/Simd")
 set(HEADER_FILES
         ${SIMD_INC_PATH}/register.h
         ${SIMD_INC_PATH}/shuffle.h
-        ${SIMD_INC_PATH}/hsum.h
+        ${SIMD_INC_PATH}/simd_functions.h
         ${SIMD_INC_PATH}/register/register_float4.h
 )
 

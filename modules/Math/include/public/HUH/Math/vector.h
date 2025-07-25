@@ -8,10 +8,7 @@
                               [&](std::size_t i) { Body });
 
 namespace HUH {
-template<typename T,
-         std::size_t N,
-         std::enable_if_t<std::is_arithmetic_v<T>, bool> = true,
-         std::enable_if_t<(N > 1), bool> = true>
+template<typename T, std::size_t N>
 class Vector {
 
 public:

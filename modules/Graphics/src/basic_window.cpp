@@ -98,17 +98,17 @@ int BasicWindow::run() {
     return 0;
 }
 BasicWindow::~BasicWindow() {
-    if (m_window != nullptr) { SDL_DestroyWindow(m_window); }
-    if (m_context != nullptr) { SDL_GL_DestroyContext(m_context); }
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
+    if (m_window != nullptr) { SDL_DestroyWindow(m_window); }
+    if (m_context != nullptr) { SDL_GL_DestroyContext(m_context); }
     SDL_Quit();
 }
 int BasicWindow::InitWindow() {
 
-    if (SDL_Init(SDL_INIT_VIDEO) == -1) {
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
         ErrorHandling::HandelSDLError("SDL initialization");
         return 1;
     }
@@ -152,16 +152,20 @@ int BasicWindow::InitWindow() {
         return 1;
     }
 
-    SDL_GL_MakeCurrent(m_window, m_context);
+    if (!SDL_GL_MakeCurrent(m_window, m_context)) {
+        ErrorHandling::HandelSDLError("GL Context make current failed");
+        return 1;
+    }
     SDL_GL_SetSwapInterval(1);
     SDL_ShowWindow(m_window);
 
-    GLenum err = glewInit();
-    if (err != GLEW_OK) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
-                     "[GLEW] Error during the initialization of glew.");
-        return 1;
-    }
+    // GLenum err = glewInit();
+    // if (err != GLEW_OK) {
+    //     SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+    //                  "[GLEW] Error during the initialization of glew. %s",
+    //                  glewGetErrorString(err));
+    //     return 1;
+    // }
 
     GLint context_flags;
     glGetIntegerv(GL_CONTEXT_FLAGS, &context_flags);

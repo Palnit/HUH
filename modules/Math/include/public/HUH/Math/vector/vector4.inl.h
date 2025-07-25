@@ -3,8 +3,8 @@
 #include <type_traits>
 
 #ifdef HUH_USE_SIMD
-#include "HUH/Simd/hsum.h"
 #include "HUH/Simd/shuffle.h"
+#include "HUH/Simd/simd_functions.h"
 #endif
 
 template<typename T>
@@ -162,14 +162,35 @@ public:
         return lhs;
     }
 
+    // #ifdef HUH_USE_SIMD
+    //     T Dot(Vector rhs) noexcept {
+    //         Simd::Register<float, 4> prod(data);
+    //         prod = prod * Simd::Register<float, 4>(rhs.data);
+    //         return HUH::Simd::HSum(prod);
+    // #else
     constexpr T Dot(Vector rhs) noexcept {
-#ifdef HUH_USE_SIMD
-        Simd::Register<float, 4> prod(data);
-        prod = prod * Simd::Register<float, 4>(rhs.data);
-        return HUH::Simd::HSum(prod);
-#else
         return data[0] * rhs.data[0] + data[1] * rhs.data[1]
             + data[2] * rhs.data[2] + data[3] * rhs.data[3];
-#endif
+        // #endif
+    }
+
+    // #ifdef HUH_USE_SIMD
+    //     Vector& Normalize() noexcept {
+    //         Simd::Register<float, 4> Reg(data);
+    //         const Simd::Register<float, 4> Inv(
+    //             HUH::Simd::InvSqrt(HUH::Simd::HSum(Reg * Reg)));
+    //         Reg = Reg * Inv;
+    //         Reg.Store(data);
+    // #else
+    constexpr Vector& Normalize() noexcept {
+        const T SquareSum = data[0] * data[0] + data[1] * data[1]
+            + data[2] * data[2] + data[3] * data[3];
+        const T sqrt = std::sqrtf(SquareSum);
+        data[0] /= sqrt;
+        data[1] /= sqrt;
+        data[2] /= sqrt;
+        data[3] /= sqrt;
+        // #endif
+        return *this;
     }
 };
