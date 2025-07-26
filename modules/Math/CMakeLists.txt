@@ -8,18 +8,13 @@ set(HEADER_FILES
         ${MATH_INC_PATH}/matrix.h
 )
 
-#if (USE_SIMD)
-#    list(APPEND HEADER_FILES
-#    )
-#endif ()
 
 add_library(HUH-Math INTERFACE ${HEADER_FILES})
 add_library(HUH::Math ALIAS HUH-Math)
-find_package(TBB CONFIG REQUIRED)
 
 set_target_properties(HUH-Math PROPERTIES LINKER_LANGUAGE CXX)
 
-target_link_libraries(HUH-Math INTERFACE HUH TBB::tbb TBB::tbbmalloc)
+target_link_libraries(HUH-Math INTERFACE HUH)
 
 if (USE_SIMD)
     target_link_libraries(HUH-Math INTERFACE HUH::Simd)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <HUH/definitions.h>
 #include <type_traits>
 
 namespace HUH::Simd {

@@ -22,6 +22,7 @@ check_simd()
 
 set(HEADER_FILES
         include/public/HUH/definitions.h
+        include/public/HUH/types.h
 )
 
 set(SOURCE_FILES
