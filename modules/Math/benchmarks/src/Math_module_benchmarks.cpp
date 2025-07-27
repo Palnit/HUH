@@ -4,17 +4,25 @@
 
 #include <iostream>
 
-class Vec4f : public benchmark::Fixture {
+template<typename T>
+class Vec_fix : public benchmark::Fixture {
 public:
-    std::vector<HUH::Vector4f> lhs;
-    std::vector<HUH::Vector4f> rhs;
+    using VecType = T;
+    using ValueType = typename VecType::ValueType;
+    std::vector<T> lhs;
+    std::vector<T> rhs;
     void SetUp(benchmark::State& st) override {
 
         std::mt19937 gen(0);
         std::uniform_real_distribution dist(-1.0f, 1.0f);
         for (int i = 0; i < st.range(0); i++) {
-            lhs.emplace_back(dist(gen));
-            rhs.emplace_back(dist(gen));
+            T tmp1, tmp2;
+            for (size_t j = 0; j < T::Size(); j++) {
+                tmp1.data[j] = dist(gen);
+                tmp2.data[j] = dist(gen);
+            }
+            lhs.emplace_back(tmp1);
+            rhs.emplace_back(tmp2);
         }
     }
 
@@ -24,28 +32,28 @@ public:
     }
 };
 
-BENCHMARK_DEFINE_F(Vec4f, BM_Dot)(benchmark::State& state) {
-    float tmp(0);
+BENCHMARK_TEMPLATE_METHOD_F(Vec_fix, BM_Dot)(benchmark::State& state) {
+    typename Base::ValueType tmp(0);
     for (auto _ : state) {
         for (int i = 0; i < state.range(0); i++) {
-            tmp += lhs[i].Dot(rhs[i]);
+            tmp += this->lhs[i].Dot(this->rhs[i]);
             benchmark::DoNotOptimize(tmp);
         }
     }
 }
 
-BENCHMARK_DEFINE_F(Vec4f, BM_Normalize)(benchmark::State& state) {
-    HUH::Vector4f tmp(0);
+BENCHMARK_TEMPLATE_METHOD_F(Vec_fix, BM_Normalize)(benchmark::State& state) {
+    typename Base::VecType tmp(0);
     for (auto _ : state) {
         for (int i = 0; i < state.range(0); i++) {
-            tmp += lhs[i].Normalize();
+            tmp += this->lhs[i].Normalize();
             benchmark::DoNotOptimize(tmp);
         }
     }
 }
-BENCHMARK_REGISTER_F(Vec4f, BM_Dot)->RangeMultiplier(2)->Range(8, 8 << 15);
-BENCHMARK_REGISTER_F(Vec4f, BM_Normalize)
-    ->RangeMultiplier(2)
-    ->Range(8, 8 << 15);
+BENCHMARK_TEMPLATE_INSTANTIATE_F(Vec_fix, BM_Dot, HUH::Vector4f)->RangeMultiplier(2)->Range(8, 8 << 15);
+BENCHMARK_TEMPLATE_INSTANTIATE_F(Vec_fix, BM_Normalize, HUH::Vector4f)->RangeMultiplier(2)->Range(8, 8 << 15);
+BENCHMARK_TEMPLATE_INSTANTIATE_F(Vec_fix, BM_Dot, HUH::Vector3f)->RangeMultiplier(2)->Range(8, 8 << 15);
+BENCHMARK_TEMPLATE_INSTANTIATE_F(Vec_fix, BM_Normalize, HUH::Vector3f)->RangeMultiplier(2)->Range(8, 8 << 15);
 
 BENCHMARK_MAIN();

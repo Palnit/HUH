@@ -17,11 +17,11 @@ HUH_FORCE_INLINE float HSum(const Register<float, 4>& reg) noexcept {
 
 HUH_FORCE_INLINE float InvSqrt(float x) noexcept {
     const __m128 One = _mm_set_ss(1.0f);
-    const __m128 Y0 = _mm_set_ss(x);
-    const __m128 X0 = _mm_sqrt_ss(Y0);
-    const __m128 R0 = _mm_div_ss(One, X0);
+    __m128 Y0 = _mm_set_ss(x);
+    Y0 = _mm_sqrt_ss(Y0);
+    Y0 = _mm_div_ss(One, Y0);
     float temp;
-    _mm_store_ss(&temp, R0);
+    _mm_store_ss(&temp, Y0);
     return temp;
 }
 

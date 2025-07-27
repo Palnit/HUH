@@ -6,6 +6,10 @@ set(HEADER_FILES
         ${MATH_INC_PATH}/vector/vector3.inl.h
         ${MATH_INC_PATH}/vector/vector4.inl.h
         ${MATH_INC_PATH}/matrix.h
+        ${MATH_INC_PATH}/matrix_functions.h
+        ${MATH_INC_PATH}/vector_functions.h
+        ${MATH_INC_PATH}/fwd.h
+        ${MATH_INC_PATH}/matrix/matrix_4x4.inl.h
 )
 
 
