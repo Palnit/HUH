@@ -60,7 +60,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator+(const T2& rhs) noexcept {
+    HUH_CONSTEXPR_FORCE auto operator+(const T2& rhs) const noexcept {
         Vector<std::common_type_t<T, T2>, N> result;
         for (std::size_t i = 0; i < N; i++) {
             result.data[i] = data[i] + rhs;
@@ -77,7 +77,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator+(const Vector<T2, N>& rhs) noexcept {
+    HUH_CONSTEXPR_FORCE auto operator+(const Vector<T2, N>& rhs) const noexcept {
         Vector<std::common_type_t<T, T2>, N> result;
         for (std::size_t i = 0; i < N; i++) {
             result.data[i] = data[i] + rhs.data[i];
@@ -94,7 +94,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator-(const T2& rhs) noexcept {
+    HUH_CONSTEXPR_FORCE auto operator-(const T2& rhs) const noexcept {
         Vector<std::common_type_t<T, T2>, N> result;
         for (std::size_t i = 0; i < N; i++) {
             result.data[i] = data[i] - rhs;
@@ -111,7 +111,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator-(const Vector<T2, N>& rhs) noexcept {
+    HUH_CONSTEXPR_FORCE auto operator-(const Vector<T2, N>& rhs) const noexcept {
         Vector<std::common_type_t<T, T2>, N> result;
         for (std::size_t i = 0; i < N; i++) {
             result.data[i] = data[i] - rhs.data[i];
@@ -128,7 +128,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator*(const T2& rhs) noexcept {
+    HUH_CONSTEXPR_FORCE auto operator*(const T2& rhs) const noexcept {
         Vector<std::common_type_t<T, T2>, N> result;
         for (std::size_t i = 0; i < N; i++) {
             result.data[i] = data[i] * rhs;
@@ -145,7 +145,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE Vector operator*(const Vector<T2, N>& rhs) noexcept {
+    HUH_CONSTEXPR_FORCE Vector operator*(const Vector<T2, N>& rhs) const noexcept {
         Vector<std::common_type_t<T, T2>, N> result;
         for (std::size_t i = 0; i < N; i++) {
             result.data[i] = data[i] * rhs.data[i];
@@ -162,7 +162,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator/(const T2& rhs) noexcept {
+    HUH_CONSTEXPR_FORCE auto operator/(const T2& rhs) const noexcept {
         Vector<std::common_type_t<T, T2>, N> result;
         for (std::size_t i = 0; i < N; i++) {
             result.data[i] = data[i] / rhs;
@@ -179,7 +179,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE Vector operator/(const Vector<T2, N>& rhs) noexcept {
+    HUH_CONSTEXPR_FORCE Vector operator/(const Vector<T2, N>& rhs) const noexcept {
         Vector<std::common_type_t<T, T2>, N> result;
         for (std::size_t i = 0; i < N; i++) {
             result.data[i] = data[i] / rhs.data[i];

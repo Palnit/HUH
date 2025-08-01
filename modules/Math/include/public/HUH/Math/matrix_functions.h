@@ -7,9 +7,9 @@
 namespace HUH {
 
 template<typename T, typename T2, std::size_t R, std::size_t C, std::size_t C2>
-HUH_CONSTEXPR_FORCE void MatrixMultiply(Matrix<std::common_type_t<T, T2>, R, C2>& result,
-                                        const Matrix<T, R, C>& lhs,
-                                        const Matrix<T, C, C2>& rhs) {
+HUH_CONSTEXPR_FORCE void MatrixMultiply(const Matrix<T, R, C>& lhs,
+                                        const Matrix<T2, C, C2>& rhs,
+                                        Matrix<std::common_type_t<T, T2>, R, C2>& result) {
     for (std::size_t i = 0; i < R; i++) {
         for (std::size_t k = 0; k < C; k++) {
             for (std::size_t j = 0; j < C2; j++) {
@@ -18,5 +18,16 @@ HUH_CONSTEXPR_FORCE void MatrixMultiply(Matrix<std::common_type_t<T, T2>, R, C2>
         }
     }
 }
+
+template<typename T, typename T2>
+HUH_CONSTEXPR_FORCE void MatrixMultiply(const Matrix4x4<T>& lhs,
+                                        const Matrix4x4<T2>& rhs,
+                                        Matrix4x4<std::common_type_t<T, T2>>& result);
+
+#ifdef HUH_USE_SIMD
+// HUH_CONSTEXPR_FORCE void MatrixMultiply(const Matrix4x4<float>& lhs,
+//                                         const Matrix4x4<float>& rhs,
+//                                         Matrix4x4<float>& result);
+#endif
 
 }// namespace HUH

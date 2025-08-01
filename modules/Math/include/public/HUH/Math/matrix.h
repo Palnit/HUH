@@ -14,6 +14,7 @@ class Matrix {
                   "Matrix must be bigger than 2x2 if you want a 1 dimensional matrix use vectors dummy");
 
 public:
+    using ValueType = T;
     using RowType = Vector<T, C>;
     using ColumnType = Vector<T, R>;
     RowType data[R];
@@ -52,6 +53,9 @@ public:
     HUH_NODISCARD HUH_CONSTEXPR_FORCE const RowType& operator[](std::size_t index) const noexcept {
         return data[index];
     }
+
+    HUH_NODISCARD HUH_CONSTEXPR_FORCE static size_t RowSize() noexcept { return R; }
+    HUH_NODISCARD HUH_CONSTEXPR_FORCE static size_t ColumnSize() noexcept { return C; }
 
     template<typename T2>
     HUH_CONSTEXPR_FORCE Matrix& operator+=(const Matrix<T2, R, C>& rhs) noexcept {
@@ -124,14 +128,14 @@ public:
     template<typename T2, std::size_t C2>
     HUH_CONSTEXPR_FORCE auto operator*(const Matrix<T2, C, C2>& rhs) {
         Matrix<std::common_type_t<T, T2>, R, C2> result{};
-        HUH::MatrixMultiply<T, T2, R, C, C2>(result, *this, rhs);
+        HUH::MatrixMultiply(*this, rhs, result);
         return result;
     }
 
     template<typename T2>
     Matrix& operator*=(const Matrix<T2, R, C>& rhs) noexcept {
         Matrix tmp;
-        HUH::MatrixMultiply<T, T2, R, C, C>(tmp, *this, rhs);
+        HUH::MatrixMultiply(*this, rhs, tmp);
         *this = tmp;
         return *this;
     }
@@ -186,3 +190,5 @@ template<std::size_t I, typename T, std::size_t C, std::size_t R>
 struct std::tuple_element<I, HUH::Matrix<T, C, R>> {
     using type = typename HUH::Matrix<T, C, R>::RowType;
 };
+
+#include <HUH/Math/matrix/matrix_4x4.inl.h>

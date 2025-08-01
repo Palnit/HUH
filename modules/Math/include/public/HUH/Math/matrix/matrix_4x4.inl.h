@@ -9,6 +9,7 @@ namespace HUH {
 template<typename T>
 class Matrix<T, 4, 4> {
 public:
+    using ValueType = T;
     using RowType = Vector<T, 4>;
     using ColumnType = Vector<T, 4>;
     RowType data[4];
@@ -43,5 +44,115 @@ public:
     HUH_NODISCARD HUH_CONSTEXPR_FORCE const RowType& operator[](std::size_t index) const noexcept {
         return data[index];
     }
+
+    HUH_NODISCARD HUH_CONSTEXPR_FORCE static size_t RowSize() noexcept { return 4; }
+    HUH_NODISCARD HUH_CONSTEXPR_FORCE static size_t ColumnSize() noexcept { return 4; }
+
+    template<typename T2>
+    HUH_CONSTEXPR_FORCE Matrix& operator+=(const Matrix<T2, 4, 4>& rhs) noexcept {
+        data[0] += rhs.data[0];
+        data[1] += rhs.data[1];
+        data[2] += rhs.data[2];
+        data[3] += rhs.data[3];
+        return *this;
+    }
+
+    template<typename T2>
+    HUH_CONSTEXPR_FORCE auto operator+(const Matrix<T2, 4, 4>& rhs) noexcept {
+        Matrix<std::common_type_t<T, T2>, 4, 4> result(
+            {{data[0] + rhs.data[0]}, {data[1] + rhs.data[1]}, {data[2] + rhs.data[2]}, {data[3] + rhs.data[3]}});
+        return result;
+    }
+
+    template<typename T2>
+    HUH_CONSTEXPR_FORCE Matrix& operator+=(const T2& rhs) noexcept {
+        data[0] += rhs;
+        data[1] += rhs;
+        data[2] += rhs;
+        data[3] += rhs;
+        return *this;
+    }
+
+    template<typename T2>
+    HUH_CONSTEXPR_FORCE auto operator+(const T2& rhs) noexcept {
+        Matrix<std::common_type_t<T, T2>, 4, 4> result(
+            {{data[0] + rhs}, {data[1] + rhs}, {data[2] + rhs}, {data[3] + rhs}});
+        return result;
+    }
+
+    template<typename T2>
+    HUH_CONSTEXPR_FORCE Matrix& operator-=(const Matrix<T2, 4, 4>& rhs) noexcept {
+        data[0] -= rhs.data[0];
+        data[1] -= rhs.data[1];
+        data[2] -= rhs.data[2];
+        data[3] -= rhs.data[3];
+        return *this;
+    }
+
+    template<typename T2>
+    HUH_CONSTEXPR_FORCE auto operator-(const Matrix<T2, 4, 4>& rhs) noexcept {
+        Matrix<std::common_type_t<T, T2>, 4, 4> result(
+            {{data[0] - rhs.data[0]}, {data[1] - rhs.data[1]}, {data[2] - rhs.data[2]}, {data[3] - rhs.data[3]}});
+        return result;
+    }
+
+    template<typename T2>
+    HUH_CONSTEXPR_FORCE Matrix& operator-=(const T2& rhs) noexcept {
+        data[0] -= rhs;
+        data[1] -= rhs;
+        data[2] -= rhs;
+        data[3] -= rhs;
+        return *this;
+    }
+
+    template<typename T2>
+    HUH_CONSTEXPR_FORCE auto operator-(const T2& rhs) noexcept {
+        Matrix<std::common_type_t<T, T2>, 4, 4> result(
+            {{data[0] - rhs}, {data[1] - rhs}, {data[2] - rhs}, {data[3] - rhs}});
+        return result;
+    }
+
+    template<typename T2>
+    HUH_CONSTEXPR_FORCE auto operator*(const Matrix<T2, 4, 4>& rhs) {
+        Matrix<std::common_type_t<T, T2>, 4, 4> result{};
+        HUH::MatrixMultiply(*this, rhs, result);
+        return result;
+    }
+
+    template<typename T2>
+    Matrix& operator*=(const Matrix<T2, 4, 4>& rhs) noexcept {
+        Matrix tmp;
+        HUH::MatrixMultiply(*this, rhs, tmp);
+        *this = tmp;
+        return *this;
+    }
 };
+
+template<typename T, typename T2>
+HUH_CONSTEXPR_FORCE void MatrixMultiply(const Matrix4x4<T>& lhs,
+                                        const Matrix4x4<T2>& rhs,
+                                        Matrix4x4<std::common_type_t<T, T2>>& result) {
+
+    typename Matrix4x4<T>::RowType lhsRow0 = lhs[0];
+    typename Matrix4x4<T>::RowType lhsRow1 = lhs[1];
+    typename Matrix4x4<T>::RowType lhsRow2 = lhs[2];
+    typename Matrix4x4<T>::RowType lhsRow3 = lhs[3];
+
+    typename Matrix4x4<T2>::RowType rhsRow0 = rhs[0];
+    typename Matrix4x4<T2>::RowType rhsRow1 = rhs[1];
+    typename Matrix4x4<T2>::RowType rhsRow2 = rhs[2];
+    typename Matrix4x4<T2>::RowType rhsRow3 = rhs[3];
+
+    result[0] = lhsRow0 * rhsRow0[0] + lhsRow1 * rhsRow0[1] + lhsRow2 * rhsRow0[2] + lhsRow3 * rhsRow0[3];
+    result[1] = lhsRow0 * rhsRow1[0] + lhsRow1 * rhsRow1[1] + lhsRow2 * rhsRow1[2] + lhsRow3 * rhsRow1[3];
+    result[2] = lhsRow0 * rhsRow2[0] + lhsRow1 * rhsRow2[1] + lhsRow2 * rhsRow2[2] + lhsRow3 * rhsRow2[3];
+    result[3] = lhsRow0 * rhsRow3[0] + lhsRow1 * rhsRow3[1] + lhsRow2 * rhsRow3[2] + lhsRow3 * rhsRow3[3];
+}
+
+#ifdef HUH_USE_SIMD
+// HUH_CONSTEXPR_FORCE void MatrixMultiply(const Matrix4x4<float>& lhs,
+//                                         const Matrix4x4<float>& rhs,
+//                                         Matrix4x4<float>& result);
+#endif
+
 }// namespace HUH
