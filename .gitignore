@@ -2,4 +2,5 @@ cmake-build*/
 .cache/
 .idea/
 .git/
+modules/Math/benchmarks/Plot/
 imgui.ini

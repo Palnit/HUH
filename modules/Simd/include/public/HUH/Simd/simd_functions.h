@@ -25,4 +25,14 @@ HUH_FORCE_INLINE float InvSqrt(float x) noexcept {
     return temp;
 }
 
+HUH_FORCE_INLINE Register<float, 4> FMA(const Register<float, 4>& a,
+                                        const Register<float, 4>& b,
+                                        const Register<float, 4>& c) noexcept {
+#ifdef HUH_FMA_SUPPORT
+    return _mm_fmadd_ps(a, b, c);
+#else
+    return (a * b) + c;
+#endif
+}
+
 }// namespace HUH::Simd

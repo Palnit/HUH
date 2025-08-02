@@ -17,6 +17,7 @@
 typedef struct cpu_featureset {
     bool ext_sse3;
     bool ext_ssse3;
+    bool ext_fma;
     bool ext_sse4_1;
     bool ext_sse4_2;
     bool ext_avx;
@@ -39,8 +40,7 @@ cpuid_result call_cpuid(int function, int subfunction) {
     memset(&result, 0, sizeof(cpuid_result));
 
 #if HAS_CPUID_COUNT
-    __cpuid_count(function, subfunction, result.eax, result.ebx, result.ecx,
-                  result.edx);
+    __cpuid_count(function, subfunction, result.eax, result.ebx, result.ecx, result.edx);
 #elif HAS_CPUIDEX
     __cpuidex((int*) &result, function, subfunction);
 #else
@@ -56,6 +56,7 @@ cpu_featureset detect_cpu_features() {
 
     features.ext_sse3 = call_cpuid(0x1, 0x0).ecx & 0b1;
     features.ext_ssse3 = call_cpuid(0x1, 0x0).ecx & (0b1 << 9);
+    features.ext_fma = call_cpuid(0x1, 0x0).ecx & (0b1 << 12);
     features.ext_sse4_1 = call_cpuid(0x1, 0x0).ecx & (0b1 << 19);
     features.ext_sse4_2 = call_cpuid(0x1, 0x0).ecx & (0b1 << 20);
     features.ext_avx = call_cpuid(0x1, 0x0).ecx & (0b1 << 28);
@@ -97,13 +98,12 @@ const char* get_cpu_vendor_string() {
     return buffer;
 }
 
-void pretty_print_feature(const char* name, bool available) {
-    printf("%s:\t%s\n", name, available ? "yes" : "no");
-}
+void pretty_print_feature(const char* name, bool available) { printf("%s:\t%s\n", name, available ? "yes" : "no"); }
 
 void pretty_print_features(cpu_featureset features) {
     pretty_print_feature("SSE3", features.ext_sse3);
     pretty_print_feature("SSSE3", features.ext_ssse3);
+    pretty_print_feature("FMA", features.ext_ssse3);
     pretty_print_feature("SSE4.1", features.ext_sse4_1);
     pretty_print_feature("SSE4.2", features.ext_sse4_2);
     pretty_print_feature("AVX", features.ext_avx);

@@ -25,9 +25,9 @@ HUH_CONSTEXPR_FORCE void MatrixMultiply(const Matrix4x4<T>& lhs,
                                         Matrix4x4<std::common_type_t<T, T2>>& result);
 
 #ifdef HUH_USE_SIMD
-// HUH_CONSTEXPR_FORCE void MatrixMultiply(const Matrix4x4<float>& lhs,
-//                                         const Matrix4x4<float>& rhs,
-//                                         Matrix4x4<float>& result);
+HUH_FORCE_INLINE void MatrixMultiply(const Matrix4x4<float>& lhs,
+                                     const Matrix4x4<float>& rhs,
+                                     Matrix4x4<float>& result);
 #endif
 
 }// namespace HUH

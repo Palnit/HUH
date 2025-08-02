@@ -4,6 +4,11 @@
 #include <HUH/Math/matrix_functions.h>
 #include <cstring>
 
+#ifdef HUH_USE_SIMD
+#include <HUH/Simd/register.h>
+#include <HUH/Simd/shuffle.h>
+#endif
+
 namespace HUH {
 
 template<typename T>
@@ -114,7 +119,7 @@ public:
 
     template<typename T2>
     HUH_CONSTEXPR_FORCE auto operator*(const Matrix<T2, 4, 4>& rhs) {
-        Matrix<std::common_type_t<T, T2>, 4, 4> result{};
+        Matrix<std::common_type_t<T, T2>, 4, 4> result;
         HUH::MatrixMultiply(*this, rhs, result);
         return result;
     }
@@ -150,9 +155,40 @@ HUH_CONSTEXPR_FORCE void MatrixMultiply(const Matrix4x4<T>& lhs,
 }
 
 #ifdef HUH_USE_SIMD
-// HUH_CONSTEXPR_FORCE void MatrixMultiply(const Matrix4x4<float>& lhs,
-//                                         const Matrix4x4<float>& rhs,
-//                                         Matrix4x4<float>& result);
+HUH_FORCE_INLINE void MatrixMultiply(const Matrix4x4<float>& lhs,
+                                     const Matrix4x4<float>& rhs,
+                                     Matrix4x4<float>& result) {
+
+    const Simd::Register<float, 4> rhsRow0(rhs[0].data);
+    const Simd::Register<float, 4> rhsRow1(rhs[1].data);
+    const Simd::Register<float, 4> rhsRow2(rhs[2].data);
+    const Simd::Register<float, 4> rhsRow3(rhs[3].data);
+
+    const Simd::Register<float, 4> lhsRow0(lhs[0].data);
+    const Simd::Register<float, 4> lhsRow1(lhs[1].data);
+    const Simd::Register<float, 4> lhsRow2(lhs[2].data);
+    const Simd::Register<float, 4> lhsRow3(lhs[3].data);
+
+    Simd::Register<float, 4> tmp(HUH::Simd::ShuffleRegister<0>(lhsRow0) * rhsRow0);
+    tmp = HUH::Simd::FMA(HUH::Simd::ShuffleRegister<1>(lhsRow0), rhsRow1, tmp);
+    tmp = HUH::Simd::FMA(HUH::Simd::ShuffleRegister<2>(lhsRow0), rhsRow2, tmp);
+    HUH::Simd::FMA(HUH::Simd::ShuffleRegister<3>(lhsRow0), rhsRow3, tmp).Store(result[0].data);
+
+    tmp = HUH::Simd::ShuffleRegister<0>(lhsRow1) * rhsRow0;
+    tmp = HUH::Simd::FMA(HUH::Simd::ShuffleRegister<1>(lhsRow1), rhsRow1, tmp);
+    tmp = HUH::Simd::FMA(HUH::Simd::ShuffleRegister<2>(lhsRow1), rhsRow2, tmp);
+    HUH::Simd::FMA(HUH::Simd::ShuffleRegister<3>(lhsRow1), rhsRow3, tmp).Store(result[1].data);
+
+    tmp = HUH::Simd::ShuffleRegister<0>(lhsRow2) * rhsRow0;
+    tmp = HUH::Simd::FMA(HUH::Simd::ShuffleRegister<1>(lhsRow2), rhsRow1, tmp);
+    tmp = HUH::Simd::FMA(HUH::Simd::ShuffleRegister<2>(lhsRow2), rhsRow2, tmp);
+    HUH::Simd::FMA(HUH::Simd::ShuffleRegister<3>(lhsRow2), rhsRow3, tmp).Store(result[2].data);
+
+    tmp = HUH::Simd::ShuffleRegister<0>(lhsRow3) * rhsRow0;
+    tmp = HUH::Simd::FMA(HUH::Simd::ShuffleRegister<1>(lhsRow3), rhsRow1, tmp);
+    tmp = HUH::Simd::FMA(HUH::Simd::ShuffleRegister<2>(lhsRow3), rhsRow2, tmp);
+    HUH::Simd::FMA(HUH::Simd::ShuffleRegister<3>(lhsRow3), rhsRow3, tmp).Store(result[3].data);
+}
 #endif
 
 }// namespace HUH
