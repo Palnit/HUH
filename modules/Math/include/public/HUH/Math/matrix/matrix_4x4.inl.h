@@ -191,4 +191,12 @@ HUH_FORCE_INLINE void MatrixMultiply(const Matrix4x4<float>& lhs,
 }
 #endif
 
+template<typename T>
+HUH_CONSTEXPR_FORCE Matrix4x4<T> Transpose(const Matrix4x4<T>& lhs) {
+    return Matrix4x4<T>({{lhs[0][0], lhs[1][0], lhs[2][0], lhs[3][0]},
+                         {lhs[0][1], lhs[1][1], lhs[2][1], lhs[3][1]},
+                         {lhs[0][2], lhs[1][2], lhs[2][2], lhs[3][2]},
+                         {lhs[0][3], lhs[1][3], lhs[2][3], lhs[3][3]}});
+}
+
 }// namespace HUH

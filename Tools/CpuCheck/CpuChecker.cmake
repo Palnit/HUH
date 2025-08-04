@@ -1,43 +1,53 @@
-function(check_simd)
+function(check_cpu)
     try_run(RUN_RESULT COMPILE_RESULT
-            SOURCES ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/SimdChecker.c
+            SOURCES ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/CpuChecker.c
+            COMPILE_OUTPUT_VARIABLE COMPILE_OUT
             RUN_OUTPUT_STDOUT_VARIABLE STD_OUT
     )
-    message(STATUS "Simd Checker Result: ")
-    message(STATUS ${STD_OUT})
+    if (COMPILE_RESULT)
+        message(STATUS "Cpu Checker Result: ")
+        message(STATUS ${STD_OUT})
 
-    string(REGEX MATCH "SSE3:\t(yes|no)" REGEX_VALUE ${STD_OUT})
-    set(SSE3_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
+        string(REGEX MATCH "SSE3:\t*(yes|no)" REGEX_VALUE ${STD_OUT})
+        set(SSE3_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
 
-    string(REGEX MATCH "SSSE3:\t(yes|no)" REGEX_VALUE ${STD_OUT})
-    set(SSSE3_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
+        string(REGEX MATCH "SSSE3:\t(yes|no)" REGEX_VALUE ${STD_OUT})
+        set(SSSE3_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
 
-    string(REGEX MATCH "FMA:\t(yes|no)" REGEX_VALUE ${STD_OUT})
-    set(FMA_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
+        string(REGEX MATCH "FMA:\t(yes|no)" REGEX_VALUE ${STD_OUT})
+        set(FMA_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
 
-    string(REGEX MATCH "SSE4.1:\t(yes|no)" REGEX_VALUE ${STD_OUT})
-    set(SSE4_1_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
+        string(REGEX MATCH "SSE4.1:\t(yes|no)" REGEX_VALUE ${STD_OUT})
+        set(SSE4_1_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
 
-    string(REGEX MATCH "SSE4.2:\t(yes|no)" REGEX_VALUE ${STD_OUT})
-    set(SSE4_2_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
+        string(REGEX MATCH "SSE4.2:\t(yes|no)" REGEX_VALUE ${STD_OUT})
+        set(SSE4_2_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
 
-    string(REGEX MATCH "AVX:\t(yes|no)" REGEX_VALUE ${STD_OUT})
-    set(AVX_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
+        string(REGEX MATCH "AVX:\t(yes|no)" REGEX_VALUE ${STD_OUT})
+        set(AVX_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
 
-    string(REGEX MATCH "MMX:\t(yes|no)" REGEX_VALUE ${STD_OUT})
-    set(MMX_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
+        string(REGEX MATCH "MMX:\t(yes|no)" REGEX_VALUE ${STD_OUT})
+        set(MMX_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
 
-    string(REGEX MATCH "SSE:\t(yes|no)" REGEX_VALUE ${STD_OUT})
-    set(SSE_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
+        string(REGEX MATCH "SSE:\t(yes|no)" REGEX_VALUE ${STD_OUT})
+        set(SSE_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
 
-    string(REGEX MATCH "SSE2:\t(yes|no)" REGEX_VALUE ${STD_OUT})
-    set(SSE2_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
+        string(REGEX MATCH "SSE2:\t(yes|no)" REGEX_VALUE ${STD_OUT})
+        set(SSE2_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
 
-    string(REGEX MATCH "AVX2:\t(yes|no)" REGEX_VALUE ${STD_OUT})
-    set(AVX2_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
+        string(REGEX MATCH "AVX2:\t(yes|no)" REGEX_VALUE ${STD_OUT})
+        set(AVX2_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
 
-    string(REGEX MATCH "AVX512:\t(yes|no)" REGEX_VALUE ${STD_OUT})
-    set(AVX512_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
+        string(REGEX MATCH "AVX512:\t(yes|no)" REGEX_VALUE ${STD_OUT})
+        set(AVX512_SUPPORT ${CMAKE_MATCH_1} PARENT_SCOPE)
+
+        string(REGEX MATCH "CACHE:\t([0-9]*)" REGEX_VALUE ${STD_OUT})
+        set(CACHE_LINE_SIZE ${CMAKE_MATCH_1} PARENT_SCOPE)
+
+    else ()
+        message(FATAL_ERROR "Error while early compiling SimdChecker: " ${COMPILE_OUT})
+
+    endif ()
 
 endfunction()
 
@@ -99,5 +109,8 @@ function(huh_target_simd_definitions Target Visibility)
     endif ()
     if (FMA_SUPPORT)
         target_compile_definitions(${Target} ${Visibility} HUH_FMA_SUPPORT)
+    endif ()
+    if (CACHE_LINE_SIZE)
+        target_compile_definitions(${Target} ${Visibility} HUH_CACHE_LINE_SIZE=${CACHE_LINE_SIZE})
     endif ()
 endfunction()

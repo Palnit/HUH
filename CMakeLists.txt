@@ -16,8 +16,8 @@ option(BUILD_TESTS "Build google tests for the modules" OFF)
 option(BUILD_BENCHMARKS "Build google benchmarks for the modules" OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Tools/Cmake")
-include(Tools/SIMD/SimdChecker.cmake)
-check_simd()
+include(Tools/CpuCheck/CpuChecker.cmake)
+check_cpu()
 
 
 set(HEADER_FILES

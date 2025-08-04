@@ -30,4 +30,19 @@ HUH_FORCE_INLINE void MatrixMultiply(const Matrix4x4<float>& lhs,
                                      Matrix4x4<float>& result);
 #endif
 
+template<typename T, size_t R, size_t C>
+HUH_CONSTEXPR_FORCE Matrix<T, C, R> Transpose(const Matrix<T, R, C>& lhs) {
+    std::cout << "Transpose() R C" << std::endl;
+    return Matrix<T, C, R>();
+}
+
+template<typename T, size_t N>
+HUH_CONSTEXPR_FORCE Matrix<T, N, N> Transpose(const Matrix<T, N, N>& lhs) {
+    std::cout << "Transpose() N" << std::endl;
+    return Matrix<T, N, N>(lhs.data);
+}
+
+template<typename T>
+HUH_CONSTEXPR_FORCE Matrix4x4<T> Transpose(const Matrix4x4<T>& lhs);
+
 }// namespace HUH

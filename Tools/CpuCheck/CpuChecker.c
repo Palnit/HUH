@@ -9,6 +9,7 @@
 #include <intrin.h>
 #endif
 
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,6 +27,7 @@ typedef struct cpu_featureset {
     bool ext_sse2;
     bool ext_avx2;
     bool ext_avx512;
+    int8_t cache_line_size;
 } cpu_featureset;
 
 typedef struct cpuid_result {
@@ -65,6 +67,7 @@ cpu_featureset detect_cpu_features() {
     features.ext_sse2 = call_cpuid(0x1, 0x0).edx & (0b1 << 26);
     features.ext_avx2 = call_cpuid(0x7, 0x0).ebx & (0b1 << 5);
     features.ext_avx512 = call_cpuid(0xD, 0x0).eax & (0b1 << 7);
+    features.cache_line_size = (call_cpuid(0x80000006, 0x0).ecx >> 0) & 0xFF;
 
     return features;
 }
@@ -99,6 +102,7 @@ const char* get_cpu_vendor_string() {
 }
 
 void pretty_print_feature(const char* name, bool available) { printf("%s:\t%s\n", name, available ? "yes" : "no"); }
+void pretty_print_cache(const char* name, int8_t size) { printf("%s:\t%d\n", name, size); }
 
 void pretty_print_features(cpu_featureset features) {
     pretty_print_feature("SSE3", features.ext_sse3);
@@ -112,6 +116,7 @@ void pretty_print_features(cpu_featureset features) {
     pretty_print_feature("SSE2", features.ext_sse2);
     pretty_print_feature("AVX2", features.ext_avx2);
     pretty_print_feature("AVX512", features.ext_avx512);
+    pretty_print_cache("CACHE", features.cache_line_size);
 }
 
 int main(int argc, char** argv) {
