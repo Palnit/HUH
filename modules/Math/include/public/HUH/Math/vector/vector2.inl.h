@@ -46,6 +46,16 @@ public:
     HUH_NODISCARD HUH_CONSTEXPR_FORCE static std::size_t Size() { return 2; }
 
     template<typename T2>
+    HUH_CONSTEXPR_FORCE bool operator==(const Vector<T2, 4>& rhs) {
+        return data[0] == rhs.data[0] && data[1] == rhs.data[1] && data[2] == rhs.data[2];
+    }
+
+    template<typename T2>
+    HUH_CONSTEXPR_FORCE bool operator!=(const Vector<T2, 4>& rhs) {
+        return !(*this == rhs);
+    }
+
+    template<typename T2>
     HUH_CONSTEXPR_FORCE Vector& operator+=(const T2& rhs) noexcept {
         data[0] += rhs;
         data[1] += rhs;
