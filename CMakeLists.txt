@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.26)
 
 project(HUH
         VERSION 0.1.1
-        LANGUAGES CXX
+        LANGUAGES CXX C
 )
 
 set(CMAKE_CXX_STANDARD 20)
