@@ -48,7 +48,7 @@ HUH_FORCE_INLINE float Dot(const HUH::Vector<float, 3>& lhs, const HUH::Vector<f
 template<typename T, std::size_t N>
 HUH_CONSTEXPR_FORCE void Normalize(HUH::Vector<T, N>& vec) noexcept {
     T tmp = HUH::Dot(vec, vec);
-    tmp = std::sqrtf(tmp);
+    tmp = std::sqrt(tmp);
     vec /= tmp;
 }
 
