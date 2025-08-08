@@ -54,3 +54,11 @@ TYPED_TEST(VectorTest, Subtraction) {
         EXPECT_EQ(result[i], static_cast<typename TestFixture::ValueType>((i + 1) - 5));
     }
 }
+
+TYPED_TEST(VectorTest, Multiplication) {
+    const auto result = this->lhs * this->rhs;
+    EXPECT_EQ(result.Size(), TestFixture::VectorType::Size());
+    for (int i = 0; i < TestFixture::VectorType::Size(); ++i) {
+        EXPECT_EQ(result[i], static_cast<typename TestFixture::ValueType>((i + 1) * 5));
+    }
+}
