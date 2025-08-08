@@ -1,9 +1,10 @@
 #pragma once
 
+#include <HUH/Math/fwd.h>
+#include <HUH/Math/matrix_functions.h>
 #include <HUH/Math/vector.h>
+#include <HUH/definitions.h>
 #include <cstddef>
-
-#include "matrix_functions.h"
 
 namespace HUH {
 

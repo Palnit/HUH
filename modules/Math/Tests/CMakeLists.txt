@@ -12,7 +12,6 @@ target_link_libraries(
         GTest::gtest_main
 )
 
-#add_test(Math_Module_Tests)
 
 include(GoogleTest)
 gtest_discover_tests(Math_module_Tests)

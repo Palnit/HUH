@@ -15,6 +15,10 @@ option(USE_SIMD "Activates auto detection of cpu intrinsics and uses simd instru
 option(BUILD_TESTS "Build google tests for the modules" OFF)
 option(BUILD_BENCHMARKS "Build google benchmarks for the modules" OFF)
 
+if (BUILD_TESTS)
+    enable_testing()
+endif ()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Tools/Cmake")
 include(Tools/CpuCheck/CpuChecker.cmake)
 check_cpu()
@@ -46,9 +50,6 @@ endif ()
 target_include_directories(HUH PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/public"
 )
 
-if (BUILD_TESTS)
-    enable_testing()
-endif ()
 
 if (BUILD_MATH)
     add_subdirectory(modules/Math)
