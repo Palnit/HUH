@@ -1,5 +1,14 @@
 cmake_minimum_required(VERSION 3.26)
 
+option(BUILD_GRAPHICS "Build Graphics module" OFF)
+option(BUILD_MATH "Build Math module" OFF)
+option(BUILD_ARRAY "Build numpy like array module" OFF)
+option(BUILD_THREADING "Build threading library" OFF)
+option(USE_SIMD "Activates auto detection of cpu intrinsics and uses simd instructions where library supports it" ON)
+
+option(BUILD_TESTS "Build google tests for the modules" OFF)
+option(BUILD_BENCHMARKS "Build google benchmarks for the modules" OFF)
+
 project(HUH
         VERSION 0.1.1
         LANGUAGES CXX C
@@ -8,18 +17,13 @@ project(HUH
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(BUILD_GRAPHICS "Build Graphics module" OFF)
-option(BUILD_MATH "Build Math module" OFF)
-option(USE_SIMD "Activates auto detection of cpu intrinsics and uses simd instructions where library supports it" ON)
-
-option(BUILD_TESTS "Build google tests for the modules" OFF)
-option(BUILD_BENCHMARKS "Build google benchmarks for the modules" OFF)
 
 if (BUILD_TESTS)
     enable_testing()
 endif ()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Tools/Cmake")
+include(HUHDependency)
 include(Tools/CpuCheck/CpuChecker.cmake)
 check_cpu()
 
@@ -47,14 +51,32 @@ if (USE_SIMD AND SSE_SUPPORT AND SSE2_SUPPORT)
     target_compile_definitions(HUH INTERFACE HUH_USE_SIMD)
 endif ()
 
-target_include_directories(HUH PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/public"
+target_include_directories(HUH PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/public"
 )
 
+huh_set_modules_dependency(HUH)
 
 if (BUILD_MATH)
-    add_subdirectory(modules/Math)
+    huh_add_module_build(HUH Math)
 endif ()
 
 if (BUILD_GRAPHICS)
-    add_subdirectory(modules/Graphics)
+    huh_add_module_build(HUH Graphics)
 endif ()
+
+if (BUILD_ARRAY)
+    huh_add_module_build(HUH Array)
+endif ()
+
+if (BUILD_THREADING)
+    huh_add_module_build(HUH Threading)
+endif ()
+
+get_property(BUILD_MODULES TARGET HUH PROPERTY BUILD_MODULES)
+
+foreach (MODULE IN LISTS BUILD_MODULES)
+    message(STATUS "Configuring ${MODULE}")
+    add_subdirectory(${MODULE})
+endforeach ()
+
