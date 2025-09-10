@@ -38,7 +38,7 @@ typedef struct cpuid_result {
 } cpuid_result;
 
 cpuid_result call_cpuid(int function, int subfunction) {
-    cpuid_result result = {};
+    cpuid_result result = {0};
     memset(&result, 0, sizeof(cpuid_result));
 
 #if HAS_CPUID_COUNT
@@ -53,7 +53,7 @@ cpuid_result call_cpuid(int function, int subfunction) {
 }
 
 cpu_featureset detect_cpu_features() {
-    cpu_featureset features = {};
+    cpu_featureset features = {0};
     memset(&features, 0, sizeof(cpu_featureset));
 
     features.ext_sse3 = call_cpuid(0x1, 0x0).ecx & 0b1;

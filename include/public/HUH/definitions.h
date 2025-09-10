@@ -3,7 +3,7 @@
 #if defined(_MSC_VER)
 #define EXPORT __declspec(dllexport)
 #define IMPORT __declspec(dllimport)
-#define HUH_FORCE_INLINE __forceinline inline
+#define HUH_FORCE_INLINE __forceinline
 #elif defined(__GNUC__)
 #define EXPORT __attribute__((visibility("default")))
 #define HUH_FORCE_INLINE __attribute__((always_inline)) inline

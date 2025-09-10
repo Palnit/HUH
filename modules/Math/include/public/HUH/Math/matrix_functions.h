@@ -3,6 +3,7 @@
 #include <HUH/Math/fwd.h>
 #include <HUH/definitions.h>
 #include <cmath>
+#include <iostream>
 
 namespace HUH {
 
