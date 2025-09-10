@@ -29,7 +29,7 @@ target_include_directories(HUH-Math INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/inclu
 
 
 if (BUILD_TESTS)
-    add_subdirectory(Tests)
+    add_subdirectory(tests)
 endif ()
 
 if (BUILD_BENCHMARKS)

@@ -23,11 +23,7 @@ struct HUH_API AttributeDescriptor {
      * \param normalized Should it be normalized or not
      * \param offset The offset of the data
      */
-    AttributeDescriptor(GLint size,
-                        GLsizei stride,
-                        GLenum type,
-                        GLboolean normalized,
-                        const GLvoid* offset)
+    AttributeDescriptor(GLint size, GLsizei stride, GLenum type, GLboolean normalized, const GLvoid* offset)
         : size(size),
           stride(stride),
           type(type),
@@ -41,10 +37,7 @@ struct HUH_API AttributeDescriptor {
      * \param type The type of the data
      * \param offset The offset of the data
      */
-    AttributeDescriptor(GLint size,
-                        GLsizei stride,
-                        GLenum type,
-                        const GLvoid* offset)
+    AttributeDescriptor(GLint size, GLsizei stride, GLenum type, const GLvoid* offset)
         : size(size),
           stride(stride),
           type(type),
@@ -100,9 +93,8 @@ public:
      * \param usage The usage type
      */
     template<auto size>
-    VertexBufferObject(T (&elements)[size], GLenum usage)
-        : m_VBO(0),
-          m_usage(usage) {
+    VertexBufferObject(T (&elements)[size], GLenum usage) : m_VBO(0),
+                                                            m_usage(usage) {
         m_elements.insert(m_elements.end(), elements, elements + size);
     }
 
@@ -112,9 +104,7 @@ public:
      * \param list The initializer list
      * \param usage The usage type
      */
-    VertexBufferObject(std::initializer_list<T> list, GLenum usage)
-        : m_VBO(0),
-          m_usage(usage) {
+    VertexBufferObject(std::initializer_list<T> list, GLenum usage) : m_VBO(0), m_usage(usage) {
         m_elements.insert(m_elements.end(), list.begin(), list.end());
     }
 
@@ -174,9 +164,7 @@ public:
      * Add an attribute descriptor to the VBO
      * \param element The descriptor to be added
      */
-    void AddAttribute(AttributeDescriptor element) {
-        m_desc.push_back(element);
-    }
+    void AddAttribute(AttributeDescriptor element) { m_desc.push_back(element); }
 
     /*!
      * Bind the VBO
@@ -185,8 +173,7 @@ public:
         if (!m_VBO) { glGenBuffers(1, &m_VBO); }
         glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
         if (!m_set) {
-            glBufferData(GL_ARRAY_BUFFER, sizeof(T) * m_elements.size(),
-                         m_elements.data(), m_usage);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(T) * m_elements.size(), m_elements.data(), m_usage);
             m_set = true;
         }
     }

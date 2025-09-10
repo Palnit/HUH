@@ -11,6 +11,10 @@
 
 namespace HUH {
 
+///
+/// @ingroup Math
+/// @class Matrix
+/// @tparam T
 template<typename T>
 class Matrix<T, 4, 4> {
 public:

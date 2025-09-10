@@ -1,4 +1,7 @@
 #pragma once
+/// \addtogroup Math
+///  @{
+///
 
 #include <HUH/Math/fwd.h>
 #include <HUH/Math/vector_functions.h>
@@ -258,6 +261,8 @@ struct std::tuple_element<I, HUH::Vector<T, N>> {
     using type = T;
 };
 
+
 #include <HUH/Math/vector/vector2.inl.h>
 #include <HUH/Math/vector/vector3.inl.h>
 #include <HUH/Math/vector/vector4.inl.h>
+/// @}

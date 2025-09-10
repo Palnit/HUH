@@ -1,5 +1,9 @@
 #pragma once
 
+/** @addtogroup Math
+ *  @{
+ */
+
 #include <HUH/Math/fwd.h>
 #include <HUH/Math/matrix_functions.h>
 #include <HUH/Math/vector.h>
@@ -8,6 +12,13 @@
 
 namespace HUH {
 
+///
+/// @ingroup Math
+/// @class Matrix
+/// @brief Default matrix class
+/// @tparam T Value type
+/// @tparam R Row size
+/// @tparam C Column size
 template<typename T, std::size_t R, std::size_t C>
 class Matrix {
     static_assert(std::is_arithmetic_v<T>, "T must be arithmetic type");
@@ -183,6 +194,7 @@ typename Matrix<T, C, R>::RowType* end(Matrix<T, C, R>& Mat) {
 }
 
 }// namespace HUH
+/** @}*/
 
 template<typename T, std::size_t C, std::size_t R>
 struct std::tuple_size<HUH::Matrix<T, C, R>> : public integral_constant<std::size_t, C> {};

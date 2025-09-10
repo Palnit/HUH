@@ -1,0 +1,17 @@
+@import 'tailwindcss';
+@import '$lib/material/css/dark.css';
+@import '$lib/material/css/light.css';
+@import '$lib/material/css/dark-mc.css';
+@import '$lib/material/css/light-mc.css';
+@import '$lib/material/css/dark-hc.css';
+@import '$lib/material/css/light-hc.css';
+
+@plugin '@tailwindcss/typography';
+
+body {
+    --md-ref-typeface-brand: 'Open Sans';
+    --md-ref-typeface-plain: 'Open Sans';
+    font-family: 'Open Sans', sans-serif;
+    background-color: var(--md-sys-color-background);
+    transition: background-color 0.3s, color 0.3s;
+}

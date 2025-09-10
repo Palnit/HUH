@@ -8,6 +8,7 @@ option(USE_SIMD "Activates auto detection of cpu intrinsics and uses simd instru
 
 option(BUILD_TESTS "Build google tests for the modules" OFF)
 option(BUILD_BENCHMARKS "Build google benchmarks for the modules" OFF)
+option(GENERATE_DOCS "Generate doxygen documentation" OFF)
 
 project(HUH
         VERSION 0.1.1
@@ -43,34 +44,36 @@ add_library(HUH OBJECT ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(HUH PROPERTIES LINKER_LANGUAGE CXX)
 target_compile_definitions(HUH PUBLIC HUH_COMP)
 
-if (USE_SIMD AND SSE_SUPPORT AND SSE2_SUPPORT)
-    add_subdirectory(modules/Simd)
-    huh_target_simd_compiler_flags(HUH INTERFACE)
-    huh_target_simd_definitions(HUH INTERFACE)
-
-    target_compile_definitions(HUH INTERFACE HUH_USE_SIMD)
-endif ()
-
 target_include_directories(HUH PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/include/public"
 )
 
+if (USE_SIMD AND SSE_SUPPORT AND SSE2_SUPPORT)
+    message(STATUS "Configuring ${MODULE}")
+    huh_target_simd_compiler_flags(HUH INTERFACE)
+    huh_target_simd_definitions(HUH INTERFACE)
+
+    add_subdirectory(modules/Simd)
+
+    target_compile_definitions(HUH INTERFACE HUH_USE_SIMD)
+endif ()
+
 huh_set_modules_dependency(HUH)
 
 if (BUILD_MATH)
-    huh_add_module_build(HUH Math)
+    huh_add_module_build(HUH INTERFACE Math)
 endif ()
 
 if (BUILD_GRAPHICS)
-    huh_add_module_build(HUH Graphics)
+    huh_add_module_build(HUH INTERFACE Graphics)
 endif ()
 
 if (BUILD_ARRAY)
-    huh_add_module_build(HUH Array)
+    huh_add_module_build(HUH INTERFACE Array)
 endif ()
 
 if (BUILD_THREADING)
-    huh_add_module_build(HUH Threading)
+    huh_add_module_build(HUH INTERFACE Threading)
 endif ()
 
 get_property(BUILD_MODULES TARGET HUH PROPERTY BUILD_MODULES)
@@ -79,4 +82,8 @@ foreach (MODULE IN LISTS BUILD_MODULES)
     message(STATUS "Configuring ${MODULE}")
     add_subdirectory(${MODULE})
 endforeach ()
+
+if (GENERATE_DOCS)
+    add_subdirectory(Tools/docs)
+endif ()
 
