@@ -1,12 +1,12 @@
 #ifndef GPGPU_EDGE_DETECTOR_SRC_GENERAL_OPENGL_SDL_VERTEXARRAYOBJECT_H_
 #define GPGPU_EDGE_DETECTOR_SRC_GENERAL_OPENGL_SDL_VERTEXARRAYOBJECT_H_
 
-#include <GL/glew.h>
-#include <HUH/Graphics/element_buffer_object.h>
-#include <HUH/Graphics/vertex_buffer_object.h>
-#include <HUH/definitions.h>
+#include "GL/glew.h"
+#include "HUH/definitions.h"
+#include "element_buffer_object.h"
+#include "vertex_buffer_object.h"
 
-namespace HUH {
+namespace HUH::Graphics::OpenGl{
 
 /*!
  * \class VertexArrayObject

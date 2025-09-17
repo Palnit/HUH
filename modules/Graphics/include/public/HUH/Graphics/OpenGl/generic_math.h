@@ -1,7 +1,7 @@
 #ifndef GENERIC_MATH_H
 #define GENERIC_MATH_H
 
-#include <glm/vec3.hpp>
+#include "glm/vec3.hpp"
 
 namespace HUH::Math {
 

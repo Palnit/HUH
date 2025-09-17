@@ -43,9 +43,9 @@
 // https://gist.github.com/liam-middlebrook/c52b069e4be2d87a6d2f
 // https://gist.github.com/Plasmoxy/aec637b85e306f671339dcfd509efc82
 
-#include <HUH/Graphics/SDL_GLDebugMessageCallback.h>
+#include "HUH/Graphics/OpenGl/SDL_GLDebugMessageCallback.h"
 
-#include <SDL3/SDL_log.h>
+#include "SDL3/SDL_log.h"
 
 // Callback function for printing debug statements
 void GLAPIENTRY SDL_GLDebugMessageCallback(GLenum source,

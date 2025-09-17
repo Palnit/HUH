@@ -1,9 +1,9 @@
 #ifndef GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_F_H_
 #define GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_F_H_
 
-#include <SDL3/SDL_surface.h>
-#include <GL/glew.h>
-#include <HUH/definitions.h>
+#include "GL/glew.h"
+#include "HUH/definitions.h"
+#include "SDL3/SDL_surface.h"
 
 /*!
  * Namespace containing useful functions for file handling

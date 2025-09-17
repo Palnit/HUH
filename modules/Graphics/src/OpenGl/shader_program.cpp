@@ -1,6 +1,6 @@
-#include <HUH/Graphics/shader_program.h>
+#include "HUH/Graphics/OpenGl/shader_program.h"
 
-namespace HUH {
+namespace HUH::Graphics::OpenGl{
 ShaderProgram::ShaderProgram() : m_program(0) {}
 
 void ShaderProgram::AttachShader(GLuint shader) {

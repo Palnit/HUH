@@ -1,10 +1,10 @@
 #ifndef GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_GENERIC_STRUCTS_H_
 #define GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_GENERIC_STRUCTS_H_
 
-#include <HUH/definitions.h>
 #include <cstdint>
+#include <HUH/definitions.h>
 
-namespace HUH {
+namespace HUH::Graphics{
 
 /*!
  * A simple RGBA struct to easily get the memory data from a uint32_t into the 4
@@ -63,7 +63,7 @@ namespace ErrorHandling {
  * A simple function to display an SDL error if happened
  * \param type The errors type
  */
-void HandelSDLError(const char* type);
+HUH_API void HandelSDLError(const char* type);
 
 }// namespace ErrorHandling
 }// namespace HUH

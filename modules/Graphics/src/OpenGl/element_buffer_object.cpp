@@ -1,5 +1,5 @@
-#include <HUH/Graphics/element_buffer_object.h>
-namespace HUH {
+#include "HUH/Graphics/OpenGl/element_buffer_object.h"
+namespace HUH::Graphics::OpenGl{
 
 void ElementBufferObject::AddElement(unsigned int element) {
     m_elements.push_back(element);

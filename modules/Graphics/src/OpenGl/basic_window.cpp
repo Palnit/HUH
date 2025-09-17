@@ -1,5 +1,5 @@
-#include <HUH/Graphics/SDL_GLDebugMessageCallback.h>
-#include <HUH/Graphics/basic_window.h>
+#include <HUH/Graphics/OpenGl/SDL_GLDebugMessageCallback.h>
+#include <HUH/Graphics/OpenGl/basic_window.h>
 #include <HUH/Graphics/generic_structs.h>
 
 #include <SDL3/SDL.h>
@@ -12,7 +12,7 @@
 #include <imgui_impl_sdl3.h>
 #include <implot.h>
 
-namespace HUH {
+namespace HUH::Graphics::OpenGl {
 BasicWindow::BasicWindow(const char* title,
                          int x,
                          int y,
@@ -109,7 +109,7 @@ BasicWindow::~BasicWindow() {
 int BasicWindow::InitWindow() {
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
-        ErrorHandling::HandelSDLError("SDL initialization");
+        HUH::Graphics::ErrorHandling::HandelSDLError("SDL initialization");
         return 1;
     }
 

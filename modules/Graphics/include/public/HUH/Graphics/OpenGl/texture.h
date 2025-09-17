@@ -1,15 +1,15 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include <GL/glew.h>
-#include <SDL3/SDL_surface.h>
+#include "GL/glew.h"
+#include "SDL3/SDL_surface.h"
 
 #include <functional>
 #include <memory>
 #include <tuple>
 #include <vector>
 
-namespace HUH {
+namespace HUH::Graphics::OpenGl{
 
 class ITextureParameters {
 public:

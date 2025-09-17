@@ -1,13 +1,13 @@
 #ifndef GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_SHADER_PROGRAM_H_
 #define GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_SHADER_PROGRAM_H_
 
-#include <GL/glew.h>
-#include <HUH/definitions.h>
+#include "GL/glew.h"
+#include "HUH/definitions.h"
 
 #include <string>
 #include <vector>
 
-namespace HUH {
+namespace HUH::Graphics::OpenGl{
 
 /*!
  * \class ShaderProgram

@@ -1,11 +1,11 @@
-#include <HUH/Graphics/file_handling.h>
+#include "HUH/Graphics/OpenGl/file_handling.h"
 
-#include <SDL3_image/SDL_image.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
+#include "SDL3_image/SDL_image.h"
 namespace HUH::FileHandling {
 
 SDL_Surface* LoadImage(const char* file) {

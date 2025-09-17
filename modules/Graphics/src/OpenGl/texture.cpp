@@ -1,5 +1,5 @@
-#include <HUH/Graphics/texture.h>
-namespace HUH {
+#include "HUH/Graphics/OpenGl/texture.h"
+namespace HUH::Graphics::OpenGl{
 
 Texture2D::Texture2D(SDL_Surface* surface)
     : m_width(surface->w),

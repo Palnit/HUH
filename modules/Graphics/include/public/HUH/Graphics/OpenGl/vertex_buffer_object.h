@@ -1,11 +1,11 @@
 #ifndef GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_VERTEXBUFFEROBJECT_H_
 #define GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_OPENGL_SDL_VERTEXBUFFEROBJECT_H_
 
-#include <GL/glew.h>
-#include <HUH/definitions.h>
 #include <vector>
+#include "GL/glew.h"
+#include "HUH/definitions.h"
 
-namespace HUH {
+namespace HUH::Graphics::OpenGl{
 
 /*!
  * \class AttributeDescriptor

@@ -2,10 +2,10 @@
 #define GPGPU_EDGE_DETECTOR_SRC_GENERAL_OPENGL_SDL_ELEMENTBUFFEROBJECT_H_
 
 #include <vector>
-#include <GL/glew.h>
-#include <HUH/definitions.h>
+#include "GL/glew.h"
+#include "HUH/definitions.h"
 
-namespace HUH {
+namespace HUH::Graphics::OpenGl{
 
 /*!
  * \class ElementBufferObject

@@ -1,11 +1,11 @@
-#include <HUH/Graphics/camera.h>
-#include <SDL3/SDL_events.h>
+#include "HUH/Graphics/OpenGl/camera.h"
+#include "SDL3/SDL_events.h"
 
-#include <glm/gtc/matrix_transform.hpp>
+#include "glm/gtc/matrix_transform.hpp"
 
 #include "HUH/Graphics/generic_structs.h"
 
-namespace HUH {
+namespace HUH::Graphics::OpenGl{
 
 Camera::Camera(glm::vec3 eye, glm::vec3 at, glm::vec3 worldUp)
     : m_eye(eye),

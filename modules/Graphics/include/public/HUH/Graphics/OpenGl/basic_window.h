@@ -2,16 +2,12 @@
 #define BASIC_WINDOW_H_
 
 #include <SDL3/SDL.h>
-
 #include <GL/glew.h>
-
 #include <glm/glm.hpp>
-
 #include <imgui.h>
-
 #include <HUH/definitions.h>
 
-namespace HUH {
+namespace HUH::Graphics::OpenGl {
 
 /*!
  * \class BasicWindow

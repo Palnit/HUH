@@ -1,12 +1,12 @@
 #pragma once
 
-#include <HUH/definitions.h>
-#include <SDL3/SDL_events.h>
+#include "HUH/definitions.h"
+#include "SDL3/SDL_events.h"
 
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 
 #include "generic_math.h"
-namespace HUH {
+namespace HUH::Graphics::OpenGl{
 
 class HUH_API Camera {
 public:
