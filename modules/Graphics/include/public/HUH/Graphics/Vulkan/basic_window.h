@@ -4,7 +4,6 @@
 #include <HUH/types.h>
 #include <SDL3/SDL.h>
 #include <imgui.h>
-#include <volk.h>
 
 namespace HUH::Graphics::Vulkan{
 /*!
@@ -131,7 +130,6 @@ protected:
     uint32_t m_flags;
     SDL_Window* m_window = nullptr;
     SDL_Event m_ev;
-    VkInstance m_instance;
 };
 }
 

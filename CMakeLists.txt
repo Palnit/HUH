@@ -58,6 +58,8 @@ if (USE_SIMD AND SSE_SUPPORT AND SSE2_SUPPORT)
     target_compile_definitions(HUH INTERFACE HUH_USE_SIMD)
 endif ()
 
+add_subdirectory(modules/Core)
+
 huh_set_modules_dependency(HUH)
 
 if (BUILD_MATH)
