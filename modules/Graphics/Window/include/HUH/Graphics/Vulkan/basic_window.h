@@ -1,14 +1,11 @@
-#ifndef BASIC_WINDOW_H_
-#define BASIC_WINDOW_H_
+#pragma once
 
-#include <SDL3/SDL.h>
-#include <GL/glew.h>
-#include <glm/glm.hpp>
-#include <imgui.h>
-#include <HUH/definitions.h>
+#include "HUH/definitions.h"
+#include "HUH/types.h"
+#include "SDL3/SDL.h"
+#include "imgui.h"
 
-namespace HUH::Graphics::OpenGl {
-
+namespace HUH::Graphics::Vulkan{
 /*!
  * \class BasicWindow
  * \brief An SDL2-Opengl-ImGui window generating virtual class should be inherited
@@ -93,7 +90,7 @@ public:
      * The new sizes of the window is stored int he protected variables m_width
      * and m_height
      */
-    virtual void Resize() { glViewport(0, 0, m_width, m_height); };
+    virtual void Resize() {  };
 
     /*!
      * Virtual function \n
@@ -112,8 +109,6 @@ public:
     * Rendering function called at every iteration of the main loop
     */
     virtual void Render() {
-        glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
-        glClear(GL_COLOR_BUFFER_BIT);
     };
 
     /*!
@@ -134,8 +129,7 @@ protected:
     bool m_running;
     uint32_t m_flags;
     SDL_Window* m_window = nullptr;
-    SDL_GLContext m_context;
     SDL_Event m_ev;
 };
-}// namespace HUH
-#endif//BASIC_WINDOW_H_
+}
+
