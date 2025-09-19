@@ -1,4 +1,4 @@
-set(GRAPHICS_INC_PATH "include/public/HUH/Graphics")
+set(GRAPHICS_INC_PATH "Window/include/HUH/Graphics")
 set(GRAPHICS_INC_PATH_OPENGL ${GRAPHICS_INC_PATH}/OpenGl)
 set(GRAPHICS_INC_PATH_VULKAN ${GRAPHICS_INC_PATH}/Vulkan)
 
@@ -15,21 +15,21 @@ set(HEADER_FILES_OPENGL
         ${GRAPHICS_INC_PATH_OPENGL}/generic_math.h
 )
 set(SOURCE_FILES_OPENGL
-        src/OpenGl/basic_window.cpp
-        src/OpenGl/element_buffer_object.cpp
-        src/OpenGl/file_handling.cpp
-        src/OpenGl/SDL_GLDebugMessageCallback.cpp
-        src/OpenGl/shader_program.cpp
-        src/OpenGl/vertex_array_object.cpp
-        src/OpenGl/texture.cpp
-        src/OpenGl/camera.cpp
+        Window/src/OpenGl/basic_window.cpp
+        Window/src/OpenGl/element_buffer_object.cpp
+        Window/src/OpenGl/file_handling.cpp
+        Window/src/OpenGl/SDL_GLDebugMessageCallback.cpp
+        Window/src/OpenGl/shader_program.cpp
+        Window/src/OpenGl/vertex_array_object.cpp
+        Window/src/OpenGl/texture.cpp
+        Window/src/OpenGl/camera.cpp
 )
 
 set(HEADER_FILES_VULKAN
         ${GRAPHICS_INC_PATH_VULKAN}/basic_window.h
 )
 set(SOURCE_FILES_VULKAN
-        src/Vulkan/basic_window.cpp
+        Window/src/Vulkan/basic_window.cpp
 )
 
 set(HEADER_FILES
@@ -37,8 +37,10 @@ set(HEADER_FILES
 )
 
 set(SOURCE_FILES
-        src/generic_structs.cpp
+        Window/src/generic_structs.cpp
 )
+
+add_subdirectory(RHI)
 
 find_package(SDL3 CONFIG REQUIRED)
 find_package(SDL3_image CONFIG REQUIRED)
@@ -48,13 +50,13 @@ find_package(imgui CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(implot CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
-find_package(volk CONFIG REQUIRED)
 
 add_library(HUH-Graphics SHARED ${HEADER_FILES} ${SOURCE_FILES} ${HEADER_FILES_OPENGL} ${SOURCE_FILES_OPENGL} ${HEADER_FILES_VULKAN} ${SOURCE_FILES_VULKAN})
 add_library(HUH::Graphics ALIAS HUH-Graphics)
 
 target_link_libraries(HUH-Graphics PUBLIC
         HUH
+        HUH::Core
         SDL3::SDL3
         $<IF:$<TARGET_EXISTS:SDL3_image::SDL3_image-shared>,SDL3_image::SDL3_image-shared,SDL3_image::SDL3_image-static>
         imgui::imgui
@@ -62,8 +64,6 @@ target_link_libraries(HUH-Graphics PUBLIC
         glm::glm
         OpenGL::GL
         implot::implot
-        volk::volk
-        volk::volk_headers
 )
 
-target_include_directories(HUH-Graphics PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/public")
+target_include_directories(HUH-Graphics PUBLIC "Window/include")

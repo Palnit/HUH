@@ -2,7 +2,7 @@
 #define GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_GENERIC_STRUCTS_H_
 
 #include <cstdint>
-#include <HUH/definitions.h>
+#include "HUH/definitions.h"
 
 namespace HUH::Graphics{
 
