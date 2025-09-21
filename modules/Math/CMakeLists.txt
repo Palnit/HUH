@@ -15,6 +15,7 @@ set(HEADER_FILES
 
 add_library(HUH-Math INTERFACE ${HEADER_FILES})
 add_library(HUH::Math ALIAS HUH-Math)
+#target_compile_definitions(HUH-Math PRIVATE HUH_COMP)
 
 set_target_properties(HUH-Math PROPERTIES LINKER_LANGUAGE CXX)
 

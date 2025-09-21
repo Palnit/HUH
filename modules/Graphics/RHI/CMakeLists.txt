@@ -19,6 +19,7 @@ set(SOURCE_FILES_VULKAN
 )
 add_library(HUH-Graphics-RHI SHARED ${HEADER_FILES} ${SOURCE_FILES} ${HEADER_FILES_VULKAN} ${SOURCE_FILES_VULKAN})
 add_library(HUH::Graphics::RHI ALIAS HUH-Graphics-RHI)
+target_compile_definitions(HUH-Graphics-RHI PRIVATE HUH_COMP)
 
 set_target_properties(HUH-Graphics-RHI PROPERTIES LINKER_LANGUAGE CXX)
 

@@ -66,4 +66,6 @@ target_link_libraries(HUH-Graphics PUBLIC
         implot::implot
 )
 
+target_compile_definitions(HUH-Graphics PRIVATE HUH_COMP)
+
 target_include_directories(HUH-Graphics PUBLIC "Window/include")
