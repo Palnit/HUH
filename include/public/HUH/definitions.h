@@ -7,7 +7,7 @@
 #elif defined(__GNUC__)
 #define EXPORT __attribute__((visibility("default")))
 #define HUH_FORCE_INLINE __attribute__((always_inline)) inline
-#define IMPORT __attribute__((weak))
+#define IMPORT
 #else
 #define EXPORT
 #define IMPORT

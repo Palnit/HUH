@@ -18,6 +18,7 @@ endif ()
 
 add_library(HUH-Core SHARED ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES})
 add_library(HUH::Core ALIAS HUH-Core)
+message(WARNING ${CORE_HEADER_FILES})
 
 set_target_properties(HUH-Core PROPERTIES LINKER_LANGUAGE CXX)
 

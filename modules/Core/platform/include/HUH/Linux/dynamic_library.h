@@ -9,8 +9,8 @@ public:
     explicit DynamicLibrary(const std::string& path);
 
     template<typename FuncType>
-    FuncType GetExport(const std::string& name) {
-        return reinterpret_cast<FuncType>(dlsym(m_handle, name.c_str()));
+    FuncType* GetExport(const std::string& name) {
+        return reinterpret_cast<FuncType*>(dlsym(m_handle, name.c_str()));
     }
     [[nodiscard]] bool IsLoaded() const { return m_handle != nullptr; }
     static std::string GetErrorMessage();
