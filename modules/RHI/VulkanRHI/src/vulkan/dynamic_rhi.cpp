@@ -1,8 +1,11 @@
-#include "HUH/Graphics/RHI/Vulkan/instance.h"
+#include <volk.h>
+
+#include <HUH/RHI/vulkan/dynamic_rhi.h>
+#include <iostream>
 #include <vector>
 
 namespace HUH::RHI {
-bool VulkanInstance::Init() {
+bool VulkanDynamicRHI::Init() {
     auto err = volkInitialize();
     if (err != VK_SUCCESS) {
         std::cout << "Volk failed to initalize";
@@ -33,8 +36,10 @@ bool VulkanInstance::Init() {
     return true;
 }
 
-void VulkanInstance::Destroy() {
+void VulkanDynamicRHI::Destroy() {
     if (m_instance != VK_NULL_HANDLE) { vkDestroyInstance(m_instance, nullptr); }
+    delete this;
 }
+extern "C" RHI::DynamicRHI* DynamicRHICreate() { return new VulkanDynamicRHI(); }
 
 }// namespace HUH::RHI

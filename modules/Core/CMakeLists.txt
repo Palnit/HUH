@@ -1,3 +1,4 @@
+option(SHARED_LIB_LOAD_WITH_RELATIVE_PATH "Try-s to load every shared library relative to exetable" OFF)
 set(CORE_INC_PATH "include/HUH")
 set(CORE_LINUX_INC_PATH "platform/include/HUH/Linux")
 set(CORE_WIN_INC_PATH "platform/include/HUH/Windows")
@@ -18,13 +19,15 @@ endif ()
 
 add_library(HUH-Core SHARED ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES})
 add_library(HUH::Core ALIAS HUH-Core)
-message(WARNING ${CORE_HEADER_FILES})
 
 set_target_properties(HUH-Core PROPERTIES LINKER_LANGUAGE CXX)
 
 target_link_libraries(HUH-Core PUBLIC HUH)
 
 target_compile_definitions(HUH-Core PRIVATE HUH_COMP)
+if (SHARED_LIB_LOAD_WITH_RELATIVE_PATH)
+    target_compile_definitions(HUH-Core PUBLIC HUH_SHARED_LIB_LOAD_WITH_RELATIVE_PATH)
+endif ()
 
 
 target_include_directories(HUH-Core PUBLIC

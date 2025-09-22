@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.26)
 
 option(BUILD_GRAPHICS "Build Graphics module" OFF)
+option(BUILD_RHI "Build Render Hardware Interface module" OFF)
 option(BUILD_MATH "Build Math module" OFF)
 option(BUILD_ARRAY "Build numpy like array module" OFF)
 option(BUILD_THREADING "Build threading library" OFF)
@@ -82,6 +83,10 @@ endif ()
 
 if (BUILD_THREADING)
     huh_add_module_build(HUH INTERFACE Threading)
+endif ()
+
+if (BUILD_RHI)
+    huh_add_module_build(HUH INTERFACE RHI)
 endif ()
 
 get_property(BUILD_MODULES TARGET HUH PROPERTY BUILD_MODULES)

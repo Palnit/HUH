@@ -6,14 +6,19 @@
 namespace HUH {
 class HUH_API DynamicLibrary {
 public:
+    DynamicLibrary() = default;
     explicit DynamicLibrary(const std::string& path);
 
+    bool Load(const std::string& path);
+    void Unload();
+
     template<typename FuncType>
-    FuncType* GetExport(const std::string& name) {
-        return reinterpret_cast<FuncType*>(dlsym(m_handle, name.c_str()));
+    HUH_NODISCARD HUH_FORCE_INLINE FuncType* GetExport(const std::string& name) {
+        return (FuncType*) (dlsym(m_handle, name.c_str()));
     }
-    [[nodiscard]] bool IsLoaded() const { return m_handle != nullptr; }
-    static std::string GetErrorMessage();
+    HUH_NODISCARD bool IsLoaded() const;
+    HUH_NODISCARD static std::string GetErrorMessage();
+    HUH_NODISCARD static std::string DecoratePlatformLibraryName(const std::string& name);
     ~DynamicLibrary();
 
 private:
