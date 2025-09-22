@@ -192,3 +192,5 @@ int BasicWindow::InitWindow() {
     return 0;
 }
 }// namespace HUH
+
+int HUH_API TestAdd(int a, int b) { return a + b; }

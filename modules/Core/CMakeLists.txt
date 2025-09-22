@@ -1,5 +1,6 @@
 set(CORE_INC_PATH "include/HUH")
 set(CORE_LINUX_INC_PATH "platform/include/HUH/Linux")
+set(CORE_WIN_INC_PATH "platform/include/HUH/Windows")
 
 set(CORE_HEADER_FILE
         ${CORE_INC_PATH}/Singleton.h
@@ -8,6 +9,8 @@ set(CORE_HEADER_FILE
 set(CORE_SOURCE_FILES)
 
 if (HUH_WIN)
+    list(APPEND CORE_HEADER_FILES ${CORE_WIN_INC_PATH}/dynamic_library.h)
+    list(APPEND CORE_SOURCE_FILES platform/src/Windows/dynamic_library.cpp)
 elseif (HUH_LINUX)
     list(APPEND CORE_HEADER_FILES ${CORE_LINUX_INC_PATH}/dynamic_library.h)
     list(APPEND CORE_SOURCE_FILES platform/src/Linux/dynamic_library.cpp)

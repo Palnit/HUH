@@ -7,6 +7,8 @@
 #include "glm/glm.hpp"
 #include "imgui.h"
 
+extern "C" int HUH_API TestAdd(int a, int b);
+
 namespace HUH::Graphics::OpenGl {
 
 /*!
@@ -33,12 +35,7 @@ public:
      * is always appended
      */
 
-    HUH_API BasicWindow(const char* title,
-                        int x,
-                        int y,
-                        int width,
-                        int height,
-                        uint32_t flags);
+    HUH_API BasicWindow(const char* title, int x, int y, int width, int height, uint32_t flags);
 
     HUH_API ~BasicWindow();
 
@@ -137,5 +134,5 @@ protected:
     SDL_GLContext m_context;
     SDL_Event m_ev;
 };
-}// namespace HUH
+}// namespace HUH::Graphics::OpenGl
 #endif//BASIC_WINDOW_H_
