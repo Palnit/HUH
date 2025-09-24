@@ -11,6 +11,7 @@ option(BUILD_TESTS "Build google tests for the modules" OFF)
 option(BUILD_BENCHMARKS "Build google benchmarks for the modules" OFF)
 option(GENERATE_DOCS "Generate doxygen documentation" OFF)
 
+
 project(HUH
         VERSION 0.1.1
         LANGUAGES CXX C
