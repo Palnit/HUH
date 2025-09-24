@@ -6,8 +6,9 @@ set(CORE_WIN_INC_PATH "platform/include/HUH/Windows")
 set(CORE_HEADER_FILE
         ${CORE_INC_PATH}/Singleton.h
         ${CORE_INC_PATH}/dynamic_library.h
+        ${CORE_INC_PATH}/logging.h
 )
-set(CORE_SOURCE_FILES)
+set(CORE_SOURCE_FILES src/logging.cpp)
 
 if (HUH_WIN)
     list(APPEND CORE_HEADER_FILES ${CORE_WIN_INC_PATH}/dynamic_library.h)

@@ -24,6 +24,6 @@ protected:
     DynamicRHI() = default;
     virtual ~DynamicRHI() = default;
     RenderApi m_renderApi = RenderApi::Unknown;
-    static DynamicLibrary m_RHIImplSharedLibrary;
+    static DynamicLibrary s_RHIImplSharedLibrary;
 };
 }// namespace HUH::RHI

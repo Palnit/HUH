@@ -40,6 +40,6 @@ void VulkanDynamicRHI::Destroy() {
     if (m_instance != VK_NULL_HANDLE) { vkDestroyInstance(m_instance, nullptr); }
     delete this;
 }
-extern "C" RHI::DynamicRHI* DynamicRHICreate() { return new VulkanDynamicRHI(); }
+extern "C" HUH_API RHI::DynamicRHI* DynamicRHICreate() { return new VulkanDynamicRHI(); }
 
 }// namespace HUH::RHI
