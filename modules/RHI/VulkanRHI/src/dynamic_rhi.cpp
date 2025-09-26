@@ -6,8 +6,8 @@
 
 namespace HUH::RHI {
 bool VulkanDynamicRHI::Init() {
-    if (HUH::LoadVulkan()) {
-        std::cout << "Volk failed to initalize";
+    if (!HUH::LoadVulkan()) {
+        HUH_LOG(LogRHI, Logging::Level::Log, "Vulkan Load Failed")
         return false;
     }
 
@@ -25,17 +25,24 @@ bool VulkanDynamicRHI::Init() {
     createInfo.ppEnabledLayerNames = validationLayers.data();
     auto err = HUH::vkCreateInstance(&createInfo, nullptr, &m_instance);
     if (err != VK_SUCCESS) {
-        std::cout << "create instance failed" << std::endl;
+        HUH_LOG(LogRHI, Logging::Level::Log, "Vulkan Instance Creation Failed")
         return false;
     }
+
+    HUH::LoadVulkanInstance(m_instance);
+
     HUH_LOG(LogRHI, Logging::Level::Log, "Vulkan Rhi Inited Successfully")
     return true;
 }
 
 void VulkanDynamicRHI::Destroy() {
-    //    if (m_instance != VK_NULL_HANDLE) { vkDestroyInstance(m_instance, nullptr); }
+    if (m_instance != VK_NULL_HANDLE) {
+        HUH::vkDestroyInstance(m_instance, nullptr);
+    }
     delete this;
 }
-extern "C" HUH_API HUH::RHI::DynamicRHI* DynamicRHICreate() { return (HUH::RHI::DynamicRHI*) new VulkanDynamicRHI(); }
+extern "C" HUH_API HUH::RHI::DynamicRHI* DynamicRHICreate() {
+    return (HUH::RHI::DynamicRHI*) new VulkanDynamicRHI();
+}
 
 }// namespace HUH::RHI

@@ -59,6 +59,6 @@ private:
 #define HUH_LOG(category, level, format, ...)                                                                    \
     HUH::Logging::Log(category, level, format,                                                                   \
                       std::string(" {") + std::filesystem::path(__FILE__).filename().string() + std::string(".") \
-                          + std::to_string(__LINE__) + std::string(":") + std::string(__FUNCTION__)              \
+                          + std::to_string(__LINE__)              \
                           + std::string("}"),                                                                    \
                       __VA_ARGS__);

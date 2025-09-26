@@ -36,6 +36,6 @@ if (VULKAN_INC)
 
     target_include_directories(HUH-VulkanRHI PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" ${VULKAN_INC})
 else ()
-    message(WARNING "No vulkan headers found skipping Vulkan RHI")
+    message(INFO "No vulkan headers found skipping Vulkan RHI")
 endif ()
 
