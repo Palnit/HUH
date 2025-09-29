@@ -1,7 +1,8 @@
 #include <HUH/RHI/dynamic_rhi.h>
 #include <iostream>
-#include "HUH/RHI/rhi_module.h"
-#include "HUH/logging.h"
+#include <HUH/RHI/rhi_module.h>
+#include <HUH/logging.h>
+#include <HUH/RHI/device.h>
 
 namespace HUH::RHI {
 DynamicRHI* DefaultCreate() {
@@ -25,13 +26,19 @@ void DynamicRHI::LoadRHI(RenderApi api) {
             break;
     }
     if (!s_RHIImplSharedLibrary.Load(DynamicLibrary::DecoratePlatformLibraryName(rhiApiName))) {
-        //TODO ERROR;
+        // TODO ERROR;
         HUH_LOG(LogRHI, Logging::Level::Error, "Cloud not load RHI API: {}", HUH::DynamicLibrary::GetErrorMessage())
     }
     DynamicRHI::Create = s_RHIImplSharedLibrary.GetExport<CreateStub>("DynamicRHICreate");
     if (DynamicRHI::Create == nullptr) {
-        //TODO NORMAL ERROR;
+        // TODO NORMAL ERROR;
         DynamicRHI::Create = &DefaultCreate;
+    }
+}
+DynamicRHI::~DynamicRHI() {
+    HUH_LOG(LogRHI, HUH::Logging::Level::Log, "Destroying Created")
+    for (const Device* device : m_created_devices) {
+        delete device;
     }
 }
 }// namespace HUH::RHI

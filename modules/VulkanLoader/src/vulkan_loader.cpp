@@ -1,12 +1,12 @@
-#include <HUH/RHI/vulkan/vulkan_loader.h>
+#include <HUH/vulkan_loader.h>
 
 namespace HUH {
 
 HUH::DynamicLibrary s_vulkan_lib;
 
-#define CreateVulkanFuncLocal(Type) PFN_##Type Type;
-HUH_VULKAN_ALL_FUNCS(CreateVulkanFuncLocal)
-#undef CreateVulkanFuncLocal
+ #define CreateVulkanFuncLocal(Type) PFN_##Type Type;
+ HUH_VULKAN_ALL_FUNCS(CreateVulkanFuncLocal)
+ #undef CreateVulkanFuncLocal
 
 bool LoadVulkan() {
 #ifdef HUH_WIN

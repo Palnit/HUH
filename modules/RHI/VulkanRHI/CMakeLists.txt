@@ -2,26 +2,20 @@ set(VULKAN_RHI_INC_PATH "include/HUH/RHI/vulkan")
 
 set(VULKAN_RHI_HEADER_FILES
         ${VULKAN_RHI_INC_PATH}/dynamic_rhi.h
-        ${VULKAN_RHI_INC_PATH}/vulkan_loader.h
+        ${VULKAN_RHI_INC_PATH}/vulkan_defines.h
+        ${VULKAN_RHI_INC_PATH}/device.h
 )
 set(VULKAN_RHI_SOURCE_FILES
         src/dynamic_rhi.cpp
-        src/vulkan_loader.cpp
+        src/device.cpp
 )
 
-if (VULKAN_HEADER_DIR)
-    set(VULKAN_INC ${VULKAN_HEADER_DIR}/include)
-else ()
-    find_package(Vulkan)
-    if (Vulkan_INCLUDE_DIRS)
-        set(VULKAN_INC "${Vulkan_INCLUDE_DIRS}")
-    elseif (DEFINED ENV{VULKAN_SDK})
-        set(VULKAN_INC "$ENV{VULKAN_SDK}/include")
-    endif ()
-endif ()
+if (TARGET HUH::VulkanLoader)
+    set_property(TARGET HUH APPEND PROPERTY HUH_REQUIRED_INSTANCE_EXTENSIONS ${HUH_REQUIRED_INSTANCE_EXTENSIONS})
+    set_property(TARGET HUH APPEND PROPERTY HUH_REQUIRED_INSTANCE_LAYERS ${HUH_REQUIRED_INSTANCE_LAYERS})
+    set_property(TARGET HUH APPEND PROPERTY HUH_REQUIRED_DEVICE_EXTENSIONS ${HUH_REQUIRED_DEVICE_EXTENSIONS})
 
-if (VULKAN_INC)
-    message(STATUS "Vulkan headers found location: ${VULKAN_INC}")
+    file(GENERATE OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/HUH/RHI/vulkan/vulkan_defines.h INPUT configure_file/vulkan_defines.h.in)
     add_library(HUH-VulkanRHI SHARED ${VULKAN_RHI_HEADER_FILES} ${VULKAN_RHI_SOURCE_FILES})
     add_library(HUH::VulkanRHI ALIAS HUH-VulkanRHI)
     target_compile_definitions(HUH-VulkanRHI PRIVATE HUH_COMP)
@@ -32,10 +26,10 @@ if (VULKAN_INC)
             HUH
             HUH::Core
             HUH::RHI
+            HUH::VulkanLoader
     )
-
-    target_include_directories(HUH-VulkanRHI PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" ${VULKAN_INC})
+    target_include_directories(HUH-VulkanRHI PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" ${VULKAN_INC} "${CMAKE_CURRENT_BINARY_DIR}/include")
 else ()
-    message(INFO "No vulkan headers found skipping Vulkan RHI")
+    message(WARNING "Vulkan Loader not built skipping")
 endif ()
 

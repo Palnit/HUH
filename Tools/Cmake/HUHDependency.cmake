@@ -27,5 +27,6 @@ endfunction()
 
 function(huh_set_modules_dependency Target)
     set_property(TARGET ${Target} PROPERTY Array_DEPENDENCY Threading)
+    set_property(TARGET ${Target} PROPERTY RHI_DEPENDENCY VulkanLoader)
 endfunction()
 

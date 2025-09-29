@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.28)
 
 option(BUILD_GRAPHICS "Build Graphics module" OFF)
 option(BUILD_RHI "Build Render Hardware Interface module" OFF)
+option(BUILD_VULKAN_LOADER "Build Vulkan Loader" OFF)
 option(BUILD_MATH "Build Math module" OFF)
 option(BUILD_ARRAY "Build numpy like array module" OFF)
 option(BUILD_THREADING "Build threading library" OFF)
@@ -52,6 +53,8 @@ elseif (UNIX AND NOT APPLE)
     target_compile_definitions(HUH PUBLIC HUH_LINUX)
 endif ()
 
+target_compile_definitions(HUH PUBLIC HUH_DEBUG $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:DEBUG>)
+
 target_include_directories(HUH PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/include/public"
 )
@@ -88,6 +91,10 @@ endif ()
 
 if (BUILD_RHI)
     huh_add_module_build(HUH INTERFACE RHI)
+endif ()
+
+if (BUILD_VULKAN_LOADER)
+    huh_add_module_build(HUH INTERFACE VulkanLoader)
 endif ()
 
 get_property(BUILD_MODULES TARGET HUH PROPERTY BUILD_MODULES)

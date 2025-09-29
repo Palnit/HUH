@@ -1,4 +1,4 @@
 #pragma once
 #include <HUH/logging.h>
 
-HUH::LogCategory LogRHI("RHI");
+inline HUH::LogCategory LogRHI("Dynamic RHI");

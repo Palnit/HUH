@@ -48,8 +48,8 @@ public:
                     const std::string& format,
                     const std::string& file_info,
                     Args&&... args) {
-        std::cout << category << " " << ToString(level) << ": " << std::vformat(format, std::make_format_args(args...))
-                  << file_info << std::endl;
+        std::cout << "[" << ToString(level) << "]" << category << " "
+                  << std::vformat(format, std::make_format_args(args...)) << file_info << std::endl;
     }
 
 private:
