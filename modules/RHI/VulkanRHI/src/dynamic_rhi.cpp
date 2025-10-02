@@ -107,6 +107,15 @@ Device* VulkanDynamicRHI::GetDevice(size_t index) {
 }
 
 std::vector<Device*> VulkanDynamicRHI::GetDevices() {
+    Uint32 deviceCount = 0;
+    HUH::vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
+    if (deviceCount == 0) {
+        HUH_LOG(LogVulkanRHI, Logging::Level::Log, "No Phyisical device with vulkan support");
+        return {};
+    }
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    HUH::vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
+
     return {};
 }
 
