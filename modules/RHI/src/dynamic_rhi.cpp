@@ -36,7 +36,7 @@ void DynamicRHI::LoadRHI(RenderApi api) {
     }
 }
 DynamicRHI::~DynamicRHI() {
-    HUH_LOG(LogRHI, HUH::Logging::Level::Log, "Destroying Created")
+    HUH_LOG(LogRHI, HUH::Logging::Level::Log, "Destroying Created Devices")
     for (const Device* device : m_created_devices) {
         delete device;
     }

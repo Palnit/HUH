@@ -1,3 +1,5 @@
+#include "HUH/RHI/vulkan/device.h"
+
 #include <HUH/RHI/rhi_module.h>
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
 #include <HUH/logging.h>
@@ -110,13 +112,16 @@ std::vector<Device*> VulkanDynamicRHI::GetDevices() {
     Uint32 deviceCount = 0;
     HUH::vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
     if (deviceCount == 0) {
-        HUH_LOG(LogVulkanRHI, Logging::Level::Log, "No Phyisical device with vulkan support");
+        HUH_LOG(LogVulkanRHI, Logging::Level::Log, "No Physical device with vulkan support");
         return {};
     }
     std::vector<VkPhysicalDevice> devices(deviceCount);
     HUH::vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
+    for (auto device : devices) {
+        m_created_devices.push_back(new VulkanDevice(device));
+    }
 
-    return {};
+    return m_created_devices;
 }
 
 void VulkanDynamicRHI::Destroy() {
