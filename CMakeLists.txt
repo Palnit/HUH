@@ -45,6 +45,7 @@ set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
 add_library(HUH OBJECT ${HEADER_FILES} ${SOURCE_FILES})
 
 set_target_properties(HUH PROPERTIES LINKER_LANGUAGE CXX)
+target_compile_features(HUH PUBLIC cxx_std_20)
 if (WIN32)
     set(HUH_WIN yes)
     target_compile_definitions(HUH PUBLIC HUH_WIN)

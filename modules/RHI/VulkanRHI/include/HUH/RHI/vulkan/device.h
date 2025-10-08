@@ -20,9 +20,13 @@ protected:
         HUH::vkGetPhysicalDeviceProperties(m_physicalDevice, &properties);
         switch (properties.deviceType) {
             case VK_PHYSICAL_DEVICE_TYPE_OTHER:
-            case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
-            case VK_PHYSICAL_DEVICE_TYPE_CPU:
                 m_type = Type::Other;
+                break;
+            case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+                m_type = Type::Software;
+                break;
+            case VK_PHYSICAL_DEVICE_TYPE_CPU:
+                m_type = Type::Cpu;
                 break;
             case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
                 m_type = Type::Integrated;

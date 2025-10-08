@@ -26,3 +26,4 @@ target_link_libraries(HUH-RHI
 target_include_directories(HUH-RHI PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 add_subdirectory(VulkanRHI)
+add_subdirectory(DirectX12RHI)

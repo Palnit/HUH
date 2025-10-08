@@ -7,7 +7,7 @@ namespace HUH::RHI {
 class HUH_API Device {
 public:
     friend class DynamicRHI;
-    enum class Type { Dedicated, Integrated, Other, Unknown };
+    enum class Type { Dedicated, Integrated, Cpu, Software, Other, Unknown };
     struct MemoryStatistics {
         Uint64 DeviceMemory;
         Uint64 OccupiedMemory;
