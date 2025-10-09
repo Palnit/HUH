@@ -7,6 +7,7 @@ namespace HUH {
 // The writer of this library is lazy to write _t :)
 // (and upper case starting just looks better in code)
 
+using Uint = unsigned int;
 using Uint8 = uint8_t;
 using Uint16 = uint16_t;
 using Uint32 = uint32_t;

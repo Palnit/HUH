@@ -5,7 +5,6 @@
 #include <HUH/definitions.h>
 #include <HUH/dynamic_library.h>
 
-
 namespace HUH::RHI {
 
 enum class DeviceType {
@@ -32,9 +31,9 @@ public:
     DynamicRHI& operator=(DynamicRHI&&) = delete;
 
 protected:
-    std::vector<Device*> m_created_devices;
     DynamicRHI() = default;
     virtual ~DynamicRHI();
+    std::vector<Device*> m_created_devices;
     RenderApi m_renderApi = RenderApi::Unknown;
     static DynamicLibrary s_RHIImplSharedLibrary;
 };

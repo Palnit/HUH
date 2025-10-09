@@ -5,7 +5,7 @@
 #include <dxgi1_6.h>
 
 #ifdef HUH_DEBUG
-#include <dxgidebug.h>
+#include <d3d12sdklayers.h>
 #endif
 
 namespace HUH::RHI {
@@ -23,6 +23,9 @@ public:
 protected:
     DX12DynamicRHI() = default;
     ~DX12DynamicRHI() override = default;
-    IDXGIFactory7* factory = nullptr;
+    IDXGIFactory7* m_factory = nullptr;
+#ifdef HUH_DEBUG
+    ID3D12Debug1* m_debugController = nullptr;
+#endif
 };
 }// namespace HUH::RHI
