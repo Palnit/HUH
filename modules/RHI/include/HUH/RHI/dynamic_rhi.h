@@ -7,11 +7,6 @@
 
 namespace HUH::RHI {
 
-enum class DeviceType {
-    Dedicated,
-    Integrated,
-};
-
 class HUH_API DynamicRHI {
 public:
     friend class Device;

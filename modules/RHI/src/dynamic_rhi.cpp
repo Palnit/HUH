@@ -27,7 +27,7 @@ void DynamicRHI::LoadRHI(RenderApi api) {
     }
     if (!s_RHIImplSharedLibrary.Load(DynamicLibrary::DecoratePlatformLibraryName(rhiApiName))) {
         // TODO ERROR;
-        HUH_LOG(LogRHI, Logging::Level::Error, "Cloud not load RHI API: {}", HUH::DynamicLibrary::GetErrorMessage())
+        HUH_ELOG(LogRHI, "Cloud not load RHI API: {}", HUH::DynamicLibrary::GetErrorMessage())
     }
     DynamicRHI::Create = s_RHIImplSharedLibrary.GetExport<CreateStub>("DynamicRHICreate");
     if (DynamicRHI::Create == nullptr) {
@@ -36,7 +36,7 @@ void DynamicRHI::LoadRHI(RenderApi api) {
     }
 }
 DynamicRHI::~DynamicRHI() {
-    HUH_LOG(LogRHI, HUH::Logging::Level::Log, "Destroying Created Devices")
+    HUH_ILOG(LogRHI, "Destroying Created Devices")
     for (const Device* device : m_created_devices) {
         delete device;
     }

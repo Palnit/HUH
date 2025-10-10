@@ -54,7 +54,7 @@ elseif (UNIX AND NOT APPLE)
     target_compile_definitions(HUH PUBLIC HUH_LINUX)
 endif ()
 
-target_compile_definitions(HUH PUBLIC HUH_DEBUG $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:DEBUG>)
+target_compile_definitions(HUH PUBLIC HUH_DEBUG $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:DEBUG> HUH_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
 
 target_include_directories(HUH PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/include/public"

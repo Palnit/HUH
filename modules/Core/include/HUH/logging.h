@@ -46,10 +46,12 @@ public:
     static void Log(const LogCategory& category,
                     Logging::Level level,
                     const std::string& format,
-                    const std::string& file_info,
+                    const std::filesystem::path& file_info,
+                    const std::string& file_line,
                     Args&&... args) {
         std::cout << "[" << ToString(level) << "]" << category << " "
-                  << std::vformat(format, std::make_format_args(args...)) << file_info << std::endl;
+                  << std::vformat(format, std::make_format_args(args...)) << "{" << file_info.string() << ":"
+                  << file_line << "}" << std::endl;
     }
 
 private:
@@ -57,8 +59,13 @@ private:
 
 }// namespace HUH
 #define HUH_LOG(category, level, format, ...)                                                                    \
-    HUH::Logging::Log(category, level, format,                                                                   \
-                      std::string(" {") + std::filesystem::path(__FILE__).filename().string() + std::string(".") \
-                          + std::to_string(__LINE__)              \
-                          + std::string("}"),                                                                    \
-                      __VA_ARGS__);
+    HUH::Logging::Log(category, level, format, __FILE__ ,std::to_string(__LINE__), __VA_ARGS__);
+
+#define HUH_ILOG(category, format, ...) \
+    HUH_LOG(category,Logging::Level::Log,format,__VA_ARGS__)
+
+#define HUH_WLOG(category, format, ...) \
+    HUH_LOG(category,Logging::Level::Warning,format,__VA_ARGS__)
+
+#define HUH_ELOG(category, format, ...) \
+    HUH_LOG(category,Logging::Level::Error,format,__VA_ARGS__)

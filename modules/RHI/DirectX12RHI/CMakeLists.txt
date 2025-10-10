@@ -2,10 +2,12 @@ set(DX12_RHI_INC_PATH "include/HUH/RHI/DX12")
 
 set(DX12_RHI_HEADER_FILES
         ${DX12_RHI_INC_PATH}/dynamic_rhi.h
+        ${DX12_RHI_INC_PATH}/device.h
         ${DX12_RHI_INC_PATH}/dx12_defines.h
 )
 set(DX12_RHI_SOURCE_FILES
         src/dynamic_rhi.cpp
+        src/device.cpp
 )
 
 if (HUH_WIN)
