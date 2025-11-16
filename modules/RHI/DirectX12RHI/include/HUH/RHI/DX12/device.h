@@ -14,7 +14,7 @@ class HUH_API DX12Device : public Device {
 public:
     Device::Type GetType() override { return Device::Type::Other; }
     Device::MemoryStatistics GetMemoryStatistics() override { return {}; }
-    bool Init(DeviceInitializer&& initialization) override {
+    bool Init(Initializer&& initialization) override {
         m_initialization = initialization;
         return true;
     }

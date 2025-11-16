@@ -1,3 +1,4 @@
 #include <HUH/logging.h>
 
-namespace HUH {}
+namespace HUH {
+}

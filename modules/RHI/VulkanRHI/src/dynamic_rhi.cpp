@@ -1,6 +1,5 @@
 #include "HUH/RHI/vulkan/device.h"
 
-#include <HUH/RHI/rhi_module.h>
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
 #include <HUH/logging.h>
 #include <iostream>
@@ -23,9 +22,9 @@ bool VulkanDynamicRHI::Init() {
     HUH::vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
 
 #if HUH_DEBUG
-    HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Available Instance extensions:")
+    HUH_LOG(LogVulkanRHI, Logging::Log, "Available Instance extensions:")
     for (size_t i = 0; i < availableExtensions.size(); i++) {
-        HUH_LOG(LogVulkanRHI, Logging::Level::Log, "{}.\t{}", i + 1, availableExtensions[i].extensionName)
+        HUH_LOG(LogVulkanRHI, Logging::Log, "{}.\t{}", i + 1, availableExtensions[i].extensionName)
     }
 #endif
 

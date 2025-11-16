@@ -8,6 +8,7 @@ set(CORE_HEADER_FILE
         ${CORE_INC_PATH}/dynamic_library.h
         ${CORE_INC_PATH}/logging.h
         ${CORE_INC_PATH}/string_operations.h
+        ${CORE_INC_PATH}/console_color.h
 )
 set(CORE_SOURCE_FILES
         src/logging.cpp
@@ -15,10 +16,14 @@ set(CORE_SOURCE_FILES
 )
 
 if (HUH_WIN)
-    list(APPEND CORE_HEADER_FILES ${CORE_WIN_INC_PATH}/dynamic_library.h)
+    list(APPEND CORE_HEADER_FILES
+            ${CORE_WIN_INC_PATH}/dynamic_library.h
+    )
     list(APPEND CORE_SOURCE_FILES platform/src/Windows/dynamic_library.cpp)
 elseif (HUH_LINUX)
-    list(APPEND CORE_HEADER_FILES ${CORE_LINUX_INC_PATH}/dynamic_library.h)
+    list(APPEND CORE_HEADER_FILES
+            ${CORE_LINUX_INC_PATH}/dynamic_library.h
+    )
     list(APPEND CORE_SOURCE_FILES platform/src/Linux/dynamic_library.cpp)
 endif ()
 

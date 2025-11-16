@@ -61,7 +61,7 @@ target_include_directories(HUH PUBLIC
 )
 
 if (USE_SIMD AND SSE_SUPPORT AND SSE2_SUPPORT)
-    message(STATUS "Configuring ${MODULE}")
+    message(STATUS "Configuring modules/Simd")
     huh_target_simd_compiler_flags(HUH INTERFACE)
     huh_target_simd_definitions(HUH INTERFACE)
 

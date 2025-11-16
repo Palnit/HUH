@@ -11,9 +11,14 @@ class HUH_API VulkanDevice final : public Device {
     friend class VulkanDynamicRHI;
 
 public:
+    struct VulkanDeviceProperties {
+        VkPhysicalDeviceProperties2KHR properties_1_0;
+        VkPhysicalDeviceVulkan11Properties properties_1_1;
+    };
+
     Device::Type GetType() override { return m_type; }
     Device::MemoryStatistics GetMemoryStatistics() override;
-    bool Init(DeviceInitializer&& initialization) override { return true; }
+    bool Init(Initializer&& initialization) override { return true; }
     void Destroy() override {}
 
 protected:
