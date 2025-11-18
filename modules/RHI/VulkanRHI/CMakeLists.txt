@@ -22,13 +22,13 @@ if (TARGET HUH::VulkanLoader)
 
     set_target_properties(HUH-VulkanRHI PROPERTIES LINKER_LANGUAGE CXX)
 
-    target_link_libraries(HUH-VulkanRHI
+    target_link_libraries(HUH-VulkanRHI PUBLIC
             HUH
             HUH::Core
             HUH::RHI
             HUH::VulkanLoader
     )
-    target_include_directories(HUH-VulkanRHI PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" ${VULKAN_INC} "${CMAKE_CURRENT_BINARY_DIR}/include")
+    target_include_directories(HUH-VulkanRHI PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 else ()
     message(WARNING "Vulkan Loader not built skipping")
 endif ()

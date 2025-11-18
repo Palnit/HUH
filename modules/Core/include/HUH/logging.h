@@ -14,7 +14,6 @@ public:
             s_largest_name = m_name.size();
         }
     }
-
     friend std::ostream& operator<<(std::ostream& os, const LogCategory& category) {
         os << "[" << category.m_name << "]";
         for (size_t i = 0; i < category.GetNumberOfTabs(); i++) {
@@ -23,7 +22,7 @@ public:
         return os;
     }
 
-    [[nodiscard]] size_t GetNumberOfTabs() const { return (m_name.size() + 2 - (s_largest_name + 2)) / 8 + 1; }
+    [[nodiscard]] size_t GetNumberOfTabs() const { return (s_largest_name + 2 - (m_name.size() + 2)) / 8 + 1; }
 
 private:
     std::string m_name;
@@ -84,13 +83,13 @@ private:
 
 }// namespace HUH
 #define HUH_LOG(category, level, format, ...)                                                                    \
-    HUH::Logging::AddLog(category, level, format, __FILE__ ,std::to_string(__LINE__), __VA_ARGS__);
+    HUH::Logging::AddLog(category, level, format, __FILE__ ,std::to_string(__LINE__) __VA_OPT__(,) __VA_ARGS__);
 
 #define HUH_ILOG(category, format, ...) \
-    HUH_LOG(category,Logging::Level::Log,format,__VA_ARGS__)
+    HUH_LOG(category,Logging::Level::Log,format __VA_OPT__(,) __VA_ARGS__)
 
 #define HUH_WLOG(category, format, ...) \
-    HUH_LOG(category,Logging::Level::Warning,format,__VA_ARGS__)
+    HUH_LOG(category,Logging::Level::Warning,format __VA_OPT__(,) __VA_ARGS__)
 
 #define HUH_ELOG(category, format, ...) \
-    HUH_LOG(category,Logging::Level::Error,format,__VA_ARGS__)
+    HUH_LOG(category,Logging::Level::Error,format __VA_OPT__(,) __VA_ARGS__)

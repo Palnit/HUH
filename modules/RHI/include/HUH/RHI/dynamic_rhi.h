@@ -4,6 +4,7 @@
 #include <HUH/RHI/types.h>
 #include <HUH/definitions.h>
 #include <HUH/dynamic_library.h>
+#include <HUH/RHI/device.h>
 
 namespace HUH::RHI {
 

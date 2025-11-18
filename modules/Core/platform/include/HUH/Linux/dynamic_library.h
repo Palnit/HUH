@@ -14,10 +14,10 @@ public:
 
     template<typename FuncType>
     HUH_NODISCARD HUH_FORCE_INLINE FuncType* GetExport(const std::string& name) {
-        return (FuncType*) (dlsym(m_handle, name.c_str()));
+        return (FuncType*)(dlsym(m_handle, name.c_str()));
     }
     HUH_NODISCARD bool IsLoaded() const;
-    HUH_NODISCARD static std::string GetErrorMessage();
+    static std::string GetErrorMessage();
     HUH_NODISCARD static std::string DecoratePlatformLibraryName(const std::string& name);
     ~DynamicLibrary();
 

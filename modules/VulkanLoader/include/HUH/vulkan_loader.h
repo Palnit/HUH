@@ -4,7 +4,7 @@
 #define VK_NO_PROTOTYPES
 #endif
 
-#include "HUH/Windows/dynamic_library.h"
+#include "HUH/dynamic_library.h"
 #include "vulkan/vulkan.h"
 
 #define HUH_VULKAN_INSTANCE_FUNCS_1_0(Macro) \
@@ -1856,7 +1856,7 @@ bool LoadVulkanInstance(VkInstance instance);
 
 extern HUH::DynamicLibrary s_vulkan_lib;
 
-#define CreateVulkanFunc(Type) extern PFN_##Type Type;
+#define CreateVulkanFunc(Type) extern PFN_## Type Type;
 HUH_VULKAN_ALL_FUNCS(CreateVulkanFunc)
 #undef CreateVulkanFunc
 
