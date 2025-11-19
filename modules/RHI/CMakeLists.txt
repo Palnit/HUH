@@ -20,7 +20,7 @@ target_compile_definitions(HUH-RHI PRIVATE HUH_COMP)
 
 set_target_properties(HUH-RHI PROPERTIES LINKER_LANGUAGE CXX)
 
-target_link_libraries(HUH-RHI
+target_link_libraries(HUH-RHI PUBLIC
         HUH
         HUH::Core
 )

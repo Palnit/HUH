@@ -30,6 +30,7 @@ endif ()
 add_library(HUH-Core SHARED ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES})
 add_library(HUH::Core ALIAS HUH-Core)
 target_compile_definitions(HUH-Core PRIVATE HUH_COMP)
+huh_target_compile_options(HUH-Core PUBLIC MSVC /Zc:preprocessor)
 if (HUH_LINUX)
     target_link_libraries(HUH-Core PUBLIC ${CMAKE_DL_LIBS})
 endif ()
@@ -37,11 +38,6 @@ endif ()
 set_target_properties(HUH-Core PROPERTIES LINKER_LANGUAGE CXX)
 
 target_link_libraries(HUH-Core PUBLIC HUH)
-
-if (SHARED_LIB_LOAD_WITH_RELATIVE_PATH)
-    target_compile_definitions(HUH-Core PUBLIC HUH_SHARED_LIB_LOAD_WITH_RELATIVE_PATH)
-endif ()
-
 
 target_include_directories(HUH-Core PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/include/"

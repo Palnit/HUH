@@ -7,26 +7,15 @@
 
 namespace HUH {
 
-class LogCategory {
+class HUH_API LogCategory {
 public:
-    explicit LogCategory(const std::string& name) : m_name(name) {
-        if (m_name.size() > s_largest_name) {
-            s_largest_name = m_name.size();
-        }
-    }
-    friend std::ostream& operator<<(std::ostream& os, const LogCategory& category) {
-        os << "[" << category.m_name << "]";
-        for (size_t i = 0; i < category.GetNumberOfTabs(); i++) {
-            os << "\t";
-        }
-        return os;
-    }
+    explicit LogCategory(std::string&& name);
+    friend HUH_API std::ostream& operator<<(std::ostream& os, const LogCategory& category);
 
-    [[nodiscard]] size_t GetNumberOfTabs() const { return (s_largest_name + 2 - (m_name.size() + 2)) / 8 + 1; }
+    HUH_NODISCARD size_t GetNumberOfTabs() const;
 
 private:
     std::string m_name;
-    inline static size_t s_largest_name = 0;
 };
 
 class HUH_API Logging {
@@ -40,13 +29,13 @@ public:
     static std::string ToStringConsole(Logging::Level level) {
         switch (level) {
             case Level::Log:
-                return "[Log]\t\t";
+                return "[Log]";
             case Level::Warning:
-                return "[Warning]\t";
+                return "[Warning]";
             case Level::Error:
-                return "[Error]\t\t";
+                return "[Error]";
             default:
-                return "[Unknown]\t";
+                return "[Unknown]";
         }
     }
 
@@ -72,8 +61,8 @@ public:
                        std::filesystem::path&& file_info,
                        const std::string& file_line,
                        Args&&... args) {
-        std::cout << ToConsoleColor(level) << ToStringConsole(level) << ConsoleColor::Cyan << category
-                  << ConsoleColor::Reset << std::vformat(format, std::make_format_args(args...)) << "\t["
+        std::cout << ToConsoleColor(level) << std::left << std::setw(12) << ToStringConsole(level) << ConsoleColor::Cyan
+                  << category << ConsoleColor::Reset << std::vformat(format, std::make_format_args(args...)) << "\t["
                   << file_info.lexically_relative(s_huh_path).string() << ":" << file_line << "]" << std::endl;
     }
 

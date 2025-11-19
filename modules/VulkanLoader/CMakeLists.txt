@@ -19,7 +19,7 @@ if (VULKAN_INC)
     )
     add_library(HUH::VulkanLoader ALIAS HUH-VulkanLoader)
     target_compile_definitions(HUH-VulkanLoader PRIVATE HUH_COMP)
-    target_compile_options(HUH-VulkanLoader PRIVATE -fPIC)
+    huh_target_compile_options(HUH-VulkanLoader PRIVATE GCClang -fPIC)
 
     set_target_properties(HUH-VulkanLoader PROPERTIES LINKER_LANGUAGE CXX)
 
