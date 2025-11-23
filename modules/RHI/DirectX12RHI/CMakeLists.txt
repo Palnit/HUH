@@ -13,7 +13,7 @@ set(DX12_RHI_SOURCE_FILES
 if (HUH_WIN)
     add_library(HUH-DirectX12RHI SHARED ${DX12_RHI_HEADER_FILES} ${DX12_RHI_SOURCE_FILES})
     add_library(HUH::DirectX12RHI ALIAS HUH-DirectX12RHI)
-    target_compile_definitions(HUH-DirectX12RHI PRIVATE HUH_COMP)
+    huh_target_create_definition(HUH-DirectX12RHI)
 
     set_target_properties(HUH-DirectX12RHI PROPERTIES LINKER_LANGUAGE CXX)
 

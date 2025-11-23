@@ -15,7 +15,7 @@ namespace HUH::Graphics::OpenGl{
  * It takes a VertexBufferObject class and an ElementBufferObject and takes
  * makes the OpenGl vertex attributes from the VBO and binds the EBO to it self
  */
-class HUH_API VertexArrayObject {
+class HUH_GRAPHICS_API VertexArrayObject {
 public:
     /*!
      * Constructor that generates the vertex arrays

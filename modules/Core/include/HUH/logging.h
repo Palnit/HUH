@@ -7,10 +7,10 @@
 
 namespace HUH {
 
-class HUH_API LogCategory {
+class HUH_CORE_API LogCategory {
 public:
     explicit LogCategory(std::string&& name);
-    friend HUH_API std::ostream& operator<<(std::ostream& os, const LogCategory& category);
+    friend HUH_CORE_API std::ostream& operator<<(std::ostream& os, const LogCategory& category);
 
     HUH_NODISCARD size_t GetNumberOfTabs() const;
 
@@ -18,7 +18,7 @@ private:
     std::string m_name;
 };
 
-class HUH_API Logging {
+class HUH_CORE_API Logging {
 public:
     enum Level {
         Log,
@@ -75,10 +75,10 @@ private:
     HUH::Logging::AddLog(category, level, format, __FILE__ ,std::to_string(__LINE__) __VA_OPT__(,) __VA_ARGS__);
 
 #define HUH_ILOG(category, format, ...) \
-    HUH_LOG(category,Logging::Level::Log,format __VA_OPT__(,) __VA_ARGS__)
+    HUH_LOG(category,HUH::Logging::Log,format __VA_OPT__(,) __VA_ARGS__)
 
 #define HUH_WLOG(category, format, ...) \
-    HUH_LOG(category,Logging::Level::Warning,format __VA_OPT__(,) __VA_ARGS__)
+    HUH_LOG(category,HUH::Logging::Warning,format __VA_OPT__(,) __VA_ARGS__)
 
 #define HUH_ELOG(category, format, ...) \
-    HUH_LOG(category,Logging::Level::Error,format __VA_OPT__(,) __VA_ARGS__)
+    HUH_LOG(category,HUH::Logging::Error,format __VA_OPT__(,) __VA_ARGS__)

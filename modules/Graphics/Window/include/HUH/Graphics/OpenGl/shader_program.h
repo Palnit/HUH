@@ -16,7 +16,7 @@ namespace HUH::Graphics::OpenGl{
  * It can take different kinds of shaders to link them and latter when needed
  * bind the program
  */
-class HUH_API ShaderProgram {
+class HUH_GRAPHICS_API ShaderProgram {
 public:
     /*!
      * Default constructor generates the OpenGl program

@@ -4,7 +4,7 @@
 #include <string>
 
 namespace HUH {
-class HUH_API DynamicLibrary {
+class HUH_CORE_API DynamicLibrary {
 public:
     DynamicLibrary() = default;
     explicit DynamicLibrary(const std::string& path);

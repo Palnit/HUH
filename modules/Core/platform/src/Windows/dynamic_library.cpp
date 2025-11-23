@@ -14,9 +14,10 @@ std::string DynamicLibrary::GetErrorMessage() {
 
     LPSTR messageBuffer = nullptr;
 
-    size_t size = FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr,
-        errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &messageBuffer, 0, nullptr);
+    size_t size = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM
+                                    | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_MAX_WIDTH_MASK,
+                                nullptr, errorMessageID, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+                                (LPSTR)&messageBuffer, 0, nullptr);
 
     std::string message(messageBuffer, size);
 

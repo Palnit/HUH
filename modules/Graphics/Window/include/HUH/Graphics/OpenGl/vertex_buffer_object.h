@@ -14,7 +14,7 @@ namespace HUH::Graphics::OpenGl{
  * It contains all data that describes a data type of VBO and the data OpenGL
  * needs to be abel to handel it later in the shader pipeline
  */
-struct HUH_API AttributeDescriptor {
+struct HUH_GRAPHICS_API AttributeDescriptor {
     /*!
      * Constructor
      * \param size The size of the data array
@@ -73,7 +73,7 @@ struct HUH_API AttributeDescriptor {
  * \tparam T The template type of the stored data
  */
 template<typename T>
-class HUH_API VertexBufferObject {
+class HUH_GRAPHICS_API VertexBufferObject {
 public:
     /*!
      * Default constructor generates the buffer

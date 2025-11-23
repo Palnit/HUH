@@ -8,7 +8,7 @@
 #include "generic_math.h"
 namespace HUH::Graphics::OpenGl{
 
-class HUH_API Camera {
+class HUH_GRAPHICS_API Camera {
 public:
     Camera(glm::vec3 eye = Math::ZeroVector,
            glm::vec3 at = Math::ForwardVector,

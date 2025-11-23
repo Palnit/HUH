@@ -16,7 +16,7 @@ set(SOURCE_FILES
 
 add_library(HUH-RHI SHARED ${HEADER_FILES} ${SOURCE_FILES})
 add_library(HUH::RHI ALIAS HUH-RHI)
-target_compile_definitions(HUH-RHI PRIVATE HUH_COMP)
+huh_target_create_definition(HUH-RHI)
 
 set_target_properties(HUH-RHI PROPERTIES LINKER_LANGUAGE CXX)
 

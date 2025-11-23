@@ -3,6 +3,7 @@
 #ifdef HUH_WIN
 #include <windows.h>
 #endif
+#include <HUH/enum_helper.h>
 
 namespace HUH {
 class ConsoleColor {
@@ -17,37 +18,30 @@ public:
         Cyan = Green | Blue,
         Reset = Blue | Green | Red
     };
-    friend Color operator|(const Color& c1, const Color& c2) {
-        return static_cast<Color>(static_cast<int>(c1) | static_cast<int>(c2));
-    }
-
-    friend Color operator&(const Color& c1, const Color& c2) {
-        return static_cast<Color>(static_cast<int>(c1) & static_cast<int>(c2));
-    }
 
     static std::string GetANSIiCode(const Color& c1) {
-        if (c1 & Red && c1 & Green && c1 & Blue) {
+        if (CheckAllFlag(c1, Reset)) {
             return "\033[0m";
         }
-        if (c1 & Red && c1 & Green) {
+        if (CheckAllFlag(c1, Yellow)) {
             return "\033[33m";
         }
-        if (c1 & Red && c1 & Blue) {
+        if (CheckAllFlag(c1, Magenta)) {
             return "\033[35m";
         }
-        if (c1 & Blue && c1 & Green) {
+        if (CheckAllFlag(c1, Cyan)) {
             return "\033[36m";
         }
-        if (c1 & Blue) {
+        if (CheckAllFlag(c1, Blue)) {
             return "\033[34m";
         }
-        if (c1 & Green) {
+        if (CheckAllFlag(c1, Green)) {
             return "\033[32m";
         }
-        if (c1 & Red) {
+        if (CheckAllFlag(c1, Red)) {
             return "\033[31m";
         }
-        if (c1 & Bright) {
+        if (CheckAllFlag(c1, Bright)) {
             return "\033[1m";
         }
         return "\033[0m";
@@ -66,4 +60,5 @@ public:
 
 private:
 };
+
 }// namespace HUH

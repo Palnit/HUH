@@ -129,7 +129,7 @@ void VulkanDynamicRHI::Destroy() {
     }
     delete this;
 }
-extern "C" HUH_API DynamicRHI* DynamicRHICreate() {
+extern "C" HUH_VULKANRHI_API DynamicRHI* DynamicRHICreate() {
     return new VulkanDynamicRHI();
 }
 

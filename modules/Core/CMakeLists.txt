@@ -9,6 +9,7 @@ set(CORE_HEADER_FILE
         ${CORE_INC_PATH}/logging.h
         ${CORE_INC_PATH}/string_operations.h
         ${CORE_INC_PATH}/console_color.h
+        ${CORE_INC_PATH}/enum_helper.h
 )
 set(CORE_SOURCE_FILES
         src/logging.cpp
@@ -36,6 +37,7 @@ if (HUH_LINUX)
 endif ()
 
 set_target_properties(HUH-Core PROPERTIES LINKER_LANGUAGE CXX)
+huh_target_create_definition(HUH-Core)
 
 target_link_libraries(HUH-Core PUBLIC HUH)
 

@@ -5,7 +5,7 @@
 #include "SDL3/SDL.h"
 #include "imgui.h"
 
-namespace HUH::Graphics::Vulkan{
+namespace HUH::Graphics::Vulkan {
 /*!
  * \class BasicWindow
  * \brief An SDL2-Opengl-ImGui window generating virtual class should be inherited
@@ -30,17 +30,12 @@ public:
      * is always appended
      */
 
-    HUH_API BasicWindow(const char* title,
-                        int x,
-                        int y,
-                        int width,
-                        int height,
-                        uint32_t flags);
+    HUH_GRAPHICS_API BasicWindow(const char* title, int x, int y, int width, int height, uint32_t flags);
 
-    HUH_API ~BasicWindow();
+    HUH_GRAPHICS_API ~BasicWindow();
 
-    HUH_API int InitWindow();
-    HUH_API int run();
+    HUH_GRAPHICS_API int InitWindow();
+    HUH_GRAPHICS_API int run();
 
     /*!
      * Virtual function \n
@@ -90,7 +85,7 @@ public:
      * The new sizes of the window is stored int he protected variables m_width
      * and m_height
      */
-    virtual void Resize() {  };
+    virtual void Resize() {};
 
     /*!
      * Virtual function \n
@@ -105,16 +100,15 @@ public:
     virtual void Update() {};
 
     /*!
-    * Virtual function \n
-    * Rendering function called at every iteration of the main loop
-    */
-    virtual void Render() {
-    };
+     * Virtual function \n
+     * Rendering function called at every iteration of the main loop
+     */
+    virtual void Render() {};
 
     /*!
-    * Virtual function \n
-    * ImGui Rendering function called at every iteration of the main loop
-    */
+     * Virtual function \n
+     * ImGui Rendering function called at every iteration of the main loop
+     */
     virtual void RenderImGui() {
         bool render = true;
         ImGui::ShowDemoWindow(&render);
@@ -131,5 +125,4 @@ protected:
     SDL_Window* m_window = nullptr;
     SDL_Event m_ev;
 };
-}
-
+}// namespace HUH::Graphics::Vulkan

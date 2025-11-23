@@ -14,7 +14,7 @@ namespace HUH::Graphics::OpenGl{
  * It contains a vector of unsigned int that it binds as its data when you simply
  * call bind and only replaces the data when any new data has been loaded
  */
-class HUH_API ElementBufferObject {
+class HUH_GRAPHICS_API ElementBufferObject {
 public:
     /*!
      * Default constructor

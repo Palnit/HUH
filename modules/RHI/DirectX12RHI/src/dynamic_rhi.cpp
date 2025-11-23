@@ -62,7 +62,7 @@ std::vector<Device*> DX12DynamicRHI::GetDevices() {
     return m_created_devices;
 }
 
-extern "C" HUH_API DynamicRHI* DynamicRHICreate() {
+extern "C" HUH_DIRECTX12RHI_API DynamicRHI* DynamicRHICreate() {
     return new DX12DynamicRHI();
 }
 }// namespace HUH::RHI

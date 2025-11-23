@@ -13,12 +13,7 @@
 #include <implot.h>
 
 namespace HUH::Graphics::OpenGl {
-BasicWindow::BasicWindow(const char* title,
-                         int x,
-                         int y,
-                         int width,
-                         int height,
-                         uint32_t flags)
+BasicWindow::BasicWindow(const char* title, int x, int y, int width, int height, uint32_t flags)
     : m_title(title),
       m_x(x),
       m_y(y),
@@ -29,16 +24,19 @@ BasicWindow::BasicWindow(const char* title,
     SDL_SetLogPriority(SDL_LOG_CATEGORY_ERROR, SDL_LOG_PRIORITY_ERROR);
 }
 int BasicWindow::run() {
-    if (InitWindow()) { return 1; }
-    if (Init()) { return 1; }
+    if (InitWindow()) {
+        return 1;
+    }
+    if (Init()) {
+        return 1;
+    }
     double fpsCount = 0;
     Uint64 fpsLastTime = SDL_GetTicks();
     ImGuiIO& io = ImGui::GetIO();
     while (m_running) {
         Time::DeltaTime = SDL_GetTicks() - Time::ElapsedTime;
         Time::ElapsedTime = SDL_GetTicks();
-        double diff =
-            static_cast<double>(Time::ElapsedTime - fpsLastTime) * 0.001;
+        double diff = static_cast<double>(Time::ElapsedTime - fpsLastTime) * 0.001;
         fpsCount++;
         if (diff >= 1.0 / 30.0) {
             Time::FPS = (1.0 / diff) * fpsCount;
@@ -57,22 +55,28 @@ int BasicWindow::run() {
                     m_running = false;
                     break;
                 case SDL_EVENT_KEY_DOWN:
-                    if (!isKeyboardCaptured) KeyboardDown(m_ev.key);
+                    if (!isKeyboardCaptured)
+                        KeyboardDown(m_ev.key);
                     break;
                 case SDL_EVENT_KEY_UP:
-                    if (!isKeyboardCaptured) KeyboardUp(m_ev.key);
+                    if (!isKeyboardCaptured)
+                        KeyboardUp(m_ev.key);
                     break;
                 case SDL_EVENT_MOUSE_BUTTON_DOWN:
-                    if (!isMouseCaptured) MouseDown(m_ev.button);
+                    if (!isMouseCaptured)
+                        MouseDown(m_ev.button);
                     break;
                 case SDL_EVENT_MOUSE_BUTTON_UP:
-                    if (!isMouseCaptured) MouseUp(m_ev.button);
+                    if (!isMouseCaptured)
+                        MouseUp(m_ev.button);
                     break;
                 case SDL_EVENT_MOUSE_WHEEL:
-                    if (!isMouseCaptured) MouseWheel(m_ev.wheel);
+                    if (!isMouseCaptured)
+                        MouseWheel(m_ev.wheel);
                     break;
                 case SDL_EVENT_MOUSE_MOTION:
-                    if (!isMouseCaptured) MouseMove(m_ev.motion);
+                    if (!isMouseCaptured)
+                        MouseMove(m_ev.motion);
                     break;
                 case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
                 case SDL_EVENT_WINDOW_SHOWN:
@@ -102,8 +106,12 @@ BasicWindow::~BasicWindow() {
     ImGui_ImplSDL3_Shutdown();
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
-    if (m_window != nullptr) { SDL_DestroyWindow(m_window); }
-    if (m_context != nullptr) { SDL_GL_DestroyContext(m_context); }
+    if (m_window != nullptr) {
+        SDL_DestroyWindow(m_window);
+    }
+    if (m_context != nullptr) {
+        SDL_GL_DestroyContext(m_context);
+    }
     SDL_Quit();
 }
 int BasicWindow::InitWindow() {
@@ -113,8 +121,7 @@ int BasicWindow::InitWindow() {
         return 1;
     }
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-                        SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
 #ifdef _DEBUG
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
@@ -133,10 +140,8 @@ int BasicWindow::InitWindow() {
     SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, m_x);
     SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, m_y);
     SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, m_width);
-    SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER,
-                          m_height);
-    SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER,
-                          SDL_WINDOW_OPENGL | m_flags);
+    SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, m_height);
+    SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, SDL_WINDOW_OPENGL | m_flags);
     m_window = SDL_CreateWindowWithProperties(props);
     SDL_DestroyProperties(props);
 
@@ -172,9 +177,7 @@ int BasicWindow::InitWindow() {
     if (context_flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE,
-                              GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr,
-                              GL_FALSE);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
         glDebugMessageCallback(SDL_GLDebugMessageCallback, nullptr);
     }
 
@@ -182,8 +185,7 @@ int BasicWindow::InitWindow() {
     ImGui::CreateContext();
     ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |=
-        ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable;
 
     ImGui::StyleColorsDark();
     ImGui_ImplSDL3_InitForOpenGL(m_window, m_context);
@@ -191,6 +193,8 @@ int BasicWindow::InitWindow() {
 
     return 0;
 }
-}// namespace HUH
+}// namespace HUH::Graphics::OpenGl
 
-int HUH_API TestAdd(int a, int b) { return a + b; }
+int HUH_GRAPHICS_API TestAdd(int a, int b) {
+    return a + b;
+}

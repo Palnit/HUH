@@ -9,9 +9,9 @@
 #endif
 
 namespace HUH::RHI {
-extern "C" HUH_API HUH::RHI::DynamicRHI* DynamicRHICreate();
+extern "C" HUH_DIRECTX12RHI_API HUH::RHI::DynamicRHI* DynamicRHICreate();
 
-class HUH_API DX12DynamicRHI final : public RHI::DynamicRHI {
+class HUH_DIRECTX12RHI_API DX12DynamicRHI final : public RHI::DynamicRHI {
 public:
     void Destroy() override;
     bool Init() override;

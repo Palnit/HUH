@@ -5,5 +5,5 @@
 #include <HUH/definitions.h>
 
 namespace HUH {
-HUH_API std::vector<std::string> Split(std::string s, std::string delimiter);
+HUH_CORE_API std::vector<std::string> Split(std::string s, std::string delimiter);
 }// namespace HUH

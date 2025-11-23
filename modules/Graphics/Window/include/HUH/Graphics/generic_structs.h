@@ -4,20 +4,19 @@
 #include <cstdint>
 #include "HUH/definitions.h"
 
-namespace HUH::Graphics{
+namespace HUH::Graphics {
 
 /*!
  * A simple RGBA struct to easily get the memory data from a uint32_t into the 4
  * channels if reinterpret casted or c style casted
  */
-typedef struct HUH_API RGBA {
+typedef struct HUH_GRAPHICS_API RGBA {
     uint8_t r;
     uint8_t g;
     uint8_t b;
     uint8_t a;
     bool operator==(const RGBA& other) {
-        if (other.r == this->r && other.g == this->g && other.b == this->b
-            && other.a == this->a) {
+        if (other.r == this->r && other.g == this->g && other.b == this->b && other.a == this->a) {
             return true;
         }
         return false;
@@ -27,7 +26,7 @@ typedef struct HUH_API RGBA {
 /*!
  * Used to get the memory data into an RGBA struct doesn't require casting
  */
-typedef union HUH_API Color {
+typedef union HUH_GRAPHICS_API Color {
     uint32_t raw;
     RGBA channels;
 } Color;
@@ -39,7 +38,7 @@ typedef union HUH_API Color {
  * A time class from witch statically we can get time data about the application
  * from anywhere in the program
  */
-class HUH_API Time {
+class HUH_GRAPHICS_API Time {
 public:
     Time() = delete;
     ~Time() = delete;
@@ -47,12 +46,8 @@ public:
     static inline uint64_t DeltaTime = 0;
     static inline double FPS = 0;
     static inline double Ms = 0;
-    static float ElapsedTimeF() {
-        return static_cast<float>(ElapsedTime) / 1000.0f;
-    };
-    static float DeltaTimeF() {
-        return static_cast<float>(DeltaTime) / 1000.0f;
-    };
+    static float ElapsedTimeF() { return static_cast<float>(ElapsedTime) / 1000.0f; };
+    static float DeltaTimeF() { return static_cast<float>(DeltaTime) / 1000.0f; };
 };
 
 /*!
@@ -63,8 +58,8 @@ namespace ErrorHandling {
  * A simple function to display an SDL error if happened
  * \param type The errors type
  */
-HUH_API void HandelSDLError(const char* type);
+HUH_GRAPHICS_API void HandelSDLError(const char* type);
 
 }// namespace ErrorHandling
-}// namespace HUH
-#endif//GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_GENERIC_STRUCTS_H_
+}// namespace HUH::Graphics
+#endif// GPGPU_EDGE_DETECTOR_INCLUDE_GENERAL_GENERIC_STRUCTS_H_

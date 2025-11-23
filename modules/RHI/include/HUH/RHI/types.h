@@ -1,5 +1,5 @@
 #pragma once
 
 namespace HUH::RHI {
-enum class RenderApi { OpenGl, Vulkan, DX12, Unknown };
+enum class RenderApi { Vulkan, DX12, Unknown };
 }

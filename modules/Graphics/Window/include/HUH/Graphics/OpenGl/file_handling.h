@@ -15,7 +15,7 @@ namespace HUH::FileHandling {
  * \return A pointer to the constructed SDL_Surface object the user is responsible
  * for the pointers lifetime
  */
-HUH_API SDL_Surface*  LoadImage(const char* file);
+HUH_GRAPHICS_API SDL_Surface*  LoadImage(const char* file);
 
 /*!
  * Loads any kind of shader from a shader file and compiles it
@@ -23,13 +23,13 @@ HUH_API SDL_Surface*  LoadImage(const char* file);
  * \param filename The path to the shader file
  * \return The OpenGl identifier for the shader
  */
-HUH_API GLuint LoadShader(GLenum shaderType, const char* filename);
+HUH_GRAPHICS_API GLuint LoadShader(GLenum shaderType, const char* filename);
 
 /// Function to load data from memory
 /// @param pointer pointer to memory
 /// @param size size of memory
 /// @return the returned sdl_surface pointer
-HUH_API SDL_Surface* LoadImageFromMemory(void* pointer, int size);
+HUH_GRAPHICS_API SDL_Surface* LoadImageFromMemory(void* pointer, int size);
 
 } // FileHandling
 

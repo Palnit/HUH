@@ -8,10 +8,8 @@
 
 namespace HUH::RHI {
 
-class HUH_API DynamicRHI {
+class HUH_RHI_API DynamicRHI {
 public:
-    friend class Device;
-
     static void LoadRHI(RenderApi api);
     using CreateStub = DynamicRHI*();
     static CreateStub* Create;

@@ -53,6 +53,7 @@ find_package(Vulkan REQUIRED)
 add_library(HUH-Graphics SHARED ${HEADER_FILES} ${SOURCE_FILES} ${HEADER_FILES_OPENGL} ${SOURCE_FILES_OPENGL} ${HEADER_FILES_VULKAN} ${SOURCE_FILES_VULKAN})
 add_library(HUH::Graphics ALIAS HUH-Graphics)
 target_compile_definitions(HUH-Graphics PRIVATE HUH_COMP)
+huh_target_create_definition(HUH-Graphics)
 
 target_link_libraries(HUH-Graphics PUBLIC
         HUH

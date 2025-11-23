@@ -1,0 +1,6 @@
+function(huh_target_create_definition TARGET)
+    string(REPLACE "-" "_" TARGET_NAME ${TARGET})
+    string(TOUPPER ${TARGET_NAME} TARGET_NAME)
+    target_compile_definitions(${TARGET} PRIVATE ${TARGET_NAME}_API=EXPORT)
+    set_property(TARGET HUH APPEND PROPERTY HUH_LIB_IMPORT_DEFINES "#ifndef ${TARGET_NAME}_API\n#define ${TARGET_NAME}_API IMPORT\n#endif\n")
+endfunction()

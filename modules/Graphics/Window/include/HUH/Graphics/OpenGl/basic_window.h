@@ -7,7 +7,7 @@
 #include "glm/glm.hpp"
 #include "imgui.h"
 
-extern "C" int HUH_API TestAdd(int a, int b);
+extern "C" int HUH_GRAPHICS_API TestAdd(int a, int b);
 
 namespace HUH::Graphics::OpenGl {
 
@@ -35,12 +35,12 @@ public:
      * is always appended
      */
 
-    HUH_API BasicWindow(const char* title, int x, int y, int width, int height, uint32_t flags);
+    HUH_GRAPHICS_API BasicWindow(const char* title, int x, int y, int width, int height, uint32_t flags);
 
-    HUH_API ~BasicWindow();
+    HUH_GRAPHICS_API ~BasicWindow();
 
-    HUH_API int InitWindow();
-    HUH_API int run();
+    HUH_GRAPHICS_API int InitWindow();
+    HUH_GRAPHICS_API int run();
 
     /*!
      * Virtual function \n

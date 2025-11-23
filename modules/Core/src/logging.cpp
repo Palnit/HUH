@@ -2,7 +2,7 @@
 #include <HUH/logging.h>
 
 namespace HUH {
-size_t HUH_API s_largest_category_size = 0;
+size_t HUH_CORE_API s_largest_category_size = 0;
 LogCategory::LogCategory(std::string&& name) : m_name(name) {
     if (m_name.size() > s_largest_category_size) {
         s_largest_category_size = m_name.size();

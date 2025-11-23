@@ -5,9 +5,9 @@
 
 namespace HUH::RHI {
 
-extern "C" HUH_API HUH::RHI::DynamicRHI* DynamicRHICreate();
+extern "C" HUH_VULKANRHI_API HUH::RHI::DynamicRHI* DynamicRHICreate();
 
-class HUH_API VulkanDynamicRHI final : public RHI::DynamicRHI {
+class HUH_VULKANRHI_API VulkanDynamicRHI final : public RHI::DynamicRHI {
 public:
     void Destroy() override;
     bool Init() override;

@@ -4,8 +4,8 @@
 #define VK_NO_PROTOTYPES
 #endif
 
-#include "HUH/dynamic_library.h"
-#include "vulkan/vulkan.h"
+#include <HUH/dynamic_library.h>
+#include <vulkan/vulkan.h>
 
 #define HUH_VULKAN_INSTANCE_FUNCS_1_0(Macro) \
     Macro(vkGetInstanceProcAddr)   \
@@ -1851,12 +1851,12 @@
     HUH_VULKAN_ALL_PROC_FUNCS(Macro)
 
 namespace HUH {
-bool LoadVulkan();
-bool LoadVulkanInstance(VkInstance instance);
+bool HUH_VULKANLOADER_API LoadVulkan();
+bool HUH_VULKANLOADER_API LoadVulkanInstance(VkInstance instance);
 
-extern HUH::DynamicLibrary s_vulkan_lib;
+extern HUH_VULKANLOADER_API HUH::DynamicLibrary s_vulkan_lib;
 
-#define CreateVulkanFunc(Type) extern PFN_## Type Type;
+#define CreateVulkanFunc(Type) extern HUH_VULKANLOADER_API PFN_## Type Type;
 HUH_VULKAN_ALL_FUNCS(CreateVulkanFunc)
 #undef CreateVulkanFunc
 

@@ -14,8 +14,6 @@ DynamicLibrary DynamicRHI::s_RHIImplSharedLibrary;
 void DynamicRHI::LoadRHI(RenderApi api) {
     std::string rhiApiName;
     switch (api) {
-        case RenderApi::OpenGl:
-            break;
         case RenderApi::Vulkan:
             rhiApiName = "HUH-VulkanRHI";
             break;
@@ -31,12 +29,11 @@ void DynamicRHI::LoadRHI(RenderApi api) {
     }
     DynamicRHI::Create = s_RHIImplSharedLibrary.GetExport<CreateStub>("DynamicRHICreate");
     if (DynamicRHI::Create == nullptr) {
-        // TODO NORMAL ERROR;
         DynamicRHI::Create = &DefaultCreate;
     }
 }
 DynamicRHI::~DynamicRHI() {
-    HUH_ILOG(LogRHI, "Destroying Created Devices")
+    HUH_ILOG(LogRHI, "Destroying Created Devices: ")
     for (const Device* device : m_created_devices) {
         delete device;
     }
