@@ -4,6 +4,7 @@ set(WINDOW_WINDOWS_INC_PATH "platform/include/HUH/Window/Windows")
 set(HEADER_FILES
         ${WINDOW_INC_PATH}/prototypes/window_proto.h
         ${WINDOW_INC_PATH}/window.h
+        ${WINDOW_INC_PATH}/definitions.h
 )
 set(SOURCE_FILES
 )

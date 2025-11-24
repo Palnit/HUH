@@ -3,5 +3,6 @@
 #include <Windows.h>
 
 namespace HUH {
-extern HUH_CORE_API HINSTANCE s_AppInstance;
-}
+extern HUH_CORE_API HINSTANCE g_AppInstance;
+extern HUH_CORE_API int g_CmdShow;
+}// namespace HUH

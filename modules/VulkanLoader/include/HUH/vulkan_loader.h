@@ -1854,7 +1854,7 @@ namespace HUH {
 bool HUH_VULKANLOADER_API LoadVulkan();
 bool HUH_VULKANLOADER_API LoadVulkanInstance(VkInstance instance);
 
-extern HUH_VULKANLOADER_API HUH::DynamicLibrary s_vulkan_lib;
+extern HUH_VULKANLOADER_API HUH::DynamicLibrary g_vulkanLib;
 
 #define CreateVulkanFunc(Type) extern HUH_VULKANLOADER_API PFN_## Type Type;
 HUH_VULKAN_ALL_FUNCS(CreateVulkanFunc)

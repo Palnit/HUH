@@ -1,14 +1,23 @@
 #pragma once
 
+#include <windows.h>
 #include <HUH/Window/prototypes/window_proto.h>
 
 namespace HUH {
+
+LRESULT CALLBACK WindowProcPassToClass(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 class HUH_WINDOW_API Window : public WindowProto {
 public:
+    Window(const std::string& name);
+    ~Window() override;
     void Show() override;
-    ~Window() override = default;
+    void Loop() override;
 
 private:
+    friend LRESULT CALLBACK WindowProcPassToClass(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+    HWND m_windowHandle = nullptr;
 };
 
 }// namespace HUH
