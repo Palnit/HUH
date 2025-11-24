@@ -19,18 +19,24 @@ set(CORE_SOURCE_FILES
 if (HUH_WIN)
     list(APPEND CORE_HEADER_FILES
             ${CORE_WIN_INC_PATH}/dynamic_library.h
+            ${CORE_WIN_INC_PATH}/win_main.h
+            ${CORE_WIN_INC_PATH}/win_instance.h
     )
-    list(APPEND CORE_SOURCE_FILES platform/src/Windows/dynamic_library.cpp)
+    list(APPEND CORE_SOURCE_FILES
+            platform/src/Windows/dynamic_library.cpp
+            platform/src/Windows/win_instance.cpp
+    )
 elseif (HUH_LINUX)
     list(APPEND CORE_HEADER_FILES
             ${CORE_LINUX_INC_PATH}/dynamic_library.h
     )
-    list(APPEND CORE_SOURCE_FILES platform/src/Linux/dynamic_library.cpp)
+    list(APPEND CORE_SOURCE_FILES
+            platform/src/Linux/dynamic_library.cpp
+    )
 endif ()
 
 add_library(HUH-Core SHARED ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES})
 add_library(HUH::Core ALIAS HUH-Core)
-target_compile_definitions(HUH-Core PRIVATE HUH_COMP)
 huh_target_compile_options(HUH-Core PUBLIC MSVC /Zc:preprocessor)
 if (HUH_LINUX)
     target_link_libraries(HUH-Core PUBLIC ${CMAKE_DL_LIBS})

@@ -1,7 +1,9 @@
+#include "HUH/string_operations.h"
 #include "HUH/RHI/vulkan/queue.h"
-
+#include "HUH/VulkanHelpers/string_converters.h"
 #include <HUH/RHI/vulkan/device.h>
 #include <HUH/enum_helper.h>
+
 namespace HUH::RHI {
 Device::MemoryStatistics VulkanDevice::GetMemoryStatistics() {
     return {};
@@ -19,7 +21,58 @@ bool VulkanDevice::Init() {
                                           .pQueuePriorities = &queuePriority};
         queueInfos.emplace_back(queueInfo);
     }
+
+    Uint32 extensionCount;
+    HUH::vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, nullptr);
+    std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+    HUH::vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, availableExtensions.data());
+
+#if HUH_DEBUG
+    HUH_LOG(LogVulkanRHI, Logging::Log, "Available Instance extensions:")
+    for (size_t i = 0; i < availableExtensions.size(); i++) {
+        HUH_LOG(LogVulkanRHI, Logging::Log, "{}.\t{}", i + 1, availableExtensions[i].extensionName)
+    }
+#endif
+
+    // TODO MAKE THIS A VECTOR FROM DEFAULT
+    const std::string requiredExtensionsString = HUH_REQUIRED_DEVICE_EXTENSIONS;
+    std::vector<std::string> requiredExtensionsStrings = HUH::Split(requiredExtensionsString, ";");
+    std::vector<const char*> requiredExtensions;
+
+    for (auto& extension : requiredExtensionsStrings) {
+        auto found_extension = std::find_if(availableExtensions.begin(), availableExtensions.end(),
+                                            [extension](const VkExtensionProperties& properties) {
+                                                if (std::string(properties.extensionName) == extension) {
+                                                    return true;
+                                                }
+                                                return false;
+                                            });
+        if (found_extension == availableExtensions.end()) {
+            HUH_LOG(LogVulkanRHI, Logging::Level::Warning, "Required instance extension is not available skipping: {}",
+                    extension)
+            continue;
+        }
+        requiredExtensions.push_back(extension.c_str());
+    }
+
+    VkDeviceCreateInfo deviceInfo{.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+                                  .pNext = &Features.features_1_0,
+                                  .queueCreateInfoCount = static_cast<Uint32>(queueInfos.size()),
+                                  .pQueueCreateInfos = queueInfos.data(),
+                                  .enabledExtensionCount = static_cast<Uint32>(requiredExtensions.size()),
+                                  .ppEnabledExtensionNames = requiredExtensions.data()};
+    if (auto err = HUH::vkCreateDevice(m_physicalDevice, &deviceInfo, nullptr, &m_device); err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Device Creation Error: {}", HUH::ToString(err))
+        return false;
+    }
+    HUH_ILOG(LogVulkanRHI, "Device creation is successful for device named: {}",
+             Properties.properties_1_0.properties.deviceName)
     return true;
+}
+void VulkanDevice::Destroy() {
+    if (m_device) {
+        HUH::vkDestroyDevice(m_device, nullptr);
+    }
 }
 Queue* VulkanDevice::CreateQueue(Queue::Type type) {
     if (m_device) {

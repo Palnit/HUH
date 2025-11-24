@@ -32,10 +32,12 @@ void DynamicRHI::LoadRHI(RenderApi api) {
         DynamicRHI::Create = &DefaultCreate;
     }
 }
-DynamicRHI::~DynamicRHI() {
+void DynamicRHI::Destroy() {
     HUH_ILOG(LogRHI, "Destroying Created Devices: ")
-    for (const Device* device : m_created_devices) {
+    for (Device* device : m_created_devices) {
+        device->Destroy();
         delete device;
     }
 }
+
 }// namespace HUH::RHI

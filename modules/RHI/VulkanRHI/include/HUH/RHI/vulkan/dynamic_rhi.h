@@ -1,6 +1,5 @@
 #pragma once
 
-#include <HUH/vulkan_loader.h>
 #include <HUH/RHI/dynamic_rhi.h>
 
 namespace HUH::RHI {

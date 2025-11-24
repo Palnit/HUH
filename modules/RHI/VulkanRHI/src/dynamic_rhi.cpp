@@ -1,7 +1,5 @@
-#include "HUH/RHI/vulkan/device.h"
-
+#include <HUH/RHI/vulkan/device.h>
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
-#include <HUH/logging.h>
 #include <iostream>
 #include <vector>
 #include <HUH/types.h>
@@ -124,6 +122,7 @@ std::vector<Device*> VulkanDynamicRHI::GetDevices() {
 }
 
 void VulkanDynamicRHI::Destroy() {
+    DynamicRHI::Destroy();
     if (m_instance != VK_NULL_HANDLE) {
         HUH::vkDestroyInstance(m_instance, nullptr);
     }

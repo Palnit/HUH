@@ -48,9 +48,6 @@ public:
     HUH_NODISCARD HUH_CONSTEXPR_FORCE T* XYZ() noexcept { return data; }
     HUH_NODISCARD HUH_CONSTEXPR_FORCE const T* XYZ() const noexcept { return data; }
 
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE T* RGB() noexcept { return data; }
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE const T* RGB() const noexcept { return data; }
-
     HUH_NODISCARD HUH_CONSTEXPR_FORCE static std::size_t Size() { return 3; }
 
     HUH_NODISCARD HUH_CONSTEXPR_FORCE T& operator[](std::size_t index) noexcept { return data[index]; }

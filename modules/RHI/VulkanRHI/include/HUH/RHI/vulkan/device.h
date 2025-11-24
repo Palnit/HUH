@@ -1,11 +1,8 @@
 #pragma once
 
 #include <unordered_map>
-#include <HUH/RHI/vulkan/vulkan_defines.h>
-#include <HUH/logging.h>
 #include <HUH/definitions.h>
 #include <HUH/RHI/device.h>
-#include <HUH/vulkan_loader.h>
 
 namespace HUH::RHI {
 class HUH_VULKANRHI_API VulkanDevice final : public Device {
@@ -52,7 +49,7 @@ public:
     HUH_NODISCARD std::string GetName() override { return m_name; }
     HUH_NODISCARD Device::MemoryStatistics GetMemoryStatistics() override;
     bool Init() override;
-    void Destroy() override {}
+    void Destroy() override;
     Queue* CreateQueue(Queue::Type type) override;
 
     void QueryVulkanPropertiesAndFeatures();

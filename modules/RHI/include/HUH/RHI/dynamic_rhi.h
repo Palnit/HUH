@@ -15,7 +15,7 @@ public:
     static CreateStub* Create;
 
     virtual bool Init() = 0;
-    virtual void Destroy() = 0;
+    virtual void Destroy();
     virtual Device* GetDevice(size_t index) = 0;
     virtual std::vector<Device*> GetDevices() = 0;
 
@@ -26,7 +26,7 @@ public:
 
 protected:
     DynamicRHI() = default;
-    virtual ~DynamicRHI();
+    virtual ~DynamicRHI() = default;
     std::vector<Device*> m_created_devices;
     RenderApi m_renderApi = RenderApi::Unknown;
     static DynamicLibrary s_RHIImplSharedLibrary;

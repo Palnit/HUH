@@ -18,7 +18,6 @@ if (VULKAN_INC)
             src/string_converters.cpp
     )
     add_library(HUH::VulkanLoader ALIAS HUH-VulkanLoader)
-    target_compile_definitions(HUH-VulkanLoader PRIVATE HUH_COMP)
     huh_target_create_definition(HUH-VulkanLoader)
 
     set_target_properties(HUH-VulkanLoader PROPERTIES LINKER_LANGUAGE CXX)

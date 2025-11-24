@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 
 option(BUILD_GRAPHICS "Build Graphics module" OFF)
 option(BUILD_RHI "Build Render Hardware Interface module" OFF)
+option(BUILD_WINDOW "Build Window management module" OFF)
 option(BUILD_VULKAN_LOADER "Build Vulkan Loader" OFF)
 option(BUILD_MATH "Build Math module" OFF)
 option(BUILD_ARRAY "Build numpy like array module" OFF)
@@ -98,6 +99,10 @@ endif ()
 
 if (BUILD_VULKAN_LOADER)
     huh_add_module_build(HUH INTERFACE VulkanLoader)
+endif ()
+
+if (BUILD_WINDOW)
+    huh_add_module_build(HUH INTERFACE Window)
 endif ()
 
 get_property(BUILD_MODULES TARGET HUH PROPERTY BUILD_MODULES)
