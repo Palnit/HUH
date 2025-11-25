@@ -1,7 +1,7 @@
 #pragma once
 #include <HUH/definitions.h>
-#include <HUH/vulkan_loader.h>
 #include <string>
+enum VkResult;
 
 namespace HUH {
 

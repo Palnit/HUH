@@ -1,4 +1,5 @@
 #include <HUH/VulkanHelpers/string_converters.h>
+#include <HUH/vulkan_loader.h>
 
 namespace HUH {
 std::string ToString(const VkResult in_enum) {

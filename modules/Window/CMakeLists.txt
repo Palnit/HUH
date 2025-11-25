@@ -9,7 +9,11 @@ set(HEADER_FILES
 set(SOURCE_FILES
 )
 
+set_property(TARGET HUH APPEND PROPERTY HUH_REQUIRED_INSTANCE_EXTENSIONS VK_KHR_surface)
+set_property(TARGET HUH APPEND PROPERTY HUH_REQUIRED_DEVICE_EXTENSIONS VK_KHR_swapchain)
+
 if (HUH_WIN)
+    set_property(TARGET HUH APPEND PROPERTY HUH_REQUIRED_INSTANCE_EXTENSIONS VK_KHR_win32_surface)
     list(APPEND HEADER_FILES
             ${WINDOW_WINDOWS_INC_PATH}/window.h
     )
@@ -26,9 +30,11 @@ endif ()
 add_library(HUH-Window SHARED ${HEADER_FILES} ${SOURCE_FILES})
 add_library(HUH::Window ALIAS HUH-Window)
 huh_target_create_definition(HUH-Window)
-target_link_libraries(HUH-Window
+target_link_libraries(HUH-Window PUBLIC
         HUH
         HUH::Core
 )
+
+
 
 target_include_directories(HUH-Window PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/platform/include")

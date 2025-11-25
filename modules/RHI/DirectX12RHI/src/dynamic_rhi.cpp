@@ -62,6 +62,10 @@ std::vector<Device*> DX12DynamicRHI::GetDevices() {
     return m_created_devices;
 }
 
+Surface* DX12DynamicRHI::CreateSurface(const Window& window) {
+    return nullptr;
+}
+
 extern "C" HUH_DIRECTX12RHI_API DynamicRHI* DynamicRHICreate() {
     return new DX12DynamicRHI();
 }

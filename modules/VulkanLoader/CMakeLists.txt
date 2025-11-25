@@ -26,7 +26,7 @@ if (VULKAN_INC)
             HUH
             HUH::Core
     )
-    target_precompile_headers(HUH-VulkanLoader PUBLIC include/HUH/vulkan_loader.h)
+    #    target_precompile_headers(HUH-VulkanLoader PUBLIC include/HUH/vulkan_loader.h)
 
     target_include_directories(HUH-VulkanLoader PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" ${VULKAN_INC})
 else ()

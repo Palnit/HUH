@@ -17,12 +17,14 @@ public:
     bool Init() override;
     Device* GetDevice(size_t index) override;
     std::vector<Device*> GetDevices() override;
+    Surface* CreateSurface(const Window& window) override;
 
     friend HUH::RHI::DynamicRHI* DynamicRHICreate();
 
 protected:
     DX12DynamicRHI() = default;
     ~DX12DynamicRHI() override = default;
+
     IDXGIFactory7* m_factory = nullptr;
 #ifdef HUH_DEBUG
     ID3D12Debug1* m_debugController = nullptr;

@@ -7,11 +7,13 @@ set(HEADER_FILES
         ${RHI_INC_PATH}/device.h
         ${RHI_INC_PATH}/rhi_module.h
         ${RHI_INC_PATH}/queue.h
+        ${RHI_INC_PATH}/surface.h
 )
 set(SOURCE_FILES
         src/dynamic_rhi.cpp
         src/device.cpp
         src/queue.cpp
+        src/surface.cpp
 )
 
 add_library(HUH-RHI SHARED ${HEADER_FILES} ${SOURCE_FILES})
@@ -24,6 +26,7 @@ target_link_libraries(HUH-RHI PUBLIC
         HUH
         HUH::Core
 )
+
 
 target_include_directories(HUH-RHI PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 

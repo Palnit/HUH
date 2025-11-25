@@ -2,7 +2,6 @@
 
 #include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/queue.h>
-#include <HUH/vulkan_loader.h>
 
 namespace HUH::RHI {
 

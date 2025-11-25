@@ -20,6 +20,7 @@ Window::Window(const std::string& name) : WindowProto(name) {
         return;
     }
     SetWindowLongPtr(m_windowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+    m_platform.WindowsHandle = m_windowHandle;
 }
 
 void Window::Show() {

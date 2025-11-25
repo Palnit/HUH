@@ -29,6 +29,12 @@ if (TARGET HUH::VulkanLoader)
             HUH::RHI
             HUH::VulkanLoader
     )
+
+    if (BUILD_WINDOW)
+        target_link_libraries(HUH-VulkanRHI PRIVATE
+                HUH::Window
+        )
+    endif ()
     target_include_directories(HUH-VulkanRHI PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 else ()
     message(WARNING "Vulkan Loader not built skipping")

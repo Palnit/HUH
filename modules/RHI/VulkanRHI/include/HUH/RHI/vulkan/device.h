@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <HUH/definitions.h>
 #include <HUH/RHI/device.h>
+#include <HUH/RHI/vulkan/vulkan_defines.h>
 
 namespace HUH::RHI {
 class HUH_VULKANRHI_API VulkanDevice final : public Device {

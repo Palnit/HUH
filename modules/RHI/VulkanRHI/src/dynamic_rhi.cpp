@@ -1,11 +1,15 @@
+#include "HUH/Windows/win_instance.h"
+
 #include <HUH/RHI/vulkan/device.h>
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
 #include <iostream>
 #include <vector>
 #include <HUH/types.h>
-#include <HUH/RHI//vulkan/vulkan_defines.h>
 #include <HUH/string_operations.h>
 #include <HUH/VulkanHelpers/string_converters.h>
+#ifdef HUH_USE_WINDOW
+#include <HUH/Window/window.h>
+#endif
 
 namespace HUH::RHI {
 bool VulkanDynamicRHI::Init() {
@@ -90,8 +94,7 @@ bool VulkanDynamicRHI::Init() {
         .enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size()),
         .ppEnabledExtensionNames = requiredExtensions.data(),
     };
-    auto error = HUH::vkCreateInstance(&createInfo, nullptr, &m_instance);
-    if (error != VK_SUCCESS) {
+    if (auto error = HUH::vkCreateInstance(&createInfo, nullptr, &m_instance); error != VK_SUCCESS) {
         HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan Instance creation failed: {}", HUH::ToString(error))
         return false;
     }
@@ -119,6 +122,26 @@ std::vector<Device*> VulkanDynamicRHI::GetDevices() {
     }
 
     return m_created_devices;
+}
+
+Surface* VulkanDynamicRHI::CreateSurface(const Window& window) {
+#ifdef HUH_WIN
+    auto platform = window.GetPlatformVariables();
+    VkWin32SurfaceCreateInfoKHR createInfoKHR{.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
+                                              .pNext = nullptr,
+                                              .hinstance = HUH::g_AppInstance,
+                                              .hwnd = platform.WindowsHandle};
+    VkSurfaceKHR surface;
+    if (auto err = HUH::vkCreateWin32SurfaceKHR(m_instance, &createInfoKHR, nullptr, &surface); err != VK_SUCCESS) {
+        HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan surface creation failed: {}", HUH::ToString(err))
+        return nullptr;
+    }
+    HUH::vkDestroySurfaceKHR(m_instance, surface, nullptr);
+    HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan surface creation OK")
+    return nullptr;
+#else
+    return nullptr;
+#endif
 }
 
 void VulkanDynamicRHI::Destroy() {
