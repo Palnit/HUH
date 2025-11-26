@@ -7,32 +7,44 @@
 #include <HUH/types.h>
 #include <vector>
 
-namespace HUH::RHI {
+namespace HUH {
+namespace RHI {
 class Queue;
 class HUH_RHI_API Device {
 public:
     friend class DynamicRHI;
-    enum Type { Dedicated, Integrated, Cpu, Virtual, Other, Unknown };
+    enum class Type { Dedicated, Integrated, Cpu, Virtual, Other, Unknown };
+    enum class Vendor { Nvidia, Amd, Arm, Qualcomm, Intel, Unknown };
 
     struct MemoryStatistics {
         Uint64 DeviceMemory;
         Uint64 OccupiedMemory;
     };
 
+    struct DeviceInformation {
+        std::string name = "Unknown";
+        Vendor vendor = Vendor::Unknown;
+        Type type = Type::Unknown;
+    };
+
+    DeviceInformation Information;
+
     virtual bool Init() = 0;
     virtual void Destroy() = 0;
-    HUH_NODISCARD virtual Device::Type GetType() = 0;
-    HUH_NODISCARD virtual std::string GetName() = 0;
     HUH_NODISCARD virtual Device::MemoryStatistics GetMemoryStatistics() = 0;
     virtual Queue* CreateQueue(Queue::Type type) = 0;
 
     HUH_NODISCARD Queue* GetQueue(size_t index) const;
+    HUH_NODISCARD size_t GetNumberOfQueues() const { return m_queues.size(); };
 
 protected:
     Device() = default;
     virtual ~Device();
-    std::string m_name;
-    Type m_type = Type::Unknown;
     std::vector<Queue*> m_queues;
 };
-}// namespace HUH::RHI
+}// namespace RHI
+
+std::string HUH_RHI_API ToString(RHI::Device::Type type);
+std::string HUH_RHI_API ToString(RHI::Device::Vendor vendor);
+
+}// namespace HUH

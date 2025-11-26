@@ -171,27 +171,27 @@ void VulkanDevice::QueryVulkanPropertiesAndFeatures() {
 
 VulkanDevice::VulkanDevice(VkPhysicalDevice physicalDevice) : m_physicalDevice(physicalDevice) {
     QueryVulkanPropertiesAndFeatures();
-    m_name = Properties.properties_1_0.properties.deviceName;
+    Information.name = Properties.properties_1_0.properties.deviceName;
     switch (Properties.properties_1_0.properties.deviceType) {
         case VK_PHYSICAL_DEVICE_TYPE_OTHER:
-            m_type = Type::Other;
+            Information.type = Type::Other;
             break;
         case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
-            m_type = Type::Virtual;
+            Information.type = Type::Virtual;
             break;
         case VK_PHYSICAL_DEVICE_TYPE_CPU:
-            m_type = Type::Cpu;
+            Information.type = Type::Cpu;
             break;
         case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
-            m_type = Type::Integrated;
+            Information.type = Type::Integrated;
             break;
         case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
-            m_type = Type::Dedicated;
+            Information.type = Type::Dedicated;
             break;
         default:;
     }
 }
 VulkanDevice::~VulkanDevice() {
-    HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan Device Named: {} Successfully Destroyed", m_name)
+    HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan Device Named: {} Successfully Destroyed", Information.name)
 }
 }// namespace HUH::RHI

@@ -46,8 +46,6 @@ public:
     VulkanDeviceProperties Properties;
     VulkanDeviceFeatures Features;
 
-    HUH_NODISCARD Device::Type GetType() override { return m_type; }
-    HUH_NODISCARD std::string GetName() override { return m_name; }
     HUH_NODISCARD Device::MemoryStatistics GetMemoryStatistics() override;
     bool Init() override;
     void Destroy() override;

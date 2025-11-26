@@ -12,8 +12,6 @@ class HUH_DIRECTX12RHI_API DX12Device : public Device {
     friend class DX12DynamicRHI;
 
 public:
-    HUH_NODISCARD Device::Type GetType() override { return Device::Type::Other; }
-    HUH_NODISCARD std::string GetName() override { return m_name; }
     HUH_NODISCARD Device::MemoryStatistics GetMemoryStatistics() override { return {}; }
     bool Init() override { return true; }
     void Destroy() override { delete this; }
