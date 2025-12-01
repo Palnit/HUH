@@ -36,5 +36,6 @@ target_link_libraries(HUH-Window PUBLIC
 )
 
 
-
 target_include_directories(HUH-Window PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/platform/include")
+
+add_subdirectory(platform/Wayland)
