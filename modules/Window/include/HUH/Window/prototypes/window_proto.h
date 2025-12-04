@@ -1,5 +1,6 @@
 #pragma once
 #include <HUH/definitions.h>
+#include <string>
 
 typedef struct HWND__* HWND;
 

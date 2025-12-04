@@ -1,5 +1,7 @@
 set(WINDOW_INC_PATH "include/HUH/Window")
 set(WINDOW_WINDOWS_INC_PATH "platform/include/HUH/Window/Windows")
+set(LINUX_WINDOWS_INC_PATH "platform/include/HUH/Window/Linux")
+set(WAYLAND_WINDOW_INC_PATH "platform/include/HUH/Window/Linux/Wayland")
 
 set(HEADER_FILES
         ${WINDOW_INC_PATH}/prototypes/window_proto.h
@@ -21,11 +23,14 @@ if (HUH_WIN)
             platform/src/Windows/window.cpp
     )
 elseif (HUH_LINUX)
-    list(APPEND HEADER_FILES
-    )
-    list(APPEND SOURCE_FILES)
-endif ()
 
+    list(APPEND HEADER_FILES
+            ${LINUX_WINDOWS_INC_PATH}/window.h
+    )
+    list(APPEND SOURCE_FILES
+            platform/src/linux/window.cpp
+    )
+endif ()
 
 add_library(HUH-Window SHARED ${HEADER_FILES} ${SOURCE_FILES})
 add_library(HUH::Window ALIAS HUH-Window)
@@ -34,8 +39,29 @@ target_link_libraries(HUH-Window PUBLIC
         HUH
         HUH::Core
 )
-
-
 target_include_directories(HUH-Window PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/platform/include")
 
-add_subdirectory(platform/Wayland)
+
+if (HUH_LINUX)
+    find_package(Wayland)
+    if (Wayland_FOUND)
+        set(WAYLAND_HEADER_FILES
+                ${WAYLAND_WINDOW_INC_PATH}/window.h
+        )
+        set(WAYLAND_SOURCE_FILES
+                platform/src/linux/wayland/window.cpp
+        )
+        add_library(HUH-WaylandWindow SHARED ${WAYLAND_SOURCE_FILES} ${WAYLAND_HEADER_FILES})
+        add_library(HUH::WaylandWindow ALIAS HUH-WaylandWindow)
+        huh_target_create_definition(HUH-WaylandWindow)
+        target_link_libraries(HUH-WaylandWindow PUBLIC
+                HUH
+                HUH::Core
+                HUH-Window
+                Wayland::client
+        )
+        target_include_directories(HUH-WaylandWindow PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/platform/include")
+    endif ()
+endif ()
+
+
