@@ -28,7 +28,7 @@ bool VulkanDevice::Init() {
     HUH::vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, availableExtensions.data());
 
 #if HUH_DEBUG
-    HUH_LOG(LogVulkanRHI, Logging::Log, "Available Instance extensions:")
+    HUH_LOG(LogVulkanRHI, Logging::Log, "Available Device extensions:")
     for (size_t i = 0; i < availableExtensions.size(); i++) {
         HUH_LOG(LogVulkanRHI, Logging::Log, "{}.\t{}", i + 1, availableExtensions[i].extensionName)
     }
