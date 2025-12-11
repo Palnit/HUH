@@ -7,6 +7,13 @@
     #endif
 #endif
 
+#ifdef HUH_LINUX
+    #ifdef HUH_USE_WINDOW
+        #define VK_USE_PLATFORM_WAYLAND_KHR
+        #define VK_USE_PLATFORM_XLIB_KHR
+    #endif
+#endif
+
 #include <HUH/vulkan_loader.h>
 #include <HUH/VulkanHelpers/string_converters.h>
 

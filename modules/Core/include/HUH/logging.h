@@ -1,4 +1,6 @@
 #pragma once
+#include "HUH/types.h"
+
 #include <HUH/definitions.h>
 #include <filesystem>
 #include <format>
@@ -11,8 +13,7 @@ class HUH_CORE_API LogCategory {
 public:
     explicit LogCategory(std::string&& name);
     friend HUH_CORE_API std::ostream& operator<<(std::ostream& os, const LogCategory& category);
-
-    HUH_NODISCARD size_t GetNumberOfTabs() const;
+    static int GetCategoryWidth();
 
 private:
     std::string m_name;
@@ -26,7 +27,7 @@ public:
         Error,
     };
 
-    static std::string ToStringConsole(Logging::Level level) {
+    static std::string ToStringConsole(Logging::Level level) noexcept {
         switch (level) {
             case Level::Log:
                 return "[Log]";
@@ -39,7 +40,7 @@ public:
         }
     }
 
-    static ConsoleColor::Color ToConsoleColor(Logging::Level level) {
+    static ConsoleColor::Color ToConsoleColor(Logging::Level level) noexcept {
         switch (level) {
             case Level::Log:
                 return ConsoleColor::Blue;
@@ -66,6 +67,17 @@ public:
                   << file_info.lexically_relative(s_huh_path).string() << ":" << file_line << "]" << std::endl;
     }
 
+    template<typename... Args>
+    static void AddLog(const std::string& format,
+                       std::filesystem::path&& file_info,
+                       const std::string& file_line,
+                       Args&&... args) {
+        std::cout << ConsoleColor::Green << std::left << std::setw(12) << "[Temp]"
+                  << std::setw(LogCategory::GetCategoryWidth()) << " " << ConsoleColor::Reset
+                  << std::vformat(format, std::make_format_args(args...)) << "\t["
+                  << file_info.lexically_relative(s_huh_path).string() << ":" << file_line << "]" << std::endl;
+    }
+
 private:
     inline static std::filesystem::path s_huh_path{HUH_SOURCE_DIR};
 };
@@ -73,6 +85,9 @@ private:
 }// namespace HUH
 #define HUH_LOG(category, level, format, ...)                                                                    \
     HUH::Logging::AddLog(category, level, format, __FILE__ ,std::to_string(__LINE__) __VA_OPT__(,) __VA_ARGS__);
+
+#define HUH_TLOG(format, ...) \
+    HUH::Logging::AddLog( format, __FILE__ ,std::to_string(__LINE__) __VA_OPT__(,) __VA_ARGS__);
 
 #define HUH_ILOG(category, format, ...) \
     HUH_LOG(category,HUH::Logging::Log,format __VA_OPT__(,) __VA_ARGS__)

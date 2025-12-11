@@ -44,15 +44,18 @@ target_include_directories(HUH-Window PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/includ
 
 if (HUH_LINUX)
     find_package(Wayland)
-    if (Wayland_FOUND)
+    find_package(WaylandProtocols)
+    if (Wayland_FOUND AND WaylandProtocols_FOUND)
         set(WAYLAND_HEADER_FILES
                 ${WAYLAND_WINDOW_INC_PATH}/window.h
+                ${WAYLAND_WINDOW_INC_PATH}/definitions.h
         )
         set(WAYLAND_SOURCE_FILES
                 platform/src/linux/wayland/window.cpp
         )
         add_library(HUH-WaylandWindow SHARED ${WAYLAND_SOURCE_FILES} ${WAYLAND_HEADER_FILES})
         add_library(HUH::WaylandWindow ALIAS HUH-WaylandWindow)
+        huh_wayland_create_protocol(HUH-WaylandWindow PUBLIC CLIENT PRIVATE_CODE PROTOCOL "stable/xdg-shell/xdg-shell.xml" FILENAME "xdg-shell")
         huh_target_create_definition(HUH-WaylandWindow)
         target_link_libraries(HUH-WaylandWindow PUBLIC
                 HUH
@@ -60,7 +63,7 @@ if (HUH_LINUX)
                 HUH-Window
                 Wayland::client
         )
-        target_include_directories(HUH-WaylandWindow PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/platform/include")
+        target_include_directories(HUH-WaylandWindow PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/platform/include" "${CMAKE_CURRENT_BINARY_DIR}/generated/include")
     endif ()
 endif ()
 

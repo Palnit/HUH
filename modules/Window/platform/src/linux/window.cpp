@@ -2,8 +2,6 @@
 #include <HUH/Window/definitions.h>
 
 namespace HUH {
-#define CallFunction(FuncName, ...)\
-    m_impl ? m_impl->FuncName(__VA_ARGS__) : HUH_ELOG(LogWindow, "Couldn't run function: {}() no window implementation",#FuncName);
 
 DynamicLibrary Window::s_lib;
 Window::Window(const std::string& name) : WindowProto(name) {
@@ -13,24 +11,29 @@ Window::Window(const std::string& name) : WindowProto(name) {
             if (!s_lib.Load(HUH::DynamicLibrary::DecoratePlatformLibraryName("HUH-WaylandWindow"))) {
                 HUH_ELOG(LogWindow, "Could not load HUH wayland shared library: {}",
                          HUH::DynamicLibrary::GetErrorMessage())
-                return;
+                throw std::runtime_error("Could not load HUH wayland shared library");
             }
         }
         s_createImpl = s_lib.GetExport<CreateWindowImpl>("CreateWindowImpl");
         if (s_createImpl == nullptr) {
             HUH_ELOG(LogWindow, "Could not load CreateWindowImpl()");
-            return;
+            throw std::runtime_error("Could not load CreateWindowImpl()");
         }
     }
     m_impl = s_createImpl(name);
 }
+Window::~Window() {
+    if (m_impl) {
+        delete m_impl;
+    }
+}
 
 void Window::Show() {
-    CallFunction(Show)
+    m_impl->Show();
 }
 
 void Window::Loop() {
-    CallFunction(Loop)
+    m_impl->Loop();
 }
 
 }// namespace HUH

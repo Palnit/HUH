@@ -8,8 +8,11 @@ LogCategory::LogCategory(std::string&& name) : m_name(name) {
         s_largest_category_size = m_name.size();
     }
 }
+int LogCategory::GetCategoryWidth() {
+    return static_cast<int>((s_largest_category_size + 2) / 4 + 1) * 4;
+}
 std::ostream& operator<<(std::ostream& os, const LogCategory& category) {
-    const Int64 width = static_cast<Int64>((s_largest_category_size + 2) / 4 + 1) * 4;
+    const int width = LogCategory::GetCategoryWidth();
     os << std::left << std::setw(width) << "[" + category.m_name + "]";
     return os;
 }
