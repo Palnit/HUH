@@ -23,7 +23,6 @@ if (HUH_WIN)
             platform/src/Windows/window.cpp
     )
 elseif (HUH_LINUX)
-
     list(APPEND HEADER_FILES
             ${LINUX_WINDOWS_INC_PATH}/window.h
     )
@@ -46,6 +45,7 @@ if (HUH_LINUX)
     find_package(Wayland)
     find_package(WaylandProtocols)
     if (Wayland_FOUND AND WaylandProtocols_FOUND)
+        set_property(TARGET HUH APPEND PROPERTY HUH_REQUIRED_INSTANCE_EXTENSIONS VK_KHR_wayland_surface)
         set(WAYLAND_HEADER_FILES
                 ${WAYLAND_WINDOW_INC_PATH}/window.h
                 ${WAYLAND_WINDOW_INC_PATH}/definitions.h

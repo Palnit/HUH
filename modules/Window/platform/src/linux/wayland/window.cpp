@@ -19,17 +19,18 @@ const wl_registry_listener WaylandWindow::s_registryListener = {
 const xdg_wm_base_listener WaylandWindow::s_xdgWmBaseListener = {.ping = xdgWmBasePing};
 const xdg_surface_listener WaylandWindow::s_xdgSurfaceListener = {.configure = xdgSurfaceConfigure};
 
-extern "C" WindowProto* CreateWindowImpl(const std::string& name) {
-    return new WaylandWindow(name);
+extern "C" WindowProto* CreateWindowImpl(const std::string& name, Int32 width, Int32 height) {
+    return new WaylandWindow(name, width, height);
 }
 
 void HandleWaylandGlobalRegister(void* data,
-                                 struct wl_registry* registry,
-                                 uint32_t name,
+                                 wl_registry* registry,
+                                 Uint32 name,
                                  const char* interface,
-                                 uint32_t version) {
+                                 Uint32 version) {
 #ifdef HUH_DEBUG
-    HUH_ILOG(LogWaylandWindow, "Wayland Global Interface: {} Version: {} Name: {} ", interface, version, name);
+    HUH_LOG(LogWaylandWindow, Logging::DebugLog, "Wayland Global Interface: {} Version: {} Name: {} ", interface,
+            version, name);
 #endif
     if (std::strcmp(interface, wl_compositor_interface.name) == 0) {
         WaylandWindow::s_waylandCompositor =
@@ -40,20 +41,21 @@ void HandleWaylandGlobalRegister(void* data,
         xdg_wm_base_add_listener(WaylandWindow::s_xdgWmBase, &WaylandWindow::s_xdgWmBaseListener, nullptr);
     }
 }
-void HandleWaylandGlobalRegisterRemove(void* data, struct wl_registry* registry, uint32_t name) {
+void HandleWaylandGlobalRegisterRemove(void* data, wl_registry* registry, Uint32 name) {
 }
 
-void xdgWmBasePing(void* data, struct xdg_wm_base* xdg_wm_base, uint32_t serial) {
+void xdgWmBasePing(void* data, xdg_wm_base* xdg_wm_base, const Uint32 serial) {
     xdg_wm_base_pong(xdg_wm_base, serial);
 }
 
-void xdgSurfaceConfigure(void* data, struct xdg_surface* xdg_surface, uint32_t serial) {
-    WaylandWindow* window = static_cast<WaylandWindow*>(data);
+void xdgSurfaceConfigure(void* data, xdg_surface* xdg_surface, const Uint32 serial) {
+    const auto* window = static_cast<WaylandWindow*>(data);
     xdg_surface_ack_configure(xdg_surface, serial);
     wl_surface_commit(window->m_surface);
 }
 
-WaylandWindow::WaylandWindow(const std::string& name) : WindowProto(name) {
+WaylandWindow::WaylandWindow(const std::string& name, const Int32 width, const Int32 height)
+    : WindowProto(name, width, height) {
     if (s_waylandDisplay == nullptr) {
         s_waylandDisplay = wl_display_connect(nullptr);
         if (!s_waylandDisplay) {
@@ -70,11 +72,16 @@ WaylandWindow::WaylandWindow(const std::string& name) : WindowProto(name) {
     m_xdgToplevel = xdg_surface_get_toplevel(m_xdgSurface);
     xdg_toplevel_set_title(m_xdgToplevel, m_name.c_str());
     wl_surface_commit(m_surface);
+    m_platform.WaylandDisplay = s_waylandDisplay;
+    m_platform.WaylandSurface = m_surface;
 }
 
 WaylandWindow::~WaylandWindow() {
     if (s_waylandDisplay) {
         HUH_ILOG(LogWaylandWindow, "Destroying Wayland Display connection")
+        xdg_toplevel_destroy(m_xdgToplevel);
+        xdg_surface_destroy(m_xdgSurface);
+        wl_surface_destroy(m_surface);
         wl_display_disconnect(s_waylandDisplay);
     }
 }
@@ -84,7 +91,7 @@ void WaylandWindow::Show() {
 }
 
 void WaylandWindow::Loop() {
-    while (wl_display_dispatch(s_waylandDisplay)) {
+    while (wl_display_dispatch(s_waylandDisplay) != -1) {
         /* This space deliberately left blank */
     }
 }

@@ -1,9 +1,10 @@
+#include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/vulkan/device.h>
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
 #include <vector>
 #include <HUH/types.h>
 #include <HUH/string_operations.h>
-#include <HUH/VulkanHelpers/string_converters.h>
+
 #ifdef HUH_USE_WINDOW
 #include <HUH/Window/window.h>
 #endif
@@ -11,7 +12,7 @@
 namespace HUH::RHI {
 bool VulkanDynamicRHI::Init() {
     if (!HUH::LoadVulkan()) {
-        HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan Load Failed")
+        HUH_LOG(LogVulkanRHI, Logging::Level::Error, "Vulkan Load Failed")
         return false;
     }
 
@@ -21,9 +22,9 @@ bool VulkanDynamicRHI::Init() {
     HUH::vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
 
 #if HUH_DEBUG
-    HUH_LOG(LogVulkanRHI, Logging::Log, "Available Instance extensions:")
+    HUH_LOG(LogVulkanRHI, Logging::DebugLog, "{} Available Instance extensions:", extensionCount)
     for (size_t i = 0; i < availableExtensions.size(); i++) {
-        HUH_LOG(LogVulkanRHI, Logging::Log, "{}.\t{}", i + 1, availableExtensions[i].extensionName)
+        HUH_LOG(LogVulkanRHI, Logging::DebugLog, "{}.\t{}", i + 1, availableExtensions[i].extensionName)
     }
 #endif
 
@@ -57,9 +58,9 @@ bool VulkanDynamicRHI::Init() {
     std::vector<const char*> requiredLayers;
 
 #if HUH_DEBUG
-    HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Available Layers:")
+    HUH_LOG(LogVulkanRHI, Logging::Level::DebugLog, "Available Layers:")
     for (size_t i = 0; i < availableLayers.size(); i++) {
-        HUH_LOG(LogVulkanRHI, Logging::Level::Log, "{}.\t{}", i + 1, availableLayers[i].layerName)
+        HUH_LOG(LogVulkanRHI, Logging::Level::DebugLog, "{}.\t{}", i + 1, availableLayers[i].layerName)
     }
 #endif
 
@@ -91,7 +92,7 @@ bool VulkanDynamicRHI::Init() {
         .enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size()),
         .ppEnabledExtensionNames = requiredExtensions.data(),
     };
-    if (auto error = HUH::vkCreateInstance(&createInfo, nullptr, &m_instance); error != VK_SUCCESS) {
+    if (const auto error = HUH::vkCreateInstance(&createInfo, nullptr, &m_instance); error != VK_SUCCESS) {
         HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan Instance creation failed: {}", HUH::ToString(error))
         return false;
     }
@@ -136,6 +137,23 @@ Surface* VulkanDynamicRHI::CreateSurface(const Window& window) {
     HUH::vkDestroySurfaceKHR(m_instance, surface, nullptr);
     HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan surface creation OK")
     return nullptr;
+#elif defined(HUH_LINUX)
+    WindowProto::PlatformVariables platform = window.GetPlatformVariables();
+    if (platform.WaylandSurface && platform.WaylandDisplay) {
+        VkWaylandSurfaceCreateInfoKHR createInfoKHR{.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR,
+                                                    .pNext = nullptr,
+                                                    .display = platform.WaylandDisplay,
+                                                    .surface = platform.WaylandSurface};
+        VkSurfaceKHR surface;
+        if (const auto err = HUH::vkCreateWaylandSurfaceKHR(m_instance, &createInfoKHR, nullptr, &surface);
+            err != VK_SUCCESS) {
+            HUH_ELOG(LogVulkanRHI, "Vulkan surface creation failed: {}", HUH::ToString(err))
+        }
+        HUH::vkDestroySurfaceKHR(m_instance, surface, nullptr);
+        HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan surface creation OK")
+        return nullptr;
+    }
+    return nullptr;
 #else
     return nullptr;
 #endif
@@ -148,6 +166,7 @@ void VulkanDynamicRHI::Destroy() {
     }
     delete this;
 }
+
 extern "C" HUH_VULKANRHI_API DynamicRHI* DynamicRHICreate() {
     return new VulkanDynamicRHI();
 }

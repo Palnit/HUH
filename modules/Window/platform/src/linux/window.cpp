@@ -4,7 +4,7 @@
 namespace HUH {
 
 DynamicLibrary Window::s_lib;
-Window::Window(const std::string& name) : WindowProto(name) {
+Window::Window(const std::string& name, const Int32 width, const Int32 height) : WindowProto(name, width, height) {
     if (!s_lib.IsLoaded() || s_createImpl == nullptr) {
         const std::string sessionType = std::getenv("XDG_SESSION_TYPE");
         if (sessionType == "wayland") {
@@ -20,12 +20,10 @@ Window::Window(const std::string& name) : WindowProto(name) {
             throw std::runtime_error("Could not load CreateWindowImpl()");
         }
     }
-    m_impl = s_createImpl(name);
+    m_impl = s_createImpl(name, width, height);
 }
 Window::~Window() {
-    if (m_impl) {
-        delete m_impl;
-    }
+    delete m_impl;
 }
 
 void Window::Show() {

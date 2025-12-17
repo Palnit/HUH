@@ -23,6 +23,7 @@ class HUH_CORE_API Logging {
 public:
     enum Level {
         Log,
+        DebugLog,
         Warning,
         Error,
     };
@@ -31,6 +32,8 @@ public:
         switch (level) {
             case Level::Log:
                 return "[Log]";
+            case Level::DebugLog:
+                return "[Debug Log]";
             case Level::Warning:
                 return "[Warning]";
             case Level::Error:
@@ -44,6 +47,8 @@ public:
         switch (level) {
             case Level::Log:
                 return ConsoleColor::Blue;
+            case Level::DebugLog:
+                return ConsoleColor::Green;
             case Level::Warning:
                 return ConsoleColor::Yellow;
             case Level::Error:
@@ -62,7 +67,7 @@ public:
                        std::filesystem::path&& file_info,
                        const std::string& file_line,
                        Args&&... args) {
-        std::cout << ToConsoleColor(level) << std::left << std::setw(12) << ToStringConsole(level) << ConsoleColor::Cyan
+        std::cout << ToConsoleColor(level) << std::left << std::setw(16) << ToStringConsole(level) << ConsoleColor::Cyan
                   << category << ConsoleColor::Reset << std::vformat(format, std::make_format_args(args...)) << "\t["
                   << file_info.lexically_relative(s_huh_path).string() << ":" << file_line << "]" << std::endl;
     }

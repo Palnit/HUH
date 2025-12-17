@@ -10,6 +10,8 @@ set(CORE_HEADER_FILE
         ${CORE_INC_PATH}/string_operations.h
         ${CORE_INC_PATH}/console_color.h
         ${CORE_INC_PATH}/enum_helper.h
+        ${CORE_INC_PATH}/event.h
+        ${CORE_INC_PATH}/template_helpers.h
 )
 set(CORE_SOURCE_FILES
         src/logging.cpp

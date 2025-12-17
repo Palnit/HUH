@@ -6,7 +6,7 @@ DynamicLibrary::DynamicLibrary(const std::string& path) {
 }
 
 bool DynamicLibrary::Load(const std::string& path) {
-    m_handle = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+    m_handle = dlopen(path.c_str(), RTLD_LAZY | RTLD_LOCAL);
 
     return IsLoaded();
 }

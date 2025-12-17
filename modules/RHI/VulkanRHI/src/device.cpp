@@ -28,9 +28,9 @@ bool VulkanDevice::Init() {
     HUH::vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, availableExtensions.data());
 
 #if HUH_DEBUG
-    HUH_LOG(LogVulkanRHI, Logging::Log, "Available Device extensions:")
+    HUH_LOG(LogVulkanRHI, Logging::DebugLog, "Available Device extensions:")
     for (size_t i = 0; i < availableExtensions.size(); i++) {
-        HUH_LOG(LogVulkanRHI, Logging::Log, "{}.\t{}", i + 1, availableExtensions[i].extensionName)
+        HUH_LOG(LogVulkanRHI, Logging::DebugLog, "{}.\t{}", i + 1, availableExtensions[i].extensionName)
     }
 #endif
 
@@ -86,7 +86,7 @@ Queue* VulkanDevice::CreateQueue(Queue::Type type) {
         m_queueFamilies.resize(queueFamilyIndex);
         vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyIndex, m_queueFamilies.data());
 #ifdef HUH_DEBUG
-        HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Available Queue Families:")
+        HUH_LOG(LogVulkanRHI, Logging::Level::DebugLog, "Available Queue Families:")
         for (size_t i = 0; i < m_queueFamilies.size(); i++) {
             std::string flags;
             if (CheckFlag(static_cast<VkQueueFlagBits>(m_queueFamilies[i].queueFlags), VK_QUEUE_GRAPHICS_BIT)) {
@@ -114,7 +114,8 @@ Queue* VulkanDevice::CreateQueue(Queue::Type type) {
                 flags += "Optical Flow NV | ";
             }
             flags = flags.substr(0, flags.size() - 3);
-            HUH_ILOG(LogVulkanRHI, "{}. Flags: {}, Queue Count: {}", i, flags, m_queueFamilies[i].queueCount)
+            HUH_LOG(LogVulkanRHI, Logging::DebugLog, "{}. Flags: {}, Queue Count: {}", i, flags,
+                    m_queueFamilies[i].queueCount)
         }
 #endif
     }
