@@ -11,7 +11,7 @@ template<typename RetType, typename... Args>
 class ICommonEventBase<RetType(Args...)> {
 public:
     virtual ~ICommonEventBase() = default;
-    virtual RetType Execute(Args...) const = 0;
+    virtual RetType Execute(Args&&...) = 0;
 };
 
 template<typename Func, typename... CommonArgs>
@@ -20,20 +20,21 @@ public:
     explicit IEventBase(CommonArgs&&... args) : m_commonArgs(std::forward<CommonArgs>(args)...) {}
     virtual ~IEventBase() = default;
 
-    // template<typename... Args, typename FunctionType, size_t... Is>
-    // auto ApplyAfter(Args&&... args, FunctionType&& function, std::index_sequence<Is...>) const {
+    // template<typename FunctionType, typename... Args, size_t... Is>
+    // auto ApplyAfterIndex(FunctionType&& function, Args&&... args, std::index_sequence<Is...>) const {
     //     return std::invoke(std::forward<FunctionType>(function), std::forward<Args>(args)...,
     //                        std::get<Is>(m_commonArgs)...);
     // }
 
     template<typename FunctionType, typename... Args>
-    auto ApplyAfter(FunctionType&& function, Args&&... args) const {
-        // TODO THIS IS HORRIBLE CHANGE IT LATER WORKS FOR NOW
-        std::apply(std::forward<FunctionType>(function),
-                   std::tuple_cat(std::tuple(std::forward<Args>(args)...), m_commonArgs));
-        // auto sequence = std::make_index_sequence<size>{};
-        // return ApplyAfter<Args..., FunctionType>(std::forward<Args>(args)..., std::forward<FunctionType>(function),
-        //                                          sequence);
+    auto ApplyAfter(FunctionType&& function, Args&&... args) {
+        // TODO THIS IS HORRIBLE CHANGE IT LATER WORKS FOR NOW PROBABLY NEED MY OWN TUPLE
+        // return std::invoke(std::forward<FunctionType>(function), std::forward<Args>(args)...);
+        return std::apply(std::forward<FunctionType>(function),
+                          std::tuple_cat(std::tuple<Args...>(args...), m_commonArgs));
+        // auto sequence = ;
+        // return ApplyAfterIndex(std::forward<FunctionType>(function), std::forward<Args>(args)...,
+        //                        std::make_index_sequence<size>{});
     }
 
 protected:
@@ -47,6 +48,9 @@ class FunctorEvent;
 template<bool IsConst, typename Func, typename ClassType, typename... CommonArgs>
 class ClassEvent;
 
+template<typename Func, typename... CommonArgs>
+class RawEvent;
+
 template<typename RetType, typename... Args, typename FunctionType, typename... CommonArgs>
 class FunctorEvent<RetType(Args...), FunctionType, CommonArgs...> : public IEventBase<RetType(Args...), CommonArgs...> {
 public:
@@ -55,8 +59,9 @@ public:
         : IEventBase<RetType(Args...), CommonArgs...>(std::forward<InCommonArgs>(commonArgs)...),
           m_functor(std::forward<InFunctionType>(functor)) {}
 
-    RetType Execute(Args... args) const override {
-        return this->ApplyAfter(std::forward<decltype(m_functor)>(m_functor), std::forward<Args>(args)...);
+    RetType Execute(Args&&... args) override {
+        return this->template ApplyAfter<decltype(m_functor), Args...>(std::forward<decltype(m_functor)>(m_functor),
+                                                                       std::forward<Args>(args)...);
     }
 
 private:
@@ -70,15 +75,16 @@ public:
     using FuncType = ClassFuncTypeHelper<IsConst, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type;
 
     template<typename... InCommonArgs>
-    ClassEvent(ClassType* inClass, FuncType inFunction, CommonArgs&&... commonArgs)
-        : IEventBase<RetType(Args...), CommonArgs...>(std::forward<CommonArgs>(commonArgs)...),
+    explicit ClassEvent(ClassType* inClass, FuncType inFunction, InCommonArgs&&... commonArgs)
+        : IEventBase<RetType(Args...), CommonArgs...>(std::forward<InCommonArgs>(commonArgs)...),
           m_class(inClass),
           m_function(inFunction) {}
 
-    RetType Execute(Args... args) const override {
+    RetType Execute(Args&&... args) override {
         using NoConstClass = std::remove_const_t<ClassType>;
-        NoConstClass* classPtr = const_cast<NoConstClass*>(m_class);
-        return this->ApplyAfter(m_function, classPtr, std::forward<Args>(args)...);
+        auto* classPtr = const_cast<NoConstClass*>(m_class);
+        return this->template ApplyAfter<FuncType, ClassType*, Args...>(
+            std::forward<FuncType>(m_function), std::forward<ClassType*>(classPtr), std::forward<Args>(args)...);
     }
 
 private:
@@ -86,10 +92,32 @@ private:
     FuncType m_function;
 };
 
-template<typename RetType, typename... Args>
-class Event {
+template<typename RetType, typename... Args, typename... CommonArgs>
+class RawEvent<RetType(Args...), CommonArgs...> : public IEventBase<RetType(Args...), CommonArgs...> {
 public:
-    ~Event() { delete m_event; };
+    using RawFunctionType = RetType(Args..., CommonArgs...);
+
+    template<typename... InCommonArgs>
+    explicit RawEvent(RawFunctionType* InFunction, InCommonArgs&&... commonArgs)
+        : IEventBase<RetType(Args...), CommonArgs...>(std::forward<InCommonArgs>(commonArgs)...),
+          m_rawFunction(InFunction) {}
+
+    RetType Execute(Args&&... args) override {
+        return this->template ApplyAfter<RawFunctionType*, Args...>(std::forward<RawFunctionType*>(m_rawFunction),
+                                                                    std::forward<Args>(args)...);
+    }
+
+private:
+    RawFunctionType* m_rawFunction = nullptr;
+};
+
+template<typename Func>
+class Event;
+
+template<typename RetType, typename... Args>
+class Event<RetType(Args...)> {
+public:
+    ~Event() { delete m_event; }
 
     template<typename FunctionType, typename... CommonArgs>
     void BindLambda(FunctionType&& InFunction, CommonArgs&&... InCommonArgs) {
@@ -102,7 +130,7 @@ public:
     template<typename ClassType, typename... CommonArgs>
     void BindClass(
         ClassType* inClass,
-        typename ClassFuncTypeHelper<false, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
+        ClassFuncTypeHelper<false, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
         CommonArgs&&... inCommonArgs) {
         delete m_event;
         m_event = new ClassEvent<false, RetType(Args...), ClassType, std::decay_t<CommonArgs>...>(
@@ -110,16 +138,22 @@ public:
     }
 
     template<typename ClassType, typename... CommonArgs>
-    void BindClass(
-        ClassType* inClass,
-        typename ClassFuncTypeHelper<true, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
-        CommonArgs&&... inCommonArgs) {
+    void BindClass(ClassType* inClass,
+                   ClassFuncTypeHelper<true, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
+                   CommonArgs&&... inCommonArgs) {
         delete m_event;
         m_event = new ClassEvent<false, RetType(Args...), ClassType, std::decay_t<CommonArgs>...>(
             inClass, inFunction, std::forward<CommonArgs>(inCommonArgs)...);
     }
 
-    RetType Execute(Args... args) const { return m_event->Execute(std::forward<Args>(args)...); }
+    template<typename... CommonArgs>
+    void BindRaw(RetType (*InFunction)(Args..., CommonArgs...), CommonArgs&&... commonArgs) {
+        delete m_event;
+        m_event = new RawEvent<RetType(Args...), std::decay_t<CommonArgs>...>(InFunction,
+                                                                              std::forward<CommonArgs>(commonArgs)...);
+    }
+
+    RetType Execute(Args&&... args) const { return m_event->Execute(std::forward<Args>(args)...); }
 
 private:
     ICommonEventBase<RetType(Args...)>* m_event = nullptr;
