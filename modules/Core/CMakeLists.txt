@@ -16,6 +16,7 @@ set(CORE_HEADER_FILE
 set(CORE_SOURCE_FILES
         src/logging.cpp
         src/string_operations.cpp
+        src/event.cpp
 )
 
 if (HUH_WIN)
