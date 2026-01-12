@@ -3,6 +3,7 @@
 #include <HUH/RHI/rhi_module.h>
 #include <HUH/logging.h>
 #include <HUH/RHI/device.h>
+#include <HUH/RHI/swapchain.h>
 
 namespace HUH::RHI {
 DynamicRHI* DefaultCreate() {
@@ -37,6 +38,9 @@ void DynamicRHI::Destroy() {
     for (Device* device : m_created_devices) {
         device->Destroy();
         delete device;
+    }
+    for (Swapchain* surface : m_created_surfaces) {
+        delete surface;
     }
 }
 

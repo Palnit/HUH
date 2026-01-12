@@ -83,6 +83,18 @@ public:
                   << file_info.lexically_relative(s_huh_path).string() << ":" << file_line << "]" << std::endl;
     }
 
+    template<typename... Args>
+    static void AddLogThrow(const LogCategory& category,
+                            Logging::Level level,
+                            const std::string& format,
+                            std::filesystem::path&& file_info,
+                            const std::string& file_line,
+                            Args&&... args) {
+        AddLog(category, level, format, std::forward<std::filesystem::path&&>(file_info), file_line,
+               std::forward<Args&&>(args)...);
+        throw std::runtime_error(std::vformat(format, std::make_format_args(args...)));
+    }
+
 private:
     inline static std::filesystem::path s_huh_path{HUH_SOURCE_DIR};
 };
@@ -102,3 +114,6 @@ private:
 
 #define HUH_ELOG(category, format, ...) \
     HUH_LOG(category,HUH::Logging::Error,format __VA_OPT__(,) __VA_ARGS__)
+
+#define HUH_ELOG_THROW(category, format, ...) \
+    HUH::Logging::AddLogThrow(category, HUH::Logging::Error, format, __FILE__ ,std::to_string(__LINE__) __VA_OPT__(,) __VA_ARGS__);

@@ -5,11 +5,13 @@ set(VULKAN_RHI_HEADER_FILES
         ${VULKAN_RHI_INC_PATH}/vulkan_defines.h
         ${VULKAN_RHI_INC_PATH}/device.h
         ${VULKAN_RHI_INC_PATH}/queue.h
+        ${VULKAN_RHI_INC_PATH}/swapchain.h
 )
 set(VULKAN_RHI_SOURCE_FILES
         src/dynamic_rhi.cpp
         src/device.cpp
         src/queue.cpp
+        src/swapchain.cpp
 )
 
 if (TARGET HUH::VulkanLoader)

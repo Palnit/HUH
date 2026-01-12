@@ -1,7 +1,6 @@
 #pragma once
 
-#include "rhi_module.h"
-
+#include <HUH/RHI/rhi_module.h>
 #include <HUH/RHI/queue.h>
 #include <HUH/definitions.h>
 #include <HUH/types.h>

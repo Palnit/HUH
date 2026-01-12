@@ -1,7 +1,8 @@
 #pragma once
+
+#include <HUH/event.h>
 #include <HUH/definitions.h>
 #include <string>
-#include <utility>
 
 typedef struct HWND__* HWND;
 struct wl_display;
@@ -22,6 +23,9 @@ public:
     virtual void Show() = 0;
     virtual void Loop() = 0;
     virtual ~WindowProto() = default;
+
+    MultiEvent<void()> OnClose;
+    MultiEvent<void(Int32 Width, Int32 Height)> OnSizeChange;
 
     HUH_NODISCARD const PlatformVariables& GetPlatformVariables() const { return m_platform; }
 

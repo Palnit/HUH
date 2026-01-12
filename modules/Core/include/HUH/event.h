@@ -148,34 +148,33 @@ public:
     ~Event() { delete m_event; }
 
     template<typename FunctionType, typename... CommonArgs>
-    void BindLambda(FunctionType InFunction, CommonArgs&&... InCommonArgs) {
+    void Bind(FunctionType InFunction, CommonArgs&&... InCommonArgs) {
         delete m_event;
         m_event =
             new FunctorEvent<RetType(Args...), std::remove_reference_t<FunctionType>, std::decay_t<CommonArgs>...>(
                 InFunction, std::forward<CommonArgs>(InCommonArgs)...);
     }
 
-    template<typename ClassType, typename... CommonArgs>
-    void BindClass(
-        ClassType* inClass,
-        ClassFuncTypeHelper<false, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
-        CommonArgs&&... inCommonArgs) {
+    template<typename ClassType, typename... CommonArgs, typename = std::enable_if_t<std::is_class_v<ClassType>>>
+    void Bind(ClassType* inClass,
+              ClassFuncTypeHelper<false, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
+              CommonArgs&&... inCommonArgs) {
         delete m_event;
         m_event = new ClassEvent<false, RetType(Args...), ClassType, std::decay_t<CommonArgs>...>(
             inClass, inFunction, std::forward<CommonArgs>(inCommonArgs)...);
     }
 
-    template<typename ClassType, typename... CommonArgs>
-    void BindClass(ClassType* inClass,
-                   ClassFuncTypeHelper<true, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
-                   CommonArgs&&... inCommonArgs) {
+    template<typename ClassType, typename... CommonArgs, typename = std::enable_if_t<std::is_class_v<ClassType>>>
+    void Bind(ClassType* inClass,
+              ClassFuncTypeHelper<true, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
+              CommonArgs&&... inCommonArgs) {
         delete m_event;
         m_event = new ClassEvent<true, RetType(Args...), ClassType, std::decay_t<CommonArgs>...>(
             inClass, inFunction, std::forward<CommonArgs>(inCommonArgs)...);
     }
 
     template<typename... CommonArgs>
-    void BindRaw(RetType (*InFunction)(Args..., CommonArgs...), CommonArgs&&... commonArgs) {
+    void Bind(RetType (*InFunction)(Args..., CommonArgs...), CommonArgs&&... commonArgs) {
         delete m_event;
         m_event = new RawEvent<RetType(Args...), std::decay_t<CommonArgs>...>(InFunction,
                                                                               std::forward<CommonArgs>(commonArgs)...);
@@ -200,37 +199,36 @@ public:
     }
 
     template<typename FunctionType, typename... CommonArgs>
-    EventHandler AddLambda(FunctionType&& InFunction, CommonArgs&&... InCommonArgs) {
+    EventHandler Add(FunctionType&& InFunction, CommonArgs&&... InCommonArgs) {
         m_eventList.push_back(new Event<RetType(Args...)>());
-        m_eventList.back()->BindLambda(std::forward<FunctionType>(InFunction),
-                                       std::forward<CommonArgs>(InCommonArgs)...);
+        m_eventList.back()->Bind(std::forward<FunctionType>(InFunction), std::forward<CommonArgs>(InCommonArgs)...);
         return m_eventList.back()->GetHandler();
     }
 
-    template<typename ClassType, typename... CommonArgs>
-    EventHandler AddClass(
+    template<typename ClassType, typename... CommonArgs, typename = std::enable_if_t<std::is_class_v<ClassType>>>
+    EventHandler Add(
         ClassType* inClass,
         ClassFuncTypeHelper<false, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
         CommonArgs&&... inCommonArgs) {
         m_eventList.push_back(new Event<RetType(Args...)>());
-        m_eventList.back()->BindClass(inClass, inFunction, std::forward<CommonArgs>(inCommonArgs)...);
+        m_eventList.back()->Bind(inClass, inFunction, std::forward<CommonArgs>(inCommonArgs)...);
         return m_eventList.back()->GetHandler();
     }
 
-    template<typename ClassType, typename... CommonArgs>
-    EventHandler AddClass(
+    template<typename ClassType, typename... CommonArgs, typename = std::enable_if_t<std::is_class_v<ClassType>>>
+    EventHandler Add(
         ClassType* inClass,
         ClassFuncTypeHelper<true, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
         CommonArgs&&... inCommonArgs) {
         m_eventList.push_back(new Event<RetType(Args...)>());
-        m_eventList.back()->BindClass(inClass, inFunction, std::forward<CommonArgs>(inCommonArgs)...);
+        m_eventList.back()->Bind(inClass, inFunction, std::forward<CommonArgs>(inCommonArgs)...);
         return m_eventList.back()->GetHandler();
     }
 
     template<typename... CommonArgs>
-    EventHandler AddRaw(RetType (*InFunction)(Args..., CommonArgs...), CommonArgs&&... commonArgs) {
+    EventHandler Add(RetType (*InFunction)(Args..., CommonArgs...), CommonArgs&&... commonArgs) {
         m_eventList.push_back(new Event<RetType(Args...)>());
-        m_eventList.back()->BindRaw(InFunction, std::forward<CommonArgs>(commonArgs)...);
+        m_eventList.back()->Bind(InFunction, std::forward<CommonArgs>(commonArgs)...);
         return m_eventList.back()->GetHandler();
     }
 

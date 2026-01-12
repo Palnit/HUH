@@ -18,6 +18,12 @@ const wl_registry_listener WaylandWindow::s_registryListener = {
 };
 const xdg_wm_base_listener WaylandWindow::s_xdgWmBaseListener = {.ping = xdgWmBasePing};
 const xdg_surface_listener WaylandWindow::s_xdgSurfaceListener = {.configure = xdgSurfaceConfigure};
+const xdg_toplevel_listener WaylandWindow::s_xdgToplevelListener = {
+    .configure = xdgToplevelConfigure,
+    .close = xdgToplevelClose,
+    .configure_bounds = xdgToplevelConfigureBounds,
+    .wm_capabilities = xdgToplevelWmCapabilities,
+};
 
 extern "C" WindowProto* CreateWindowImpl(const std::string& name, Int32 width, Int32 height) {
     return new WaylandWindow(name, width, height);
@@ -41,6 +47,7 @@ void HandleWaylandGlobalRegister(void* data,
         xdg_wm_base_add_listener(WaylandWindow::s_xdgWmBase, &WaylandWindow::s_xdgWmBaseListener, nullptr);
     }
 }
+
 void HandleWaylandGlobalRegisterRemove(void* data, wl_registry* registry, Uint32 name) {
 }
 
@@ -52,6 +59,29 @@ void xdgSurfaceConfigure(void* data, xdg_surface* xdg_surface, const Uint32 seri
     const auto* window = static_cast<WaylandWindow*>(data);
     xdg_surface_ack_configure(xdg_surface, serial);
     wl_surface_commit(window->m_surface);
+}
+
+void xdgToplevelConfigure(void* data, xdg_toplevel* xdg_toplevel, int32_t width, int32_t height, wl_array* states) {
+    const auto window = static_cast<WaylandWindow*>(data);
+    if (width == 0 || height == 0) {
+        return;
+    }
+    window->m_width = width;
+    window->m_height = height;
+    window->OnSizeChange.ExecuteAll(window->m_width, window->m_height);
+}
+
+void xdgToplevelClose(void* data, struct xdg_toplevel* toplevel) {
+    const auto window = static_cast<WaylandWindow*>(data);
+    HUH_TLOG("WHY IS WE NOT HERE??")
+    window->OnClose.ExecuteAll();
+    window->close = true;
+}
+
+void xdgToplevelConfigureBounds(void* data, struct xdg_toplevel* xdg_toplevel, int32_t width, int32_t height) {
+}
+
+void xdgToplevelWmCapabilities(void* data, xdg_toplevel* xdg_toplevel, struct wl_array* capabilities) {
 }
 
 WaylandWindow::WaylandWindow(const std::string& name, const Int32 width, const Int32 height)
@@ -70,6 +100,9 @@ WaylandWindow::WaylandWindow(const std::string& name, const Int32 width, const I
     m_xdgSurface = xdg_wm_base_get_xdg_surface(s_xdgWmBase, m_surface);
     xdg_surface_add_listener(m_xdgSurface, &s_xdgSurfaceListener, this);
     m_xdgToplevel = xdg_surface_get_toplevel(m_xdgSurface);
+    xdg_toplevel_add_listener(m_xdgToplevel, &s_xdgToplevelListener, this);
+    xdg_toplevel_set_min_size(m_xdgToplevel, m_width, m_height);
+    // xdg_toplevel_set_max_size(m_xdgToplevel, m_width, m_height);
     xdg_toplevel_set_title(m_xdgToplevel, m_name.c_str());
     wl_surface_commit(m_surface);
     m_platform.WaylandDisplay = s_waylandDisplay;
@@ -91,7 +124,7 @@ void WaylandWindow::Show() {
 }
 
 void WaylandWindow::Loop() {
-    while (wl_display_dispatch(s_waylandDisplay) != -1) {
+    while (wl_display_dispatch(s_waylandDisplay) != -1 && close == false) {
         /* This space deliberately left blank */
     }
 }

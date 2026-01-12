@@ -1,3 +1,4 @@
+#include <HUH/RHI/vulkan/swapchain.h>
 #include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/vulkan/device.h>
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
@@ -122,7 +123,7 @@ std::vector<Device*> VulkanDynamicRHI::GetDevices() {
     return m_created_devices;
 }
 
-Surface* VulkanDynamicRHI::CreateSurface(const Window& window) {
+Swapchain* VulkanDynamicRHI::CreateSurface(const Window& window) {
 #ifdef HUH_WIN
     auto platform = window.GetPlatformVariables();
     VkWin32SurfaceCreateInfoKHR createInfoKHR{.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
@@ -149,9 +150,8 @@ Surface* VulkanDynamicRHI::CreateSurface(const Window& window) {
             err != VK_SUCCESS) {
             HUH_ELOG(LogVulkanRHI, "Vulkan surface creation failed: {}", HUH::ToString(err))
         }
-        HUH::vkDestroySurfaceKHR(m_instance, surface, nullptr);
-        HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan surface creation OK")
-        return nullptr;
+        m_created_surfaces.push_back(new VulkanSwapchain(surface, this));
+        return m_created_surfaces.back();
     }
     return nullptr;
 #else

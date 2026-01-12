@@ -5,7 +5,7 @@
 
 namespace HUH::RHI {
 
-class VulkanQueue final : public Queue {
+class HUH_VULKANRHI_API VulkanQueue final : public Queue {
     friend class VulkanDevice;
 
 public:

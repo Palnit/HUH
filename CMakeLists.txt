@@ -8,6 +8,7 @@ option(BUILD_MATH "Build Math module" OFF)
 option(BUILD_ARRAY "Build numpy like array module" OFF)
 option(BUILD_THREADING "Build threading library" OFF)
 option(BUILD_PYTHON_BINDING "Build the python binding module" OFF)
+option(BUILD_HUH_PYTHON_BINDING "Build the python binding for all building HUH module" OFF)
 option(USE_SIMD "Activates auto detection of cpu intrinsics and uses simd instructions where library supports it" ON)
 
 option(BUILD_TESTS "Build google tests for the modules" OFF)

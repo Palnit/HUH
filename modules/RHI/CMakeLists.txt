@@ -7,13 +7,13 @@ set(HEADER_FILES
         ${RHI_INC_PATH}/device.h
         ${RHI_INC_PATH}/rhi_module.h
         ${RHI_INC_PATH}/queue.h
-        ${RHI_INC_PATH}/surface.h
+        ${RHI_INC_PATH}/swapchain.h
 )
 set(SOURCE_FILES
         src/dynamic_rhi.cpp
         src/device.cpp
         src/queue.cpp
-        src/surface.cpp
+        src/swapchain.cpp
 )
 
 add_library(HUH-RHI SHARED ${HEADER_FILES} ${SOURCE_FILES})
