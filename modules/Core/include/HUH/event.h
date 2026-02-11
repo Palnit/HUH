@@ -1,10 +1,11 @@
 #pragma once
+
 #include <string>
 #include <format>
-#include <tuple>
 #include <vector>
-#include <HUH/template_helpers.h>
-#include <oneapi/tbb/profiling.h>
+#include <HUH/templates.h>
+#include <HUH/concepts.h>
+#include <HUH/Types/tuple.h>
 
 namespace HUH {
 
@@ -32,15 +33,16 @@ public:
     friend class Event;
 
     template<typename Tp, typename CharT>
+    // NOLINTNEXTLINE(*-dcl58-cpp)
     friend struct std::formatter;
 
-    EventHandler() = default;
+    HUH_FORCE_INLINE EventHandler() = default;
 
-    bool operator==(const EventHandler& rhs) const { return this->m_id == rhs.m_id; }
-    bool operator!=(const EventHandler& rhs) const { return !(*this == rhs); }
+    HUH_FORCE_INLINE bool operator==(const EventHandler& rhs) const { return this->m_id == rhs.m_id; }
+    HUH_FORCE_INLINE bool operator!=(const EventHandler& rhs) const { return !(*this == rhs); }
 
 private:
-    EventHandler(Uint64 new_id) : m_id(new_id) {}
+    HUH_FORCE_INLINE explicit EventHandler(const Uint64 new_id) : m_id(new_id) {}
     static Uint64 GetNextEventId();
 
     Uint64 m_id = 0;
@@ -56,42 +58,24 @@ public:
 template<typename Func, typename... CommonArgs>
 class IEventBase : public ICommonEventBase<Func> {
 public:
-    explicit IEventBase(CommonArgs&&... args) : m_commonArgs(std::forward<CommonArgs>(args)...) {}
-    virtual ~IEventBase() = default;
-
-    // template<typename FunctionType, typename... Args, size_t... Is>
-    // auto ApplyAfterIndex(FunctionType&& function, Args&&... args, std::index_sequence<Is...>) const {
-    //     return std::invoke(std::forward<FunctionType>(function), std::forward<Args>(args)...,
-    //                        std::get<Is>(m_commonArgs)...);
-    // }
-
-    template<typename FunctionType, typename... Args>
-    auto ApplyAfter(FunctionType&& function, Args&&... args) {
-        // TODO THIS IS HORRIBLE CHANGE IT LATER WORKS FOR NOW PROBABLY NEED MY OWN TUPLE
-        // return std::invoke(std::forward<FunctionType>(function), std::forward<Args>(args)...);
-        return std::apply(std::forward<FunctionType>(function),
-                          std::tuple_cat(std::tuple<Args...>(args...), m_commonArgs));
-        // auto sequence = ;
-        // return ApplyAfterIndex(std::forward<FunctionType>(function), std::forward<Args>(args)...,
-        //                        std::make_index_sequence<size>{});
-    }
+    HUH_FORCE_INLINE explicit IEventBase(CommonArgs&&... args) : m_commonArgs(std::forward<CommonArgs>(args)...) {}
+    HUH_FORCE_INLINE ~IEventBase() override = default;
 
 protected:
-    std::tuple<CommonArgs...> m_commonArgs;
-    static constexpr size_t size = std::tuple_size_v<std::tuple<CommonArgs...>>;
+    Tuple<CommonArgs...> m_commonArgs;
 };
 
 template<typename RetType, typename... Args, typename FunctionType, typename... CommonArgs>
 class FunctorEvent<RetType(Args...), FunctionType, CommonArgs...> : public IEventBase<RetType(Args...), CommonArgs...> {
 public:
     template<typename InFunctionType, typename... InCommonArgs>
-    explicit FunctorEvent(InFunctionType functor, InCommonArgs&&... commonArgs)
+    HUH_FORCE_INLINE explicit FunctorEvent(InFunctionType functor, InCommonArgs&&... commonArgs)
         : IEventBase<RetType(Args...), CommonArgs...>(std::forward<InCommonArgs>(commonArgs)...),
           m_functor(functor) {}
 
-    RetType Execute(Args... args) override {
-        return this->template ApplyAfter<decltype(m_functor), Args...>(std::forward<decltype(m_functor)>(m_functor),
-                                                                       std::forward<Args>(args)...);
+    HUH_FORCE_INLINE RetType Execute(Args... args) override {
+        return this->m_commonArgs.template ApplyAfter<decltype(m_functor), Args...>(
+            std::forward<decltype(m_functor)>(m_functor), std::forward<Args>(args)...);
     }
 
 private:
@@ -105,15 +89,15 @@ public:
     using FuncType = ClassFuncTypeHelper<IsConst, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type;
 
     template<typename... InCommonArgs>
-    explicit ClassEvent(ClassType* inClass, FuncType inFunction, InCommonArgs&&... commonArgs)
+    HUH_FORCE_INLINE explicit ClassEvent(ClassType* inClass, FuncType inFunction, InCommonArgs&&... commonArgs)
         : IEventBase<RetType(Args...), CommonArgs...>(std::forward<InCommonArgs>(commonArgs)...),
           m_class(inClass),
           m_function(inFunction) {}
 
-    RetType Execute(Args... args) override {
+    HUH_FORCE_INLINE RetType Execute(Args... args) override {
         using NoConstClass = std::remove_const_t<ClassType>;
         auto* classPtr = const_cast<NoConstClass*>(m_class);
-        return this->template ApplyAfter<FuncType, ClassType*, Args...>(
+        return this->m_commonArgs.template ApplyAfter<FuncType, ClassType*, Args...>(
             std::forward<FuncType>(m_function), std::forward<ClassType*>(classPtr), std::forward<Args>(args)...);
     }
 
@@ -128,13 +112,13 @@ public:
     using RawFunctionType = RetType(Args..., CommonArgs...);
 
     template<typename... InCommonArgs>
-    explicit RawEvent(RawFunctionType* InFunction, InCommonArgs&&... commonArgs)
+    HUH_FORCE_INLINE explicit RawEvent(RawFunctionType* InFunction, InCommonArgs&&... commonArgs)
         : IEventBase<RetType(Args...), CommonArgs...>(std::forward<InCommonArgs>(commonArgs)...),
           m_rawFunction(InFunction) {}
 
-    RetType Execute(Args... args) override {
-        return this->template ApplyAfter<RawFunctionType*, Args...>(std::forward<RawFunctionType*>(m_rawFunction),
-                                                                    std::forward<Args>(args)...);
+    HUH_FORCE_INLINE RetType Execute(Args... args) override {
+        return this->m_commonArgs.template ApplyAfter<RawFunctionType*, Args...>(
+            std::forward<RawFunctionType*>(m_rawFunction), std::forward<Args>(args)...);
     }
 
 private:
@@ -148,7 +132,7 @@ public:
     ~Event() { delete m_event; }
 
     template<typename FunctionType, typename... CommonArgs>
-    void Bind(FunctionType InFunction, CommonArgs&&... InCommonArgs) {
+    HUH_FORCE_INLINE void Bind(FunctionType InFunction, CommonArgs&&... InCommonArgs) {
         delete m_event;
         m_event =
             new FunctorEvent<RetType(Args...), std::remove_reference_t<FunctionType>, std::decay_t<CommonArgs>...>(
@@ -156,31 +140,33 @@ public:
     }
 
     template<typename ClassType, typename... CommonArgs, typename = std::enable_if_t<std::is_class_v<ClassType>>>
-    void Bind(ClassType* inClass,
-              ClassFuncTypeHelper<false, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
-              CommonArgs&&... inCommonArgs) {
+    HUH_FORCE_INLINE void Bind(
+        ClassType* inClass,
+        ClassFuncTypeHelper<false, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
+        CommonArgs&&... inCommonArgs) {
         delete m_event;
         m_event = new ClassEvent<false, RetType(Args...), ClassType, std::decay_t<CommonArgs>...>(
             inClass, inFunction, std::forward<CommonArgs>(inCommonArgs)...);
     }
 
     template<typename ClassType, typename... CommonArgs, typename = std::enable_if_t<std::is_class_v<ClassType>>>
-    void Bind(ClassType* inClass,
-              ClassFuncTypeHelper<true, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
-              CommonArgs&&... inCommonArgs) {
+    HUH_FORCE_INLINE void Bind(
+        ClassType* inClass,
+        ClassFuncTypeHelper<true, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
+        CommonArgs&&... inCommonArgs) {
         delete m_event;
         m_event = new ClassEvent<true, RetType(Args...), ClassType, std::decay_t<CommonArgs>...>(
             inClass, inFunction, std::forward<CommonArgs>(inCommonArgs)...);
     }
 
     template<typename... CommonArgs>
-    void Bind(RetType (*InFunction)(Args..., CommonArgs...), CommonArgs&&... commonArgs) {
+    HUH_FORCE_INLINE void Bind(RetType (*InFunction)(Args..., CommonArgs...), CommonArgs&&... commonArgs) {
         delete m_event;
         m_event = new RawEvent<RetType(Args...), std::decay_t<CommonArgs>...>(InFunction,
                                                                               std::forward<CommonArgs>(commonArgs)...);
     }
 
-    RetType Execute(Args... args) const { return m_event->Execute(args...); }
+    HUH_FORCE_INLINE RetType Execute(Args... args) const { return m_event->Execute(args...); }
 
     HUH_NODISCARD EventHandler GetHandler() const { return m_handler; }
 
@@ -192,22 +178,22 @@ private:
 template<typename RetType, typename... Args>
 class MultiEvent<RetType(Args...)> {
 public:
-    ~MultiEvent() {
+    HUH_FORCE_INLINE ~MultiEvent() {
         for (auto event : m_eventList) {
             delete event;
         }
     }
 
     template<typename FunctionType, typename... CommonArgs>
-    EventHandler Add(FunctionType&& InFunction, CommonArgs&&... InCommonArgs) {
+    HUH_FORCE_INLINE EventHandler Add(FunctionType&& InFunction, CommonArgs&&... InCommonArgs) {
         m_eventList.push_back(new Event<RetType(Args...)>());
         m_eventList.back()->Bind(std::forward<FunctionType>(InFunction), std::forward<CommonArgs>(InCommonArgs)...);
         return m_eventList.back()->GetHandler();
     }
 
     template<typename ClassType, typename... CommonArgs, typename = std::enable_if_t<std::is_class_v<ClassType>>>
-    EventHandler Add(
-        ClassType* inClass,
+    HUH_FORCE_INLINE EventHandler
+    Add(ClassType* inClass,
         ClassFuncTypeHelper<false, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
         CommonArgs&&... inCommonArgs) {
         m_eventList.push_back(new Event<RetType(Args...)>());
@@ -216,8 +202,8 @@ public:
     }
 
     template<typename ClassType, typename... CommonArgs, typename = std::enable_if_t<std::is_class_v<ClassType>>>
-    EventHandler Add(
-        ClassType* inClass,
+    HUH_FORCE_INLINE EventHandler
+    Add(ClassType* inClass,
         ClassFuncTypeHelper<true, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
         CommonArgs&&... inCommonArgs) {
         m_eventList.push_back(new Event<RetType(Args...)>());
@@ -226,13 +212,13 @@ public:
     }
 
     template<typename... CommonArgs>
-    EventHandler Add(RetType (*InFunction)(Args..., CommonArgs...), CommonArgs&&... commonArgs) {
+    HUH_FORCE_INLINE EventHandler Add(RetType (*InFunction)(Args..., CommonArgs...), CommonArgs&&... commonArgs) {
         m_eventList.push_back(new Event<RetType(Args...)>());
         m_eventList.back()->Bind(InFunction, std::forward<CommonArgs>(commonArgs)...);
         return m_eventList.back()->GetHandler();
     }
 
-    void Remove(const EventHandler& handler) {
+    HUH_FORCE_INLINE void Remove(const EventHandler& handler) {
         for (size_t i = 0; i < m_eventList.size(); ++i) {
             if (m_eventList[i]->GetHandler() == handler) {
                 delete m_eventList[i];
@@ -241,7 +227,7 @@ public:
         }
     }
 
-    void ExecuteAll(Args... args) const {
+    HUH_FORCE_INLINE void ExecuteAll(Args... args) const {
         if (m_eventList.empty()) {
             return;
         }

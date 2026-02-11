@@ -10,6 +10,8 @@ set(HEADER_FILES
         ${INC_PATH}/Types/accessor.h
         ${INC_PATH}/Types/object.h
         ${INC_PATH}/Types/tuple.h
+        ${INC_PATH}/Types/unicode.h
+        ${INC_PATH}/Types/fwd.h
 )
 
 add_library(HUH-Python INTERFACE ${HEADER_FILES})

@@ -12,10 +12,9 @@ namespace HUH {
 //     return T();
 // }
 
-template<typename StringType,
-         typename = std::enable_if_t<std::is_same_v<StringType, std::string> || std::is_same_v<StringType, std::wstring>
-                                     || std::is_same_v<StringType, std::u16string>
-                                     || std::is_same_v<StringType, std::u32string>>>
+template<typename StringType>
+    requires(HUH::Same<StringType, std::string> || HUH::Same<StringType, std::wstring>
+             || HUH::Same<StringType, std::u16string> || HUH::Same<StringType, std::u32string>)
 StringType Cast(const HUH::Py::Object& obj) {
     using CharT = typename StringType::value_type;
     static constexpr size_t utfBytes = 8 * sizeof(CharT);
@@ -24,7 +23,7 @@ StringType Cast(const HUH::Py::Object& obj) {
         if (PyBytes_Check(obj)) {
             const char* bytes = PyBytes_AsString(obj);
             if (!bytes) {
-                HUH_ELOG_THROW(LogPython, "Unexpected PyBytes_AsString() failure")
+                throw std::runtime_error("Unexpected PyBytes_AsString() failure");
             }
             return StringType(bytes, static_cast<size_t>(PyBytes_Size(obj)));
         }
@@ -32,33 +31,40 @@ StringType Cast(const HUH::Py::Object& obj) {
         if (PyByteArray_Check(obj)) {
             const char* bytes = PyByteArray_AsString(obj);
             if (!bytes) {
-                HUH_ELOG_THROW(LogPython, "Unexpected PyByteArray_AsString() failure")
+                throw std::runtime_error("Unexpected PyByteArray_AsString() failure");
             }
             return StringType(bytes, static_cast<size_t>(PyByteArray_Size(obj)));
         }
-        HUH_ELOG_THROW(LogPython, "Python object is not string/bytes/byteArray")
+        throw std::runtime_error("Trying To Cast to string from a non string castable type");
     }
 
     if (utfBytes == 8) {
         Py_ssize_t size = -1;
         const auto* buffer = reinterpret_cast<const CharT*>(PyUnicode_AsUTF8AndSize(obj, &size));
         if (!buffer) {
-            HUH_ELOG_THROW(LogPython, "Unexpected PyUnicode_AsUTF8AndSize() failure")
+            throw std::runtime_error("Unexpected PyUnicode_AsUTF8AndSize() failure");
         }
         return StringType(buffer);
     }
 
     auto bytes_counter =
-        Py::StealObj<Py::Object>(PyUnicode_AsEncodedString(obj, utfBytes == 16 ? "utf-16" : "utf-32", nullptr));
+        Py::Steal<Py::Object>(PyUnicode_AsEncodedString(obj, utfBytes == 16 ? "utf-16" : "utf-32", nullptr));
     if (!bytes_counter) {
-        HUH_ELOG_THROW(LogPython, "Unexpected PyUnicode_AsEncodedString() failure")
+        throw std::runtime_error("Unexpected PyUnicode_AsEncodedString() failure");
     }
 
     const auto* bytes = reinterpret_cast<const CharT*>(PyBytes_AsString(*bytes_counter));
     if (!bytes) {
-        HUH_ELOG_THROW(LogPython, "Unexpected PyBytes_AsString() failure")
+        throw std::runtime_error("Unexpected PyBytes_AsString() failure");
     }
 
     return StringType(++bytes, static_cast<size_t>(PyBytes_Size(*bytes_counter)) - 1);
+}
+
+template<typename StringType>
+    requires(HUH::Same<StringType, std::string> || HUH::Same<StringType, std::wstring>
+             || HUH::Same<StringType, std::u16string> || HUH::Same<StringType, std::u32string>)
+StringType Cast(const HUH::Py::Unicode& obj) {
+    return StringType();
 }
 }// namespace HUH

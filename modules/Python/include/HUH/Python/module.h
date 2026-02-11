@@ -1,13 +1,14 @@
 #pragma once
 
 #include <HUH/Python/definitions.h>
+#include <HUH/Python/Types/object.h>
 #include <string>
 #include <utility>
 #include <vector>
 
 namespace HUH::Py {
 
-class Module {
+class Module : public Object {
 public:
     Module(std::string name, std::string docs) : m_name(std::move(name)), m_docs(std::move(docs)) {
         module.m_name = m_name.c_str();
@@ -24,6 +25,7 @@ protected:
     std::string m_name;
     std::string m_docs;
     std::vector<PyMethodDef> m_methods;
+    std::vector<PyModuleDef_Slot> m_slots;
 };
 
 }// namespace HUH::Py

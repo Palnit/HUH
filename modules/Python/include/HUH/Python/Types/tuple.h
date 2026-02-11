@@ -8,32 +8,49 @@ namespace HUH::Py {
 
 class Tuple : public Object {
 public:
-    class Accessor final : public HUH::Py::Accessor {
-    public:
-        Accessor(const Tuple* parent, const long index) : HUH::Py::Accessor(parent, index) {
-            if (m_parent) {
-                m_object = PyTuple_GetItem(*m_parent, m_index);
-            }
-        }
+    struct TupleAccessor final : public HUH::Py::AccessorType<Object, long> {
+        AccessorTypeConstructor(TupleAccessor) {}
 
-        Accessor& operator=(const Object& other) {
-            PyTuple_SetItem(*m_parent, m_index, other);
-            return *this;
-        }
+        HUH_NODISCARD Object Get() const override { return PyTuple_GetItem(*parent, key); }
+        void Set(const Object& type) override { PyTuple_SetItem(*parent, key, type); }
     };
 
-    Tuple() = default;
-
     // NOLINTNEXTLINE(google-explicit-constructor)
-    Tuple(PyObject* object) : Object(object) {
-        if (!PyTuple_Check(m_object)) {
-            HUH_ELOG_THROW(LogPython, "Trying to create a tuple object from non tuple python object")
-        }
+    HUH_PYOBJECT_CONSTRUCTORS(Tuple, PyTuple_Check)
+
+    static Tuple Create(const long n) { return PyTuple_New(n); }
+
+    /// Creates a Tuple wrapper
+    /// @param obj The Objects to put in the Tuple (Borrows)
+    /// @return The created Tuple wrapper
+    template<typename... Args>
+        requires((HUH::Derived<Args, Object> || HUH::Convertable<Args, PyObject*>) && ...)
+    static Tuple Create(const Args&... obj) {
+        return PyTuple_Pack(sizeof...(obj), obj...);
     }
 
-    Accessor operator[](const long i) { return {this, i}; }
+    Accessor<TupleAccessor> operator[](HUH::Integral auto i) { return {this, static_cast<long>(i)}; }
 
     HUH_NODISCARD long size() const { return PyTuple_Size(m_object); }
+};
+
+// TODO Finish Named Tuple
+class NamedTuple : public Tuple {
+public:
+    class Descriptor {
+    public:
+    private:
+    };
+
+    NamedTuple() = default;
+
+    // NOLINTNEXTLINE(google-explicit-constructor)
+    NamedTuple(PyObject* object) : Tuple(object) {
+        if (!IsNamedTuple(m_object)) {
+            m_object = nullptr;
+        }
+    }
+    HUH_FORCE_INLINE static bool IsNamedTuple(PyObject* obj) { return PyTuple_Check(obj); }
 };
 
 }// namespace HUH::Py

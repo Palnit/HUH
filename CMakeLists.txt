@@ -39,6 +39,9 @@ check_cpu()
 set(HEADER_FILES
         include/public/HUH/definitions.h
         include/public/HUH/types.h
+        include/public/HUH/templates.h
+        include/public/HUH/concepts.h
+        include/public/HUH/enum_helper.h
 )
 
 set(SOURCE_FILES
