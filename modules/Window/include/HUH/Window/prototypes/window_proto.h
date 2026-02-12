@@ -9,6 +9,8 @@ struct wl_display;
 struct wl_surface;
 
 namespace HUH {
+class Window;
+
 class HUH_WINDOW_API WindowProto {
 public:
     struct PlatformVariables {
@@ -24,8 +26,8 @@ public:
     virtual void Loop() = 0;
     virtual ~WindowProto() = default;
 
-    MultiEvent<void()> OnClose;
-    MultiEvent<void(Int32 Width, Int32 Height)> OnSizeChange;
+    MultiEvent<void(Window*)> OnClose;
+    MultiEvent<void(Window*, Int32 Width, Int32 Height)> OnSizeChange;
 
     HUH_NODISCARD const PlatformVariables& GetPlatformVariables() const { return m_platform; }
 

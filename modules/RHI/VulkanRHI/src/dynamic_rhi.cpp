@@ -7,6 +7,7 @@
 #include <HUH/string_operations.h>
 
 #ifdef HUH_USE_WINDOW
+#include <HUH/Windows/win_instance.h>
 #include <HUH/Window/window.h>
 #endif
 

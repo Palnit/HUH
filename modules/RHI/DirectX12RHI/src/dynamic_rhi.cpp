@@ -62,7 +62,7 @@ std::vector<Device*> DX12DynamicRHI::GetDevices() {
     return m_created_devices;
 }
 
-Surface* DX12DynamicRHI::CreateSurface(const Window& window) {
+Swapchain* DX12DynamicRHI::CreateSurface(const Window& window) {
     return nullptr;
 }
 

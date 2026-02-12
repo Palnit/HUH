@@ -43,7 +43,7 @@ public:
 
 private:
     HUH_FORCE_INLINE explicit EventHandler(const Uint64 new_id) : m_id(new_id) {}
-    static Uint64 GetNextEventId();
+    HUH_CORE_API static Uint64 GetNextEventId();
 
     Uint64 m_id = 0;
 };
