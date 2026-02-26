@@ -12,6 +12,7 @@ class Queue;
 class HUH_RHI_API Device {
 public:
     friend class DynamicRHI;
+    friend class Swapchain;
     enum class Type { Dedicated, Integrated, Cpu, Virtual, Other, Unknown };
     enum class Vendor { Nvidia, Amd, Arm, Qualcomm, Intel, Unknown };
 

@@ -124,7 +124,7 @@ std::vector<Device*> VulkanDynamicRHI::GetDevices() {
     return m_created_devices;
 }
 
-Swapchain* VulkanDynamicRHI::CreateSurface(const Window& window) {
+Swapchain* VulkanDynamicRHI::CreateSwapchain(const Window& window) {
 #ifdef HUH_WIN
     auto platform = window.GetPlatformVariables();
     VkWin32SurfaceCreateInfoKHR createInfoKHR{.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
@@ -136,9 +136,8 @@ Swapchain* VulkanDynamicRHI::CreateSurface(const Window& window) {
         HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan surface creation failed: {}", HUH::ToString(err))
         return nullptr;
     }
-    HUH::vkDestroySurfaceKHR(m_instance, surface, nullptr);
-    HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan surface creation OK")
-    return nullptr;
+    m_created_surfaces.push_back(new VulkanSwapchain(surface, this));
+    return m_created_surfaces.back();
 #elif defined(HUH_LINUX)
     WindowProto::PlatformVariables platform = window.GetPlatformVariables();
     if (platform.WaylandSurface && platform.WaylandDisplay) {

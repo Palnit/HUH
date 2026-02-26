@@ -168,6 +168,7 @@ Queue* VulkanDevice::CreateQueue(Queue::Type type) {
 void VulkanDevice::QueryVulkanPropertiesAndFeatures() {
     HUH::vkGetPhysicalDeviceProperties2KHR(m_physicalDevice, &Properties.properties_1_0);
     HUH::vkGetPhysicalDeviceFeatures2KHR(m_physicalDevice, &Features.features_1_0);
+    Features.features_1_0.features.robustBufferAccess = false;
 }
 
 VulkanDevice::VulkanDevice(VkPhysicalDevice physicalDevice) : m_physicalDevice(physicalDevice) {

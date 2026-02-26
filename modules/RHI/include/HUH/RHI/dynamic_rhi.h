@@ -21,7 +21,7 @@ public:
     virtual void Destroy();
     virtual Device* GetDevice(size_t index) = 0;
     virtual std::vector<Device*> GetDevices() = 0;
-    virtual Swapchain* CreateSurface(const Window& window) = 0;
+    virtual Swapchain* CreateSwapchain(const Window& window) = 0;
 
     DynamicRHI(const DynamicRHI&) = delete;
     DynamicRHI& operator=(const DynamicRHI&) = delete;

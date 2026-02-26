@@ -17,7 +17,7 @@ public:
     bool Init() override;
     Device* GetDevice(size_t index) override;
     std::vector<Device*> GetDevices() override;
-    Swapchain* CreateSurface(const Window& window) override;
+    Swapchain* CreateSwapchain(const Window& window) override;
 
     friend HUH::RHI::DynamicRHI* DynamicRHICreate();
 
