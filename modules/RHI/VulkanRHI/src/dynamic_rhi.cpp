@@ -2,12 +2,18 @@
 #include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/vulkan/device.h>
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
+
+#include "HUH/RHI/vulkan/shader.h"
+
 #include <vector>
 #include <HUH/types.h>
 #include <HUH/string_operations.h>
 
-#ifdef HUH_USE_WINDOW
+#ifdef HUH_WIN
 #include <HUH/Windows/win_instance.h>
+#endif
+
+#ifdef HUH_USE_WINDOW
 #include <HUH/Window/window.h>
 #endif
 
@@ -118,13 +124,13 @@ std::vector<Device*> VulkanDynamicRHI::GetDevices() {
     std::vector<VkPhysicalDevice> devices(deviceCount);
     HUH::vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
     for (auto device : devices) {
-        m_created_devices.push_back(new VulkanDevice(device));
+        m_createdDevices.push_back(new VulkanDevice(device));
     }
 
-    return m_created_devices;
+    return m_createdDevices;
 }
 
-Swapchain* VulkanDynamicRHI::CreateSwapchain(const Window& window) {
+Swapchain* VulkanDynamicRHI::CreateSwapchain(Window& window) {
 #ifdef HUH_WIN
     auto platform = window.GetPlatformVariables();
     VkWin32SurfaceCreateInfoKHR createInfoKHR{.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
@@ -136,8 +142,8 @@ Swapchain* VulkanDynamicRHI::CreateSwapchain(const Window& window) {
         HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan surface creation failed: {}", HUH::ToString(err))
         return nullptr;
     }
-    m_created_surfaces.push_back(new VulkanSwapchain(surface, this));
-    return m_created_surfaces.back();
+    m_createdSwapchains.push_back(new VulkanSwapchain(surface, this));
+    return m_createdSwapchains.back();
 #elif defined(HUH_LINUX)
     WindowProto::PlatformVariables platform = window.GetPlatformVariables();
     if (platform.WaylandSurface && platform.WaylandDisplay) {
@@ -150,13 +156,35 @@ Swapchain* VulkanDynamicRHI::CreateSwapchain(const Window& window) {
             err != VK_SUCCESS) {
             HUH_ELOG(LogVulkanRHI, "Vulkan surface creation failed: {}", HUH::ToString(err))
         }
-        m_created_surfaces.push_back(new VulkanSwapchain(surface, this));
-        return m_created_surfaces.back();
+        m_createdSwapchains.push_back(new VulkanSwapchain(&window, surface, this));
+        return m_createdSwapchains.back();
     }
     return nullptr;
 #else
     return nullptr;
 #endif
+}
+
+Shader* VulkanDynamicRHI::CreateShader(void* byteCode, Uint64 size) {
+    m_createdShaders.push_back(new VulkanShader(byteCode, size));
+    return m_createdShaders.back();
+}
+
+VkFormat VulkanDynamicRHI::ConvertFormat(Format format) {
+    switch (format) {
+        case Format::R8G8B8A8_UNORM:
+            return VK_FORMAT_R8G8B8A8_UNORM;
+        case Format::R8G8B8A8_SRGB:
+            return VK_FORMAT_R8G8B8A8_SRGB;
+        case Format::B8G8R8A8_UNORM:
+            return VK_FORMAT_B8G8R8A8_UNORM;
+        case Format::B8G8R8A8_SRGB:
+            return VK_FORMAT_B8G8R8A8_SRGB;
+        case Format::UNKNOWN:
+            return VK_FORMAT_UNDEFINED;
+        default:
+            return VK_FORMAT_UNDEFINED;
+    }
 }
 
 void VulkanDynamicRHI::Destroy() {

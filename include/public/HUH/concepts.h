@@ -55,6 +55,9 @@ concept RValueReference = std::is_rvalue_reference_v<T>;
 template<typename T>
 concept Pointer = std::is_pointer_v<T>;
 
+template<typename T>
+concept Enum = std::is_enum_v<T>;
+
 // Concepts for niche but helpful things
 
 template<typename T, typename... Type>
@@ -79,7 +82,7 @@ template<typename T, typename U>
 concept HasSubtraction = requires(T a, U b) { b - a; };
 
 template<typename T, typename U>
-concept HasMultiplication = requires(T a, U b) { b* a; };
+concept HasMultiplication = requires(T a, U b) { b * a; };
 
 template<typename T, typename U>
 concept HasDivision = requires(T a, U b) { b / a; };

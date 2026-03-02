@@ -62,7 +62,7 @@ bool VulkanDevice::Init() {
                                   .enabledExtensionCount = static_cast<Uint32>(requiredExtensions.size()),
                                   .ppEnabledExtensionNames = requiredExtensions.data()};
     if (auto err = HUH::vkCreateDevice(m_physicalDevice, &deviceInfo, nullptr, &m_device); err != VK_SUCCESS) {
-        HUH_ELOG(LogVulkanRHI, "Device Creation Error: {}", HUH::ToString(err))
+        HUH_ELOG(LogVulkanRHI, "Device Creation Error: {}", err)
         return false;
     }
     HUH_ILOG(LogVulkanRHI, "Device creation is successful for device named: {}",

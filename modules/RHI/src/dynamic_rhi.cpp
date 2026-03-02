@@ -1,4 +1,7 @@
 #include <HUH/RHI/dynamic_rhi.h>
+
+#include "HUH/RHI/shader.h"
+
 #include <iostream>
 #include <HUH/RHI/rhi_module.h>
 #include <HUH/logging.h>
@@ -7,12 +10,12 @@
 
 namespace HUH::RHI {
 DynamicRHI* DefaultCreate() {
-    HUH_LOG(LogRHI, Logging::Level::Warning, "No RHI Library Loaded Try using LoadRHI")
+    HUH_LOG(LogRHI, Logging::Level::Warning, "No RHI Library Loaded Try using LoadRHI Or Look at error logs.")
     return nullptr;
 }
 DynamicRHI::CreateStub* DynamicRHI::Create = &DefaultCreate;
 DynamicLibrary DynamicRHI::s_RHIImplSharedLibrary;
-void DynamicRHI::LoadRHI(RenderApi api) {
+void DynamicRHI::LoadRHI(const RenderApi api) {
     std::string rhiApiName;
     switch (api) {
         case RenderApi::Vulkan:
@@ -25,7 +28,6 @@ void DynamicRHI::LoadRHI(RenderApi api) {
             break;
     }
     if (!s_RHIImplSharedLibrary.Load(DynamicLibrary::DecoratePlatformLibraryName(rhiApiName))) {
-        // TODO ERROR;
         HUH_ELOG(LogRHI, "Cloud not load RHI API: {}", HUH::DynamicLibrary::GetErrorMessage())
     }
     DynamicRHI::Create = s_RHIImplSharedLibrary.GetExport<CreateStub>("DynamicRHICreate");
@@ -35,12 +37,17 @@ void DynamicRHI::LoadRHI(RenderApi api) {
 }
 void DynamicRHI::Destroy() {
     HUH_ILOG(LogRHI, "Destroying Created Devices: ")
-    for (Device* device : m_created_devices) {
+    for (Shader* shader : m_createdShaders) {
+        shader->Destroy();
+        delete shader;
+    }
+    for (Swapchain* surface : m_createdSwapchains) {
+        surface->Destroy();
+        delete surface;
+    }
+    for (Device* device : m_createdDevices) {
         device->Destroy();
         delete device;
-    }
-    for (Swapchain* surface : m_created_surfaces) {
-        delete surface;
     }
 }
 

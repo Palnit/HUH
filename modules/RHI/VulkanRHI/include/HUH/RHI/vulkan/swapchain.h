@@ -1,12 +1,16 @@
 #include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/swapchain.h>
+#include <vector>
 
 namespace HUH::RHI {
 class VulkanDynamicRHI;
+class VulkanDevice;
+
 class HUH_VULKANRHI_API VulkanSwapchain : public Swapchain {
 public:
-    friend class VulkanDynamicRHI;
-    bool Init(Device* device) override;
+    friend VulkanDynamicRHI;
+    bool Init(Device* device, Format format, PresentMode presentMode, Uint32 minImageCount) override;
+    void Destroy() override;
 
     struct SwapchainDetails {
         VkSurfaceCapabilities2KHR capabilities{.sType = VK_STRUCTURE_TYPE_SURFACE_CAPABILITIES_2_KHR};
@@ -16,11 +20,16 @@ public:
 
     SwapchainDetails Details;
 
+    static VkPresentModeKHR ConvertPresentMode(PresentMode presentMode);
+
 private:
-    VulkanSwapchain(VkSurfaceKHR surface, VulkanDynamicRHI* parent);
+    VulkanSwapchain(Window* window, VkSurfaceKHR surface, VulkanDynamicRHI* parent);
     ~VulkanSwapchain() override;
 
     VkPhysicalDeviceSurfaceInfo2KHR m_surface{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR};
+    VkSwapchainKHR m_swapchain;
     VulkanDynamicRHI* m_parent;
+    VulkanDevice* m_device = nullptr;
+    VkExtent2D m_extent = {};
 };
 }// namespace HUH::RHI

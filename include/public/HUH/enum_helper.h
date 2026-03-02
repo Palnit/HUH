@@ -1,6 +1,8 @@
 #pragma once
 
+#include <string>
 #include <type_traits>
+#include <HUH/concepts.h>
 
 #define HUH_ENUM_BIT_OPERATORS(EnumName) \
     HUH_CONSTEXPR_FORCE EnumName operator|(const EnumName lhs,const EnumName rhs) {return static_cast<EnumName>(static_cast<std::underlying_type_t<EnumName>>(lhs) | static_cast<std::underlying_type_t<EnumName>>(rhs)); } \
@@ -20,6 +22,12 @@ bool CheckAllFlag(const EnumName flags, const EnumName contains) {
 template<typename EnumName>
 bool CheckFlag(const EnumName flags, const EnumName contains) {
     return (flags & contains) != 0;
+}
+
+template<HUH::Enum T>
+std::string ToString(T inEnum) {
+    static_assert(false, "No ToString enum function specialization");
+    return "";
 }
 
 }// namespace HUH

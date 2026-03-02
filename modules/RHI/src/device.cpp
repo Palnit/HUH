@@ -12,8 +12,9 @@ Device::~Device() {
 }
 }// namespace RHI
 
-std::string ToString(RHI::Device::Type type) {
-    switch (type) {
+template<>
+std::string ToString(const RHI::Device::Type inEnum) {
+    switch (inEnum) {
         case RHI::Device::Type::Dedicated:
             return "Dedicated";
         case RHI::Device::Type::Integrated:
@@ -30,8 +31,9 @@ std::string ToString(RHI::Device::Type type) {
     }
 }
 
-std::string ToString(RHI::Device::Vendor vendor) {
-    switch (vendor) {
+template<>
+std::string ToString(const RHI::Device::Vendor inEnum) {
+    switch (inEnum) {
         case RHI::Device::Vendor::Nvidia:
             return "Nvidia";
         case RHI::Device::Vendor::Amd:

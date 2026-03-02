@@ -26,10 +26,13 @@ public:
     virtual void Loop() = 0;
     virtual ~WindowProto() = default;
 
+    HUH_NODISCARD HUH_CONSTEXPR_FORCE Int32 GetWidth() const { return m_width; }
+    HUH_NODISCARD HUH_CONSTEXPR_FORCE Int32 GetHeight() const { return m_height; }
+
     MultiEvent<void(Window*)> OnClose;
     MultiEvent<void(Window*, Int32 Width, Int32 Height)> OnSizeChange;
 
-    HUH_NODISCARD const PlatformVariables& GetPlatformVariables() const { return m_platform; }
+    HUH_NODISCARD virtual const PlatformVariables& GetPlatformVariables() const { return m_platform; }
 
 protected:
     std::string m_name;

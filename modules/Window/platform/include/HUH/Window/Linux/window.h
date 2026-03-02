@@ -13,6 +13,7 @@ public:
 
     using CreateWindowImpl = WindowProto*(const std::string&, const Int32, const Int32);
     inline static CreateWindowImpl* s_createImpl = nullptr;
+    HUH_NODISCARD const PlatformVariables& GetPlatformVariables() const override;
     void Show() override;
     void Loop() override;
 

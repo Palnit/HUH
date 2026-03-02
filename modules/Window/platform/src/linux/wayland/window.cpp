@@ -68,13 +68,12 @@ void xdgToplevelConfigure(void* data, xdg_toplevel* xdg_toplevel, int32_t width,
     }
     window->m_width = width;
     window->m_height = height;
-    window->OnSizeChange.ExecuteAll(window->m_width, window->m_height);
+    window->OnSizeChange.ExecuteAll(nullptr, window->m_width, window->m_height);
 }
 
 void xdgToplevelClose(void* data, struct xdg_toplevel* toplevel) {
     const auto window = static_cast<WaylandWindow*>(data);
-    HUH_TLOG("WHY IS WE NOT HERE??")
-    window->OnClose.ExecuteAll();
+    window->OnClose.ExecuteAll(nullptr);
     window->close = true;
 }
 

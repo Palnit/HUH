@@ -1,6 +1,6 @@
 #pragma once
-#include "HUH/types.h"
 
+#include <HUH/concepts.h>
 #include <HUH/definitions.h>
 #include <filesystem>
 #include <format>
@@ -102,3 +102,10 @@ private:
 
 #define HUH_ELOG(category, format, ...) \
     HUH_LOG(category,HUH::Logging::Error,format __VA_OPT__(,) __VA_ARGS__)
+
+template<HUH::Enum T>
+struct std::formatter<T> : std::formatter<std::string> {
+    auto format(T p, format_context& ctx) const {
+        return formatter<string>::format(std::format("{}", HUH::ToString(p)), ctx);
+    }
+};

@@ -9,6 +9,8 @@ namespace HUH::RHI {
 class HUH_VULKANRHI_API VulkanDevice final : public Device {
     friend class VulkanDynamicRHI;
     friend class VulkanSwapchain;
+    friend class VulkanShader;
+    friend class VulkanImage;
 
 public:
     struct VulkanDeviceProperties {

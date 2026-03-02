@@ -168,6 +168,8 @@ public:
 
     HUH_FORCE_INLINE RetType Execute(Args... args) const { return m_event->Execute(args...); }
 
+    HUH_FORCE_INLINE RetType operator()(Args... args) const { return m_event->Execute(args...); }
+
     HUH_NODISCARD EventHandler GetHandler() const { return m_handler; }
 
 private:
@@ -192,7 +194,7 @@ public:
     }
 
     template<typename ClassType, typename... CommonArgs, typename = std::enable_if_t<std::is_class_v<ClassType>>>
-    HUH_FORCE_INLINE EventHandler
+    HUH_NODISCARD HUH_FORCE_INLINE EventHandler
     Add(ClassType* inClass,
         ClassFuncTypeHelper<false, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
         CommonArgs&&... inCommonArgs) {
@@ -202,7 +204,7 @@ public:
     }
 
     template<typename ClassType, typename... CommonArgs, typename = std::enable_if_t<std::is_class_v<ClassType>>>
-    HUH_FORCE_INLINE EventHandler
+    HUH_NODISCARD HUH_FORCE_INLINE EventHandler
     Add(ClassType* inClass,
         ClassFuncTypeHelper<true, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
         CommonArgs&&... inCommonArgs) {
@@ -236,6 +238,8 @@ public:
         }
         m_eventList[0]->Execute(args...);
     }
+
+    HUH_FORCE_INLINE void operator()(Args... args) const { ExecuteAll(args...); }
 
 private:
     std::vector<Event<RetType(Args...)>*> m_eventList;

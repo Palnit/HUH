@@ -21,11 +21,21 @@ Window::Window(const std::string& name, const Int32 width, const Int32 height) :
         }
     }
     m_impl = s_createImpl(name, width, height);
+    // Rethrowing events
+    m_impl->OnClose.Add([&](Window*) { this->OnClose(this); });
+    m_impl->OnSizeChange.Add([&](Window*, const int32_t inWidth, const int32_t inHeight) {
+        this->m_height = inHeight;
+        this->m_width = inWidth;
+        this->OnSizeChange.ExecuteAll(this, inWidth, inHeight);
+    });
 }
 Window::~Window() {
     delete m_impl;
 }
 
+const WindowProto::PlatformVariables& Window::GetPlatformVariables() const {
+    return m_impl->GetPlatformVariables();
+}
 void Window::Show() {
     m_impl->Show();
 }

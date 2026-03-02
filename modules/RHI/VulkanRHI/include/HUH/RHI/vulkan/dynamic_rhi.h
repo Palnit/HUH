@@ -14,9 +14,12 @@ public:
     bool Init() override;
     Device* GetDevice(size_t index) override;
     std::vector<Device*> GetDevices() override;
-    Swapchain* CreateSwapchain(const Window& window) override;
+    Swapchain* CreateSwapchain(Window& window) override;
+    Shader* CreateShader(void* byteCode, Uint64 size) override;
 
     friend HUH::RHI::DynamicRHI* DynamicRHICreate();
+
+    static VkFormat ConvertFormat(Format format);
 
 protected:
     VulkanDynamicRHI() = default;

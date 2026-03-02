@@ -44,7 +44,9 @@ protected:
 };
 }// namespace RHI
 
-std::string HUH_RHI_API ToString(RHI::Device::Type type);
-std::string HUH_RHI_API ToString(RHI::Device::Vendor vendor);
+template<>
+std::string HUH_RHI_API ToString(RHI::Device::Type inEnum);
+template<>
+std::string HUH_RHI_API ToString(RHI::Device::Vendor inEnum);
 
 }// namespace HUH

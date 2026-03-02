@@ -6,12 +6,18 @@ set(VULKAN_RHI_HEADER_FILES
         ${VULKAN_RHI_INC_PATH}/device.h
         ${VULKAN_RHI_INC_PATH}/queue.h
         ${VULKAN_RHI_INC_PATH}/swapchain.h
+        ${VULKAN_RHI_INC_PATH}/shader.h
+        ${VULKAN_RHI_INC_PATH}/pipeline.h
+        ${VULKAN_RHI_INC_PATH}/Types/image.h
 )
 set(VULKAN_RHI_SOURCE_FILES
         src/dynamic_rhi.cpp
         src/device.cpp
         src/queue.cpp
         src/swapchain.cpp
+        src/shader.cpp
+        src/pipeline.cpp
+        src/Types/image.cpp
 )
 
 if (TARGET HUH::VulkanLoader)
