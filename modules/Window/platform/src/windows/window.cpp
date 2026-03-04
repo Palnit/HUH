@@ -27,13 +27,15 @@ void Window::Show() {
     std::cout << "Hello World!" << std::endl;
     ShowWindow(m_windowHandle, HUH::g_CmdShow);
 }
-void Window::Loop() {
+bool Window::Loop() {
     MSG msg = {};
     // peak message
-    while (GetMessage(&msg, m_windowHandle, 0, 0) > 0) {
+    auto value = GetMessage(&msg, m_windowHandle, 0, 0);
+    if (value > 0) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+    return value > 0;
 }
 
 LRESULT Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {

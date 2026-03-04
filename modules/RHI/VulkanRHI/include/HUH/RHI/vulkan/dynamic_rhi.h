@@ -16,6 +16,8 @@ public:
     std::vector<Device*> GetDevices() override;
     Swapchain* CreateSwapchain(Window& window) override;
     Shader* CreateShader(void* byteCode, Uint64 size) override;
+    Pipeline* CreatePipeline() override;
+    CommandBuffer* CreateCommandBuffer(Pipeline* pipeline) override;
 
     friend HUH::RHI::DynamicRHI* DynamicRHICreate();
 

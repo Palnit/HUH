@@ -11,7 +11,7 @@ public:
     Window(const std::string& name, const Int32 width, const Int32 height);
     ~Window() override;
     void Show() override;
-    void Loop() override;
+    bool Loop() override;
 
 private:
     friend LRESULT CALLBACK WindowProcPassToClass(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

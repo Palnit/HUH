@@ -11,6 +11,7 @@ class HUH_VULKANRHI_API VulkanDevice final : public Device {
     friend class VulkanSwapchain;
     friend class VulkanShader;
     friend class VulkanImage;
+    friend class VulkanPipeline;
 
 public:
     struct VulkanDeviceProperties {

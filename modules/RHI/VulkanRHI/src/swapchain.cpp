@@ -1,6 +1,6 @@
 #include <HUH/RHI/vulkan/device.h>
 #include <HUH/RHI/vulkan/swapchain.h>
-#include <HUH/Window/Linux/window.h>
+#include <HUH/Window/window.h>
 #include <HUH/RHI/vulkan/Types/image.h>
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
 
@@ -15,7 +15,7 @@ bool VulkanSwapchain::Init(Device* device, Format format, PresentMode presentMod
     HUH::vkGetPhysicalDeviceSurfaceCapabilities2KHR(m_device->m_physicalDevice, &m_surface, &Details.capabilities);
     Uint32 size = 0;
     HUH::vkGetPhysicalDeviceSurfaceFormats2KHR(m_device->m_physicalDevice, &m_surface, &size, nullptr);
-    Details.surfaceFormats.resize(size);
+    Details.surfaceFormats.resize(size, {.sType = VK_STRUCTURE_TYPE_SURFACE_FORMAT_2_KHR});
     HUH::vkGetPhysicalDeviceSurfaceFormats2KHR(m_device->m_physicalDevice, &m_surface, &size,
                                                Details.surfaceFormats.data());
 #ifdef HUH_DEBUG

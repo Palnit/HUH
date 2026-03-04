@@ -16,6 +16,10 @@ bool VulkanShader::Init(class Device* device, Stage stage, const std::string& en
         return false;
     }
 
+    m_shaderStageInfo.stage = ShaderStageToVkShaderStage(m_stage);
+    m_shaderStageInfo.module = m_shaderModule;
+    m_shaderStageInfo.pName = entryFunctionName.c_str();
+
     return true;
 }
 

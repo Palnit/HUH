@@ -1,3 +1,5 @@
+#include "HUH/RHI/command_buffer.h"
+
 #include <HUH/RHI/dynamic_rhi.h>
 
 #include "HUH/RHI/shader.h"
@@ -37,6 +39,14 @@ void DynamicRHI::LoadRHI(const RenderApi api) {
 }
 void DynamicRHI::Destroy() {
     HUH_ILOG(LogRHI, "Destroying Created Devices: ")
+    for (CommandBuffer* cmd : m_createdCommandBuffers) {
+        cmd->Destroy();
+        delete cmd;
+    }
+    for (Pipeline* pipeline : m_createdPipelines) {
+        pipeline->Destroy();
+        delete pipeline;
+    }
     for (Shader* shader : m_createdShaders) {
         shader->Destroy();
         delete shader;

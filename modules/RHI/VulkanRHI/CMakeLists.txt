@@ -8,6 +8,7 @@ set(VULKAN_RHI_HEADER_FILES
         ${VULKAN_RHI_INC_PATH}/swapchain.h
         ${VULKAN_RHI_INC_PATH}/shader.h
         ${VULKAN_RHI_INC_PATH}/pipeline.h
+        ${VULKAN_RHI_INC_PATH}/command_buffer.h
         ${VULKAN_RHI_INC_PATH}/Types/image.h
 )
 set(VULKAN_RHI_SOURCE_FILES
@@ -17,6 +18,7 @@ set(VULKAN_RHI_SOURCE_FILES
         src/swapchain.cpp
         src/shader.cpp
         src/pipeline.cpp
+        src/command_buffer.cpp
         src/Types/image.cpp
 )
 
@@ -34,6 +36,7 @@ if (TARGET HUH::VulkanLoader)
     target_link_libraries(HUH-VulkanRHI PUBLIC
             HUH
             HUH::Core
+            HUH::Math
             HUH::RHI
             HUH::VulkanLoader
     )

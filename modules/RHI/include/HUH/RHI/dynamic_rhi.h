@@ -1,5 +1,7 @@
 #pragma once
 
+#include "pipeline.h"
+
 #include <vector>
 #include <HUH/RHI/types.h>
 #include <HUH/definitions.h>
@@ -30,6 +32,8 @@ public:
     virtual std::vector<Device*> GetDevices() = 0;
     virtual class Swapchain* CreateSwapchain(Window& window) = 0;
     virtual class Shader* CreateShader(void* byteCode, Uint64 size) = 0;
+    virtual Pipeline* CreatePipeline() = 0;
+    virtual CommandBuffer* CreateCommandBuffer(Pipeline* pipeline) = 0;
 
     DynamicRHI(const DynamicRHI&) = delete;
     DynamicRHI& operator=(const DynamicRHI&) = delete;
@@ -42,6 +46,8 @@ protected:
     std::vector<Device*> m_createdDevices;
     std::vector<Swapchain*> m_createdSwapchains;
     std::vector<Shader*> m_createdShaders;
+    std::vector<Pipeline*> m_createdPipelines;
+    std::vector<CommandBuffer*> m_createdCommandBuffers;
     RenderApi m_renderApi = RenderApi::Unknown;
     static DynamicLibrary s_RHIImplSharedLibrary;
 };

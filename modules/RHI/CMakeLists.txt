@@ -10,6 +10,7 @@ set(HEADER_FILES
         ${RHI_INC_PATH}/swapchain.h
         ${RHI_INC_PATH}/shader.h
         ${RHI_INC_PATH}/pipeline.h
+        ${RHI_INC_PATH}/command_buffer.h
         ${RHI_INC_PATH}/Types/image.h
 )
 set(SOURCE_FILES
@@ -19,6 +20,7 @@ set(SOURCE_FILES
         src/swapchain.cpp
         src/shader.cpp
         src/pipeline.cpp
+        src/command_buffer.cpp
         src/Types/image.cpp
 )
 
@@ -31,10 +33,11 @@ set_target_properties(HUH-RHI PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(HUH-RHI PUBLIC
         HUH
         HUH::Core
+        HUH::Math
 )
 
 
 target_include_directories(HUH-RHI PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 add_subdirectory(VulkanRHI)
-add_subdirectory(DirectX12RHI)
+#add_subdirectory(DirectX12RHI)

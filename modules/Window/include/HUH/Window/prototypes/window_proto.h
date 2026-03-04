@@ -23,7 +23,7 @@ public:
           m_width(width),
           m_height(height) {}
     virtual void Show() = 0;
-    virtual void Loop() = 0;
+    virtual bool Loop() = 0;
     virtual ~WindowProto() = default;
 
     HUH_NODISCARD HUH_CONSTEXPR_FORCE Int32 GetWidth() const { return m_width; }

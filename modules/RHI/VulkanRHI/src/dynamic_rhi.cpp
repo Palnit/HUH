@@ -1,3 +1,6 @@
+#include <HUH/RHI/vulkan/command_buffer.h>
+#include <HUH/RHI/vulkan/pipeline.h>
+
 #include <HUH/RHI/vulkan/swapchain.h>
 #include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/vulkan/device.h>
@@ -142,7 +145,7 @@ Swapchain* VulkanDynamicRHI::CreateSwapchain(Window& window) {
         HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan surface creation failed: {}", HUH::ToString(err))
         return nullptr;
     }
-    m_createdSwapchains.push_back(new VulkanSwapchain(surface, this));
+    m_createdSwapchains.push_back(new VulkanSwapchain(&window, surface, this));
     return m_createdSwapchains.back();
 #elif defined(HUH_LINUX)
     WindowProto::PlatformVariables platform = window.GetPlatformVariables();
@@ -168,6 +171,17 @@ Swapchain* VulkanDynamicRHI::CreateSwapchain(Window& window) {
 Shader* VulkanDynamicRHI::CreateShader(void* byteCode, Uint64 size) {
     m_createdShaders.push_back(new VulkanShader(byteCode, size));
     return m_createdShaders.back();
+}
+
+Pipeline* VulkanDynamicRHI::CreatePipeline() {
+    m_createdPipelines.push_back(new VulkanPipeline());
+    return m_createdPipelines.back();
+}
+
+CommandBuffer* VulkanDynamicRHI::CreateCommandBuffer(Pipeline* pipeline) {
+    auto vk_pipeline = dynamic_cast<VulkanPipeline*>(pipeline);
+    m_createdCommandBuffers.push_back(new VulkanCommandBuffer(vk_pipeline));
+    return m_createdCommandBuffers.back();
 }
 
 VkFormat VulkanDynamicRHI::ConvertFormat(Format format) {
