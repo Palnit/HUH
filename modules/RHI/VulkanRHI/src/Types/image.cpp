@@ -14,6 +14,7 @@ void VulkanImage::Destroy() {
 }
 
 bool VulkanImage::Init(Intializer&& init) {
+    // TODO proper vulkan image creation from real image or swapchain image
     m_device = dynamic_cast<VulkanDevice*>(init.Device);
     VkComponentMapping componentMapping = {
         .r = VK_COMPONENT_SWIZZLE_IDENTITY,

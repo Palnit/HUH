@@ -8,7 +8,7 @@ public:
     virtual bool Init() = 0;
     virtual void Destroy() = 0;
 
-private:
+protected:
     Pipeline() = default;
     virtual ~Pipeline() = default;
 };
