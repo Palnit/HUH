@@ -15,7 +15,7 @@ public:
     inline static CreateWindowImpl* s_createImpl = nullptr;
     HUH_NODISCARD const PlatformVariables& GetPlatformVariables() const override;
     void Show() override;
-    void Loop() override;
+    bool Loop() override;
 
 private:
     WindowProto* m_impl = nullptr;

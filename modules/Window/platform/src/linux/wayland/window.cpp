@@ -122,10 +122,8 @@ void WaylandWindow::Show() {
     HUH_ILOG(LogWaylandWindow, "WaylandWindow::Show");
 }
 
-void WaylandWindow::Loop() {
-    while (wl_display_dispatch(s_waylandDisplay) != -1 && close == false) {
-        /* This space deliberately left blank */
-    }
+bool WaylandWindow::Loop() {
+    return wl_display_dispatch(s_waylandDisplay) != -1 && close == false;
 }
 
 }// namespace HUH

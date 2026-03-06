@@ -53,7 +53,7 @@ public:
 
     friend WindowProto* CreateWindowImpl(const std::string& name);
     void Show() override;
-    void Loop() override;
+    bool Loop() override;
 
 protected:
     HUH_WAYLANDWINDOW_API friend void HandleWaylandGlobalRegister(void* data,

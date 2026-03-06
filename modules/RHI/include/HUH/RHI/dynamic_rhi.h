@@ -1,12 +1,12 @@
 #pragma once
 
-#include "pipeline.h"
-
 #include <vector>
 #include <HUH/RHI/types.h>
 #include <HUH/definitions.h>
 #include <HUH/dynamic_library.h>
 #include <HUH/RHI/device.h>
+#include <HUH/RHI/pipeline.h>
+#include <HUH/RHI/command_buffer.h>
 
 namespace HUH {
 class Window;
@@ -33,7 +33,7 @@ public:
     virtual class Swapchain* CreateSwapchain(Window& window) = 0;
     virtual class Shader* CreateShader(void* byteCode, Uint64 size) = 0;
     virtual Pipeline* CreatePipeline() = 0;
-    virtual CommandBuffer* CreateCommandBuffer(Pipeline* pipeline) = 0;
+    virtual class CommandBuffer* CreateCommandBuffer(Pipeline* pipeline) = 0;
 
     DynamicRHI(const DynamicRHI&) = delete;
     DynamicRHI& operator=(const DynamicRHI&) = delete;

@@ -1,5 +1,6 @@
 #include <HUH/Math/vector.h>
 #include <HUH/RHI/vulkan/command_buffer.h>
+#include <HUH/RHI/vulkan/device.h>
 
 namespace HUH::RHI {
 
@@ -13,10 +14,8 @@ void VulkanCommandBuffer::End() {
 void VulkanCommandBuffer::AddRenderTarget(Image* renderTarget) {
 }
 
-void VulkanCommandBuffer::SetViewPort(Vector2i) {
-}
-
-void VulkanCommandBuffer::Init() {
+void VulkanCommandBuffer::Init(Device* device, Queue* queue) {
+    m_device = dynamic_cast<VulkanDevice*>(device);
 }
 
 void VulkanCommandBuffer::Destroy() {

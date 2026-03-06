@@ -13,13 +13,15 @@ public:
     bool Begin() override;
     void End() override;
     void AddRenderTarget(Image* renderTarget) override;
-    void SetViewPort(Vector2i) override;
-    void Init() override;
+    void Init(Device* device, Queue* queue) override;
     void Destroy() override;
 
 protected:
     explicit VulkanCommandBuffer(VulkanPipeline* pipeline);
     ~VulkanCommandBuffer() override;
     VulkanPipeline* m_pipeline;
+    VulkanDevice* m_device = nullptr;
+    VkCommandPool m_commandPool = nullptr;
 };
+
 }// namespace HUH::RHI

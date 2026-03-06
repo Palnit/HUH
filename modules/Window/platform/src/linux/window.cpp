@@ -40,8 +40,8 @@ void Window::Show() {
     m_impl->Show();
 }
 
-void Window::Loop() {
-    m_impl->Loop();
+bool Window::Loop() {
+    return m_impl->Loop();
 }
 
 }// namespace HUH
