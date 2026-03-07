@@ -2,7 +2,21 @@
 #include <HUH/RHI/vulkan/queue.h>
 #include <HUH/VulkanHelpers/string_converters.h>
 #include <HUH/RHI/vulkan/device.h>
+
+#include "HUH/RHI/vulkan/dynamic_rhi.h"
+#include <HUH/RHI/vulkan/command_buffer.h>
+#include "HUH/RHI/vulkan/shader.h"
+#include "HUH/RHI/vulkan/swapchain.h"
+
 #include <HUH/enum_helper.h>
+
+#ifdef HUH_WIN
+#include <HUH/Windows/win_instance.h>
+#endif
+
+#ifdef HUH_USE_WINDOW
+#include <HUH/Window/window.h>
+#endif
 
 namespace HUH::RHI {
 Device::MemoryStatistics VulkanDevice::GetMemoryStatistics() {
@@ -70,6 +84,7 @@ bool VulkanDevice::Init() {
     return true;
 }
 void VulkanDevice::Destroy() {
+    Device::Destroy();
     if (m_device) {
         HUH::vkDestroyDevice(m_device, nullptr);
     }
@@ -162,7 +177,7 @@ Queue* VulkanDevice::CreateQueue(Queue::Type type) {
     }
 
     m_queues.emplace_back(
-        new VulkanQueue(match_index, m_familyQueueCount[match_index]++, m_queueFamilies[match_index]));
+        new VulkanQueue(this, match_index, m_familyQueueCount[match_index]++, m_queueFamilies[match_index]));
     return m_queues.back();
 }
 void VulkanDevice::QueryVulkanPropertiesAndFeatures() {
@@ -171,7 +186,9 @@ void VulkanDevice::QueryVulkanPropertiesAndFeatures() {
     Features.features_1_0.features.robustBufferAccess = false;
 }
 
-VulkanDevice::VulkanDevice(VkPhysicalDevice physicalDevice) : m_physicalDevice(physicalDevice) {
+VulkanDevice::VulkanDevice(class VulkanDynamicRHI* parent, VkPhysicalDevice physicalDevice)
+    : m_parent(parent),
+      m_physicalDevice(physicalDevice) {
     QueryVulkanPropertiesAndFeatures();
     Information.name = Properties.properties_1_0.properties.deviceName;
     switch (Properties.properties_1_0.properties.deviceType) {
@@ -193,6 +210,58 @@ VulkanDevice::VulkanDevice(VkPhysicalDevice physicalDevice) : m_physicalDevice(p
         default:;
     }
 }
+
+Swapchain* VulkanDevice::CreateSwapchain(Window& window) {
+#ifdef HUH_WIN
+    auto platform = window.GetPlatformVariables();
+    VkWin32SurfaceCreateInfoKHR createInfoKHR{.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
+                                              .pNext = nullptr,
+                                              .hinstance = HUH::g_AppInstance,
+                                              .hwnd = platform.WindowsHandle};
+    VkSurfaceKHR surface;
+    if (auto err = HUH::vkCreateWin32SurfaceKHR(m_instance, &createInfoKHR, nullptr, &surface); err != VK_SUCCESS) {
+        HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan surface creation failed: {}", HUH::ToString(err))
+        return nullptr;
+    }
+    m_createdSwapchains.push_back(new VulkanSwapchain(&window, surface, this));
+    return m_createdSwapchains.back();
+#elif defined(HUH_LINUX)
+    WindowProto::PlatformVariables platform = window.GetPlatformVariables();
+    if (platform.WaylandSurface && platform.WaylandDisplay) {
+        VkWaylandSurfaceCreateInfoKHR createInfoKHR{.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR,
+                                                    .pNext = nullptr,
+                                                    .display = platform.WaylandDisplay,
+                                                    .surface = platform.WaylandSurface};
+        VkSurfaceKHR surface;
+        if (const auto err = HUH::vkCreateWaylandSurfaceKHR(m_parent->m_instance, &createInfoKHR, nullptr, &surface);
+            err != VK_SUCCESS) {
+            HUH_ELOG(LogVulkanRHI, "Vulkan surface creation failed: {}", HUH::ToString(err))
+        }
+        m_createdSwapchains.push_back(new VulkanSwapchain(this, &window, surface, m_parent));
+        return m_createdSwapchains.back();
+    }
+    return nullptr;
+#else
+    return nullptr;
+#endif
+}
+
+Shader* VulkanDevice::CreateShader(void* byteCode, Uint64 size) {
+    m_createdShaders.push_back(new VulkanShader(this, byteCode, size));
+    return m_createdShaders.back();
+}
+
+Pipeline* VulkanDevice::CreatePipeline() {
+    m_createdPipelines.push_back(new VulkanPipeline(this));
+    return m_createdPipelines.back();
+}
+
+CommandBuffer* VulkanDevice::CreateCommandBuffer(Pipeline* pipeline) {
+    auto vk_pipeline = dynamic_cast<VulkanPipeline*>(pipeline);
+    m_createdCommandBuffers.push_back(new VulkanCommandBuffer(this, vk_pipeline));
+    return m_createdCommandBuffers.back();
+}
+
 VulkanDevice::~VulkanDevice() {
     HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan Device Named: {} Successfully Destroyed", Information.name)
 }

@@ -5,7 +5,7 @@
 #include <HUH/RHI/vulkan/device.h>
 
 namespace HUH::RHI {
-bool VulkanPipeline::Init(Device* device) {
+bool VulkanPipeline::Init() {
     // TODO REFACTOR THIS TO MAKE IT WORK WITHOUT ME HAVING TO DO MAGIC
     std::vector<VkDynamicState> dynamicStates{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo = {
@@ -88,7 +88,6 @@ bool VulkanPipeline::Init(Device* device) {
     pipelineLayoutInfo.pushConstantRangeCount = 0;   // Optional
     pipelineLayoutInfo.pPushConstantRanges = nullptr;// Optional
 
-    m_device = dynamic_cast<VulkanDevice*>(device);
     if (auto err = HUH::vkCreatePipelineLayout(m_device->m_device, &pipelineLayoutInfo, nullptr, &m_layout);
         err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "Error during Pipeline Layout creation: {}", err);

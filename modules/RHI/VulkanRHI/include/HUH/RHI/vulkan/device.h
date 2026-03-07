@@ -57,9 +57,19 @@ public:
 
     void QueryVulkanPropertiesAndFeatures();
 
+    Shader* CreateShader(void* byteCode, Uint64 size) override;
+    Pipeline* CreatePipeline() override;
+    CommandBuffer* CreateCommandBuffer(Pipeline* pipeline) override;
+    Swapchain* CreateSwapchain(Window& window) override;
+
+    // ReSharper disable once CppNonExplicitConversionOperator
+    operator VkDevice() const { return m_device; }
+
 protected:
-    explicit VulkanDevice(VkPhysicalDevice physicalDevice);
+    explicit VulkanDevice(class VulkanDynamicRHI* parent, VkPhysicalDevice physicalDevice);
     ~VulkanDevice() override;
+
+    VulkanDynamicRHI* m_parent;
     VkPhysicalDevice m_physicalDevice = nullptr;
     VkDevice m_device = nullptr;
     std::vector<VkQueueFamilyProperties> m_queueFamilies;

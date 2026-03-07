@@ -1,18 +1,41 @@
 #include <HUH/RHI/device.h>
+#include <HUH/RHI/command_buffer.h>
+#include <HUH/RHI/pipeline.h>
+#include <HUH/RHI/queue.h>
+#include <HUH/RHI/swapchain.h>
+#include <HUH/RHI/shader.h>
+
 namespace HUH {
 namespace RHI {
+void Device::Destroy() {
+    for (CommandBuffer* cmd : m_createdCommandBuffers) {
+        cmd->Destroy();
+        delete cmd;
+    }
+    for (Pipeline* pipeline : m_createdPipelines) {
+        pipeline->Destroy();
+        delete pipeline;
+    }
+    for (Shader* shader : m_createdShaders) {
+        shader->Destroy();
+        delete shader;
+    }
+    for (Swapchain* surface : m_createdSwapchains) {
+        surface->Destroy();
+        delete surface;
+    }
+    for (auto queue : m_queues) {
+        delete queue;
+    }
+}
 Queue* Device::GetQueue(const size_t index) const {
     return m_queues[index];
 }
 
 Device::~Device() {
-    for (auto queue : m_queues) {
-        delete queue;
-    }
 }
 }// namespace RHI
 
-template<>
 std::string ToString(const RHI::Device::Type inEnum) {
     switch (inEnum) {
         case RHI::Device::Type::Dedicated:
@@ -31,7 +54,6 @@ std::string ToString(const RHI::Device::Type inEnum) {
     }
 }
 
-template<>
 std::string ToString(const RHI::Device::Vendor inEnum) {
     switch (inEnum) {
         case RHI::Device::Vendor::Nvidia:

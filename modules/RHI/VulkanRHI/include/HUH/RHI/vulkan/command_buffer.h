@@ -8,19 +8,22 @@ namespace HUH::RHI {
 class VulkanCommandBuffer : public CommandBuffer {
 public:
     friend class VulkanPipeline;
-    friend class VulkanDynamicRHI;
+    friend class VulkanDevice;
 
     bool Begin() override;
     void End() override;
     void AddRenderTarget(Image* renderTarget) override;
-    void Init(Device* device, Queue* queue) override;
+    void Init(Queue* queue) override;
     void Destroy() override;
+    bool Submit() override;
+    void Reset() override;
 
 protected:
-    explicit VulkanCommandBuffer(VulkanPipeline* pipeline);
+    explicit VulkanCommandBuffer(VulkanDevice* device, VulkanPipeline* pipeline);
     ~VulkanCommandBuffer() override;
+
+    VulkanDevice* m_device;
     VulkanPipeline* m_pipeline;
-    VulkanDevice* m_device = nullptr;
     VkCommandPool m_commandPool = nullptr;
 };
 

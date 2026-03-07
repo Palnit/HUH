@@ -1,10 +1,10 @@
 #pragma once
-#include <HUH/Math/fwd.h>
+#include <HUH/Math/vector.h>
 
 namespace HUH::RHI {
 class CommandBuffer {
 public:
-    friend class DynamicRHI;
+    friend class Device;
     virtual bool Begin() = 0;
     virtual void End() = 0;
     virtual void AddRenderTarget(class Image* renderTarget) = 0;
@@ -12,7 +12,7 @@ public:
     void SetScissor(Vector2i Scissor) { m_scissor = Scissor; };
     virtual bool Submit() = 0;
     virtual void Reset() = 0;
-    virtual void Init(class Device* device, class Queue* queue) = 0;
+    virtual void Init(class Queue* queue) = 0;
     virtual void Destroy() = 0;
 
 protected:

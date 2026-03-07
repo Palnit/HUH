@@ -10,11 +10,9 @@ class HUH_RHI_API Swapchain {
 public:
     enum class PresentMode { Immediate, VSync };
 
-    friend class DynamicRHI;
-    virtual bool Init(class Device* device,
-                      HUH::RHI::Format format,
-                      PresentMode present_mode,
-                      Uint32 MinImageCount) = 0;
+    friend class Device;
+
+    virtual bool Init(HUH::RHI::Format format, PresentMode present_mode, Uint32 MinImageCount) = 0;
     virtual void Destroy();
 
     Image* operator[](const size_t index) const { return m_images[index]; }

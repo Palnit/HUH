@@ -2,7 +2,7 @@
 #include <HUH/VulkanHelpers/string_converters.h>
 
 namespace HUH {
-template<>
+
 std::string ToString(const VkResult inEnum) {
     switch (inEnum) {
         case VK_SUCCESS:
@@ -110,7 +110,6 @@ std::string ToString(const VkResult inEnum) {
     }
 }
 
-template<>
 std::string ToString(const VkFormat inEnum) {
     switch (inEnum) {
         case VK_FORMAT_UNDEFINED:
@@ -650,8 +649,7 @@ std::string ToString(const VkFormat inEnum) {
     }
 }
 
-template<>
-std::string ToString<VkShaderStageFlagBits>(VkShaderStageFlagBits inEnum) {
+std::string ToString(VkShaderStageFlagBits inEnum) {
     std::string result;
 
     if (CheckFlag(inEnum, VK_SHADER_STAGE_VERTEX_BIT)) {
@@ -738,7 +736,7 @@ std::string ToString<VkShaderStageFlagBits>(VkShaderStageFlagBits inEnum) {
 }
 
 #if defined(VK_KHR_surface)
-template<>
+
 std::string ToString(const VkColorSpaceKHR inEnum) {
     switch (inEnum) {
         case VK_COLOR_SPACE_SRGB_NONLINEAR_KHR:
@@ -780,7 +778,6 @@ std::string ToString(const VkColorSpaceKHR inEnum) {
     }
 }
 
-template<>
 std::string ToString(const VkPresentModeKHR inEnum) {
     switch (inEnum) {
         case VK_PRESENT_MODE_IMMEDIATE_KHR:

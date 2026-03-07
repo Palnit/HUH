@@ -5,9 +5,9 @@
 namespace HUH::RHI {
 class Pipeline {
 public:
-    friend class DynamicRHI;
     friend class CommandBuffer;
-    virtual bool Init(class Device* device) = 0;
+    friend class Device;
+    virtual bool Init() = 0;
     virtual void Destroy() = 0;
     virtual void AddShader(class Shader* shader) = 0;
 

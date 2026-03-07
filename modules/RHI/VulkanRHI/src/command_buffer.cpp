@@ -14,14 +14,22 @@ void VulkanCommandBuffer::End() {
 void VulkanCommandBuffer::AddRenderTarget(Image* renderTarget) {
 }
 
-void VulkanCommandBuffer::Init(Device* device, Queue* queue) {
-    m_device = dynamic_cast<VulkanDevice*>(device);
+void VulkanCommandBuffer::Init(Queue* queue) {
 }
 
 void VulkanCommandBuffer::Destroy() {
 }
 
-VulkanCommandBuffer::VulkanCommandBuffer(VulkanPipeline* pipeline) : m_pipeline(pipeline) {
+bool VulkanCommandBuffer::Submit() {
+    return false;
+}
+
+void VulkanCommandBuffer::Reset() {
+}
+
+VulkanCommandBuffer::VulkanCommandBuffer(VulkanDevice* device, VulkanPipeline* pipeline)
+    : m_device(device),
+      m_pipeline(pipeline) {
 }
 
 VulkanCommandBuffer::~VulkanCommandBuffer() {

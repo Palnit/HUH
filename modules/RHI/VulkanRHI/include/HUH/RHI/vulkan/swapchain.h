@@ -8,8 +8,8 @@ class VulkanDevice;
 
 class HUH_VULKANRHI_API VulkanSwapchain : public Swapchain {
 public:
-    friend VulkanDynamicRHI;
-    bool Init(Device* device, Format format, PresentMode presentMode, Uint32 minImageCount) override;
+    friend VulkanDevice;
+    bool Init(Format format, PresentMode presentMode, Uint32 minImageCount) override;
     void Destroy() override;
 
     struct SwapchainDetails {
@@ -23,13 +23,13 @@ public:
     static VkPresentModeKHR ConvertPresentMode(PresentMode presentMode);
 
 private:
-    VulkanSwapchain(Window* window, VkSurfaceKHR surface, VulkanDynamicRHI* parent);
+    VulkanSwapchain(VulkanDevice* device, Window* window, VkSurfaceKHR surface, VulkanDynamicRHI* parent);
     ~VulkanSwapchain() override;
 
     VkPhysicalDeviceSurfaceInfo2KHR m_surface{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR};
-    VkSwapchainKHR m_swapchain;
+    VkSwapchainKHR m_swapchain = nullptr;
     VulkanDynamicRHI* m_parent;
-    VulkanDevice* m_device = nullptr;
+    VulkanDevice* m_device;
     VkExtent2D m_extent = {};
 };
 }// namespace HUH::RHI

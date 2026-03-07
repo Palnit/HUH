@@ -30,10 +30,6 @@ public:
     virtual void Destroy();
     virtual Device* GetDevice(size_t index) = 0;
     virtual std::vector<Device*> GetDevices() = 0;
-    virtual class Swapchain* CreateSwapchain(Window& window) = 0;
-    virtual class Shader* CreateShader(void* byteCode, Uint64 size) = 0;
-    virtual Pipeline* CreatePipeline() = 0;
-    virtual class CommandBuffer* CreateCommandBuffer(Pipeline* pipeline) = 0;
 
     DynamicRHI(const DynamicRHI&) = delete;
     DynamicRHI& operator=(const DynamicRHI&) = delete;
@@ -44,10 +40,6 @@ protected:
     DynamicRHI() = default;
     virtual ~DynamicRHI() = default;
     std::vector<Device*> m_createdDevices;
-    std::vector<Swapchain*> m_createdSwapchains;
-    std::vector<Shader*> m_createdShaders;
-    std::vector<Pipeline*> m_createdPipelines;
-    std::vector<CommandBuffer*> m_createdCommandBuffers;
     RenderApi m_renderApi = RenderApi::Unknown;
     static DynamicLibrary s_RHIImplSharedLibrary;
 };

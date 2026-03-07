@@ -6,8 +6,7 @@
 
 namespace HUH::RHI {
 
-bool VulkanSwapchain::Init(Device* device, Format format, PresentMode presentMode, Uint32 minImageCount) {
-    m_device = dynamic_cast<VulkanDevice*>(device);
+bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minImageCount) {
     if (!m_device) {
         HUH_ELOG(LogVulkanRHI, "None vulkan device give to vulkan swapchain")
         return false;
@@ -130,9 +129,10 @@ VkPresentModeKHR VulkanSwapchain::ConvertPresentMode(PresentMode presentMode) {
     }
 }
 
-VulkanSwapchain::VulkanSwapchain(Window* window, VkSurfaceKHR surface, VulkanDynamicRHI* parent)
+VulkanSwapchain::VulkanSwapchain(VulkanDevice* device, Window* window, VkSurfaceKHR surface, VulkanDynamicRHI* parent)
     : Swapchain(window),
-      m_parent(parent) {
+      m_parent(parent),
+      m_device(device) {
     m_surface.surface = surface;
 }
 

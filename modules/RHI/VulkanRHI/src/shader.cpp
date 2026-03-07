@@ -3,8 +3,7 @@
 
 namespace HUH::RHI {
 
-bool VulkanShader::Init(class Device* device, Stage stage, const std::string& entryFunctionName) {
-    m_device = dynamic_cast<VulkanDevice*>(device);
+bool VulkanShader::Init(Stage stage, const std::string& entryFunctionName) {
     m_stage = stage;
     VkShaderModuleCreateInfo createInfo{.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
                                         .pNext = nullptr,

@@ -12,14 +12,6 @@
 #include <HUH/types.h>
 #include <HUH/string_operations.h>
 
-#ifdef HUH_WIN
-#include <HUH/Windows/win_instance.h>
-#endif
-
-#ifdef HUH_USE_WINDOW
-#include <HUH/Window/window.h>
-#endif
-
 namespace HUH::RHI {
 bool VulkanDynamicRHI::Init() {
     if (!HUH::LoadVulkan()) {
@@ -127,61 +119,10 @@ std::vector<Device*> VulkanDynamicRHI::GetDevices() {
     std::vector<VkPhysicalDevice> devices(deviceCount);
     HUH::vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
     for (auto device : devices) {
-        m_createdDevices.push_back(new VulkanDevice(device));
+        m_createdDevices.push_back(new VulkanDevice(this, device));
     }
 
     return m_createdDevices;
-}
-
-Swapchain* VulkanDynamicRHI::CreateSwapchain(Window& window) {
-#ifdef HUH_WIN
-    auto platform = window.GetPlatformVariables();
-    VkWin32SurfaceCreateInfoKHR createInfoKHR{.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
-                                              .pNext = nullptr,
-                                              .hinstance = HUH::g_AppInstance,
-                                              .hwnd = platform.WindowsHandle};
-    VkSurfaceKHR surface;
-    if (auto err = HUH::vkCreateWin32SurfaceKHR(m_instance, &createInfoKHR, nullptr, &surface); err != VK_SUCCESS) {
-        HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan surface creation failed: {}", HUH::ToString(err))
-        return nullptr;
-    }
-    m_createdSwapchains.push_back(new VulkanSwapchain(&window, surface, this));
-    return m_createdSwapchains.back();
-#elif defined(HUH_LINUX)
-    WindowProto::PlatformVariables platform = window.GetPlatformVariables();
-    if (platform.WaylandSurface && platform.WaylandDisplay) {
-        VkWaylandSurfaceCreateInfoKHR createInfoKHR{.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR,
-                                                    .pNext = nullptr,
-                                                    .display = platform.WaylandDisplay,
-                                                    .surface = platform.WaylandSurface};
-        VkSurfaceKHR surface;
-        if (const auto err = HUH::vkCreateWaylandSurfaceKHR(m_instance, &createInfoKHR, nullptr, &surface);
-            err != VK_SUCCESS) {
-            HUH_ELOG(LogVulkanRHI, "Vulkan surface creation failed: {}", HUH::ToString(err))
-        }
-        m_createdSwapchains.push_back(new VulkanSwapchain(&window, surface, this));
-        return m_createdSwapchains.back();
-    }
-    return nullptr;
-#else
-    return nullptr;
-#endif
-}
-
-Shader* VulkanDynamicRHI::CreateShader(void* byteCode, Uint64 size) {
-    m_createdShaders.push_back(new VulkanShader(byteCode, size));
-    return m_createdShaders.back();
-}
-
-Pipeline* VulkanDynamicRHI::CreatePipeline() {
-    m_createdPipelines.push_back(new VulkanPipeline());
-    return m_createdPipelines.back();
-}
-
-CommandBuffer* VulkanDynamicRHI::CreateCommandBuffer(Pipeline* pipeline) {
-    auto vk_pipeline = dynamic_cast<VulkanPipeline*>(pipeline);
-    m_createdCommandBuffers.push_back(new VulkanCommandBuffer(vk_pipeline));
-    return m_createdCommandBuffers.back();
 }
 
 VkFormat VulkanDynamicRHI::ConvertFormat(Format format) {

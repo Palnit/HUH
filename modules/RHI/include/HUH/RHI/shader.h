@@ -14,10 +14,10 @@ public:
         Compute = 1 << 3,
     };
 
-    friend class DynamicRHI;
+    friend class Device;
 
     // TODO refactor to put it into constructor Stage and Entry function name
-    virtual bool Init(class Device* device, Stage stage, const std::string& entryFunctionName = "main") = 0;
+    virtual bool Init(Stage stage, const std::string& entryFunctionName = "main") = 0;
     virtual void Destroy() = 0;
 
 protected:

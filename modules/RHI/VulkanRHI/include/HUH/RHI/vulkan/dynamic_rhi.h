@@ -10,14 +10,11 @@ extern "C" HUH_VULKANRHI_API HUH::RHI::DynamicRHI* DynamicRHICreate();
 class HUH_VULKANRHI_API VulkanDynamicRHI final : public RHI::DynamicRHI {
 public:
     friend class VulkanSwapchain;
+    friend class VulkanDevice;
     void Destroy() override;
     bool Init() override;
     Device* GetDevice(size_t index) override;
     std::vector<Device*> GetDevices() override;
-    Swapchain* CreateSwapchain(Window& window) override;
-    Shader* CreateShader(void* byteCode, Uint64 size) override;
-    Pipeline* CreatePipeline() override;
-    CommandBuffer* CreateCommandBuffer(Pipeline* pipeline) override;
 
     friend HUH::RHI::DynamicRHI* DynamicRHICreate();
 

@@ -7,18 +7,20 @@
 namespace HUH::RHI {
 class HUH_VULKANRHI_API VulkanShader : public Shader {
 public:
-    friend class VulkanDynamicRHI;
+    friend class VulkanDevice;
     friend class VulkanPipeline;
 
-    bool Init(Device* device, Stage stage, const std::string& entryFunctionName) override;
+    bool Init(Stage stage, const std::string& entryFunctionName) override;
     void Destroy() override;
     static VkShaderStageFlagBits ShaderStageToVkShaderStage(Stage stage);
 
 protected:
-    explicit VulkanShader(void* byteCode, Uint64 size) : Shader(byteCode, size) {}
+    explicit VulkanShader(class VulkanDevice* device, void* byteCode, Uint64 size)
+        : Shader(byteCode, size),
+          m_device(device) {}
     ~VulkanShader() override;
 
-    class VulkanDevice* m_device = nullptr;
+    class VulkanDevice* m_device;
     VkShaderModule m_shaderModule = nullptr;
     VkPipelineShaderStageCreateInfo m_shaderStageInfo = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,

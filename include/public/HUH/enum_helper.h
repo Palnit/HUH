@@ -24,10 +24,12 @@ bool CheckFlag(const EnumName flags, const EnumName contains) {
     return (flags & contains) != 0;
 }
 
-template<HUH::Enum T>
-std::string ToString(T inEnum) {
-    static_assert(false, "No ToString enum function specialization");
-    return "";
-}
+#define ENUM_FORMATER(EnumName) \
+template<> \
+struct std::formatter<EnumName> : std::formatter<std::string> { \
+    auto format(EnumName p, format_context& ctx) const { \
+        return formatter<string>::format(std::format("{}", HUH::ToString(p)), ctx); \
+    } \
+};
 
 }// namespace HUH
