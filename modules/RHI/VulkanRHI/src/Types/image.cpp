@@ -2,6 +2,7 @@
 
 #include "HUH/RHI/vulkan/device.h"
 #include "HUH/RHI/vulkan/dynamic_rhi.h"
+#include "HUH/RHI/vulkan/pipeline.h"
 namespace HUH::RHI {
 
 void VulkanImage::Destroy() {
@@ -16,6 +17,7 @@ void VulkanImage::Destroy() {
 bool VulkanImage::Init(Intializer&& init) {
     // TODO proper vulkan image creation from real image or swapchain image
     m_device = dynamic_cast<VulkanDevice*>(init.Device);
+    m_size = init.Size;
     VkComponentMapping componentMapping = {
         .r = VK_COMPONENT_SWIZZLE_IDENTITY,
         .g = VK_COMPONENT_SWIZZLE_IDENTITY,
@@ -46,13 +48,13 @@ bool VulkanImage::Init(Intializer&& init) {
         HUH_ELOG(LogVulkanRHI, "Image Creation Error: {}", err)
         return false;
     }
-    HUH_ILOG(LogVulkanRHI, "Image Creation Success");
+    HUH_ILOG(LogVulkanRHI, "Image Creation Successful");
 
     return true;
 }
 
 VulkanImage::~VulkanImage() {
-    HUH_ILOG(LogVulkanRHI, "Image Destroyed");
+    HUH_ILOG(LogVulkanRHI, "VulkanImage Destroyed");
 }
 
 }// namespace HUH::RHI

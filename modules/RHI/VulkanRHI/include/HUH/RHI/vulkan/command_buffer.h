@@ -1,5 +1,6 @@
 #pragma once
 #include "pipeline.h"
+#include "HUH/Types/tuple.h"
 
 #include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/command_buffer.h>
@@ -13,7 +14,7 @@ public:
     bool Begin() override;
     void End() override;
     void AddRenderTarget(Image* renderTarget) override;
-    void Init(Queue* queue) override;
+    bool Init(Queue* queue) override;
     void Destroy() override;
     bool Submit() override;
     void Reset() override;
@@ -25,6 +26,10 @@ protected:
     VulkanDevice* m_device;
     VulkanPipeline* m_pipeline;
     VkCommandPool m_commandPool = nullptr;
+    VkCommandBuffer m_commandBuffer = nullptr;
+    // TODO DO CORRECT FRAME BUFFERS
+    VkFramebuffer m_frameBuffer = nullptr;
+    VkRect2D m_renderArea;
 };
 
 }// namespace HUH::RHI

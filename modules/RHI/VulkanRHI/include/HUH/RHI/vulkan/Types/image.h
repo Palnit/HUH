@@ -8,6 +8,7 @@ class VulkanImage : public Image {
 public:
     friend class VulkanDynamicRHI;
     friend class VulkanSwapchain;
+    friend class VulkanCommandBuffer;
 
     bool Init(Intializer&& init) override;
     void Destroy() override;

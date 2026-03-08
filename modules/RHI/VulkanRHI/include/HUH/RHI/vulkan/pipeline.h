@@ -6,13 +6,15 @@ namespace HUH::RHI {
 class VulkanPipeline : public Pipeline {
 public:
     friend class VulkanDevice;
+    friend class VulkanCommandBuffer;
+    friend class VulkanImage;
     bool Init() override;
     void Destroy() override;
     void AddShader(class Shader* shader) override;
 
 protected:
     VulkanPipeline(class VulkanDevice* device) : m_device(device) {}
-    ~VulkanPipeline() override = default;
+    ~VulkanPipeline() override;
     class VulkanDevice* m_device;
     VkPipelineLayout m_layout = nullptr;
     VkPipeline m_pipeline = nullptr;

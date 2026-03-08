@@ -15,6 +15,7 @@ public:
         HUH::RHI::Device* Device = nullptr;
         HUH::RHI::Format Format = Format::UNKNOWN;
         Uint32 MipLevels = 0;
+        HUH::Vector2u32 Size;
     };
     virtual bool Init(Intializer&& init) = 0;
     virtual void Destroy() = 0;
@@ -23,5 +24,6 @@ protected:
     Image(bool created) : m_created(created) {}
     virtual ~Image() = default;
     bool m_created = false;
+    HUH::Vector2u32 m_size;
 };
 }// namespace HUH::RHI

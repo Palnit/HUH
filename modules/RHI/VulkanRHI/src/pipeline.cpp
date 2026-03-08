@@ -151,6 +151,7 @@ bool VulkanPipeline::Init() {
         HUH_ELOG(LogVulkanRHI, "Error creating graphics pipeline: {}", err);
         return false;
     }
+    HUH_ILOG(LogVulkanRHI, "Pipeline Creation Successful")
 
     return true;
 }
@@ -164,5 +165,8 @@ void VulkanPipeline::Destroy() {
 void VulkanPipeline::AddShader(class Shader* shader) {
     auto vk_shader = dynamic_cast<VulkanShader*>(shader);
     m_shaderStages.push_back(vk_shader->m_shaderStageInfo);
+}
+VulkanPipeline::~VulkanPipeline() {
+    HUH_ILOG(LogVulkanRHI, "VulkanPipeline Destroyed")
 }
 }// namespace HUH::RHI
