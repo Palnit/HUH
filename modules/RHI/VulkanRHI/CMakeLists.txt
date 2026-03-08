@@ -10,6 +10,7 @@ set(VULKAN_RHI_HEADER_FILES
         ${VULKAN_RHI_INC_PATH}/pipeline.h
         ${VULKAN_RHI_INC_PATH}/command_buffer.h
         ${VULKAN_RHI_INC_PATH}/Types/image.h
+        ${VULKAN_RHI_INC_PATH}/Types/fence.h
 )
 set(VULKAN_RHI_SOURCE_FILES
         src/dynamic_rhi.cpp
@@ -20,6 +21,7 @@ set(VULKAN_RHI_SOURCE_FILES
         src/pipeline.cpp
         src/command_buffer.cpp
         src/Types/image.cpp
+        src/Types/fence.cpp
 )
 
 if (TARGET HUH::VulkanLoader)

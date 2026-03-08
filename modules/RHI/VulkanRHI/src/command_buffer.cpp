@@ -3,6 +3,7 @@
 
 #include "HUH/RHI/Types/image.h"
 #include "HUH/RHI/vulkan/queue.h"
+#include "HUH/RHI/vulkan/Types/fence.h"
 #include "HUH/RHI/vulkan/Types/image.h"
 
 #include <HUH/RHI/vulkan/device.h>
@@ -32,6 +33,23 @@ bool VulkanCommandBuffer::Begin() {
     };
     HUH::vkCmdBeginRenderPass(m_commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
     HUH::vkCmdBindPipeline(m_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->m_pipeline);
+
+    // TODO REFACTOR THIS TO NOT BE TEMPORARY
+    VkViewport viewport{};
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = static_cast<float>(m_renderArea.extent.width);
+    viewport.height = static_cast<float>(m_renderArea.extent.height);
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+    vkCmdSetViewport(m_commandBuffer, 0, 1, &viewport);
+
+    VkRect2D scissor{};
+    scissor.offset = {0, 0};
+    scissor.extent = m_renderArea.extent;
+    vkCmdSetScissor(m_commandBuffer, 0, 1, &scissor);
+
+    vkCmdDraw(m_commandBuffer, 3, 1, 0, 0);
 
     return true;
 }
@@ -65,9 +83,10 @@ void VulkanCommandBuffer::AddRenderTarget(Image* renderTarget) {
 }
 
 bool VulkanCommandBuffer::Init(Queue* queue) {
-    auto vk_queue = dynamic_cast<VulkanQueue*>(queue);
+    m_queue = dynamic_cast<VulkanQueue*>(queue);
     VkCommandPoolCreateInfo poolInfo = {.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-                                        .queueFamilyIndex = static_cast<Uint32>(vk_queue->m_familyIndex)};
+                                        .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+                                        .queueFamilyIndex = static_cast<Uint32>(m_queue->m_familyIndex)};
     if (auto err = HUH::vkCreateCommandPool(*m_device, &poolInfo, nullptr, &m_commandPool); err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "CommandBuffer Creation Error: {}", err)
         return false;
@@ -89,14 +108,39 @@ bool VulkanCommandBuffer::Init(Queue* queue) {
 }
 
 void VulkanCommandBuffer::Destroy() {
+    HUH::vkDestroyFramebuffer(*m_device, m_frameBuffer, nullptr);
     HUH::vkDestroyCommandPool(*m_device, m_commandPool, nullptr);
 }
 
-bool VulkanCommandBuffer::Submit() {
-    return false;
-}
+bool VulkanCommandBuffer::Submit(Fence<SyncType::GpuToGpu>* wait,
+                                 Fence<SyncType::GpuToGpu>* signal,
+                                 Fence<SyncType::GpuToCpu>* waitSignal) {
+    auto vk_wait_fence = dynamic_cast<VulkanFence<SyncType::GpuToGpu>*>(wait);
+    auto vk_signal_fence = dynamic_cast<VulkanFence<SyncType::GpuToGpu>*>(signal);
+    auto vk_wait_signal_fence = dynamic_cast<VulkanFence<SyncType::GpuToCpu>*>(waitSignal);
+    VkSemaphore waitSemaphores[] = {*vk_wait_fence};
+    VkPipelineStageFlags waitFlags[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    VkSemaphore signalSemaphores[] = {*vk_signal_fence};
+    VkSubmitInfo submitInfo = {
+        .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+        .waitSemaphoreCount = 1,
+        .pWaitSemaphores = waitSemaphores,
+        .pWaitDstStageMask = waitFlags,
+        .commandBufferCount = 1,
+        .pCommandBuffers = &m_commandBuffer,
+        .signalSemaphoreCount = 1,
+        .pSignalSemaphores = signalSemaphores,
+    };
+
+    if (auto err = HUH::vkQueueSubmit(*m_queue, 1, &submitInfo, *vk_wait_signal_fence); err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Submit Error: {}", err)
+        return false;
+    }
+    return true;
+}// namespace HUH::RHI
 
 void VulkanCommandBuffer::Reset() {
+    HUH::vkResetCommandBuffer(m_commandBuffer, 0);
 }
 
 VulkanCommandBuffer::VulkanCommandBuffer(VulkanDevice* device, VulkanPipeline* pipeline)

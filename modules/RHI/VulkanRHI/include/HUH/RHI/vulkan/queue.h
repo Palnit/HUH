@@ -8,8 +8,11 @@ namespace HUH::RHI {
 class HUH_VULKANRHI_API VulkanQueue final : public Queue {
     friend class VulkanDevice;
     friend class VulkanCommandBuffer;
+    friend class VulkanSwapchain;
 
 public:
+    operator VkQueue();
+
 private:
     VulkanQueue(class VulkanDevice* device,
                 const size_t familyIndex,
@@ -27,5 +30,6 @@ private:
     size_t m_familyIndex = 0;
     size_t m_queueIndex = 0;
     VkQueueFamilyProperties m_properties;
+    VkQueue m_queue = nullptr;
 };
 }// namespace HUH::RHI

@@ -22,7 +22,12 @@ public:
 
     static VkPresentModeKHR ConvertPresentMode(PresentMode presentMode);
 
-private:
+    Image* NextImage(Fence<SyncType::GpuToGpu>* fence) override;
+    Image* NextImage(Fence<SyncType::GpuToGpu>* fence, Uint64 timeout) override;
+
+    void Present(Queue* queue, Fence<SyncType::GpuToGpu>* fence) override;
+
+protected:
     VulkanSwapchain(VulkanDevice* device, Window* window, VkSurfaceKHR surface, VulkanDynamicRHI* parent);
     ~VulkanSwapchain() override;
 
@@ -31,5 +36,6 @@ private:
     VulkanDynamicRHI* m_parent;
     VulkanDevice* m_device;
     VkExtent2D m_extent = {};
+    Uint32 m_imageIndex = 0;
 };
 }// namespace HUH::RHI

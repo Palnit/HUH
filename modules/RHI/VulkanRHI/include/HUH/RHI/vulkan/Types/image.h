@@ -4,7 +4,7 @@
 #include <HUH/RHI/Types/image.h>
 
 namespace HUH::RHI {
-class VulkanImage : public Image {
+class HUH_VULKANRHI_API VulkanImage : public Image {
 public:
     friend class VulkanDynamicRHI;
     friend class VulkanSwapchain;

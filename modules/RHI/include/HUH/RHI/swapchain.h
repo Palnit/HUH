@@ -17,6 +17,9 @@ public:
 
     Image* operator[](const size_t index) const { return m_images[index]; }
     size_t size() const { return m_images.size(); }
+    virtual Image* NextImage(Fence<SyncType::GpuToGpu>* fence) = 0;
+    virtual Image* NextImage(Fence<SyncType::GpuToGpu>* fence, Uint64 timeout) = 0;
+    virtual void Present(Queue* queue, Fence<SyncType::GpuToGpu>* fence) = 0;
 
 protected:
     explicit Swapchain(Window* window) : m_windowParent(window) {}

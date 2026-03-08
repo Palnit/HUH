@@ -1,5 +1,7 @@
 #pragma once
 
+#include "types.h"
+
 #include <HUH/RHI/rhi_module.h>
 #include <HUH/RHI/queue.h>
 #include <HUH/definitions.h>
@@ -9,6 +11,10 @@
 namespace HUH {
 class Window;
 namespace RHI {
+
+template<SyncType>
+class Fence;
+
 class Queue;
 class HUH_RHI_API Device {
 public:
@@ -39,6 +45,9 @@ public:
     virtual class CommandBuffer* CreateCommandBuffer(Pipeline* pipeline) = 0;
     virtual class Swapchain* CreateSwapchain(Window& window) = 0;
 
+    virtual Fence<SyncType::GpuToCpu>* CreateFenceGtC() = 0;
+    virtual Fence<SyncType::GpuToGpu>* CreateFenceGtG() = 0;
+
     HUH_NODISCARD Queue* GetQueue(size_t index) const;
     HUH_NODISCARD size_t GetNumberOfQueues() const { return m_queues.size(); };
 
@@ -50,6 +59,8 @@ protected:
     std::vector<Pipeline*> m_createdPipelines;
     std::vector<CommandBuffer*> m_createdCommandBuffers;
     std::vector<class Swapchain*> m_createdSwapchains;
+    std::vector<Fence<SyncType::GpuToCpu>*> m_createdFencesC;
+    std::vector<Fence<SyncType::GpuToGpu>*> m_createdFencesG;
 };
 }// namespace RHI
 

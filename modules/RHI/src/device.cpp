@@ -4,10 +4,17 @@
 #include <HUH/RHI/queue.h>
 #include <HUH/RHI/swapchain.h>
 #include <HUH/RHI/shader.h>
+#include <HUH/RHI/Types/fence.h>
 
 namespace HUH {
 namespace RHI {
 void Device::Destroy() {
+    for (auto fence : m_createdFencesC) {
+        delete fence;
+    }
+    for (auto fence : m_createdFencesG) {
+        delete fence;
+    }
     for (CommandBuffer* cmd : m_createdCommandBuffers) {
         cmd->Destroy();
         delete cmd;

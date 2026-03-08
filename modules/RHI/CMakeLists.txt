@@ -12,6 +12,7 @@ set(HEADER_FILES
         ${RHI_INC_PATH}/pipeline.h
         ${RHI_INC_PATH}/command_buffer.h
         ${RHI_INC_PATH}/Types/image.h
+        ${RHI_INC_PATH}/Types/fence.h
 )
 set(SOURCE_FILES
         src/dynamic_rhi.cpp
@@ -22,6 +23,7 @@ set(SOURCE_FILES
         src/pipeline.cpp
         src/command_buffer.cpp
         src/Types/image.cpp
+        src/Types/fence.cpp
 )
 
 add_library(HUH-RHI SHARED ${HEADER_FILES} ${SOURCE_FILES})

@@ -1,7 +1,11 @@
 #pragma once
+#include "types.h"
+
 #include <HUH/Math/vector.h>
 
 namespace HUH::RHI {
+template<SyncType>
+class Fence;
 class CommandBuffer {
 public:
     friend class Device;
@@ -10,7 +14,9 @@ public:
     virtual void AddRenderTarget(class Image* renderTarget) = 0;
     void SetViewPort(Vector2u32 viewPort) { m_viewPort = viewPort; };
     void SetScissor(Vector2u32 Scissor) { m_scissor = Scissor; };
-    virtual bool Submit() = 0;
+    virtual bool Submit(Fence<SyncType::GpuToGpu>* wait,
+                        Fence<SyncType::GpuToGpu>* signal,
+                        Fence<SyncType::GpuToCpu>* waitSignal) = 0;
     virtual void Reset() = 0;
     virtual bool Init(class Queue* queue) = 0;
     virtual void Destroy() = 0;

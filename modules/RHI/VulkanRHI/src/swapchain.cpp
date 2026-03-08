@@ -1,5 +1,10 @@
 #include <HUH/RHI/vulkan/device.h>
 #include <HUH/RHI/vulkan/swapchain.h>
+
+#include "HUH/RHI/Types/fence.h"
+#include "HUH/RHI/vulkan/queue.h"
+#include "HUH/RHI/vulkan/Types/fence.h"
+
 #include <HUH/Window/window.h>
 #include <HUH/RHI/vulkan/Types/image.h>
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
@@ -60,11 +65,11 @@ bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minIma
                  Details.capabilities.surfaceCapabilities.maxImageCount);
         return false;
     }
-    VkExtent2D swapchainExtent = Details.capabilities.surfaceCapabilities.currentExtent;
+    m_extent = Details.capabilities.surfaceCapabilities.currentExtent;
 
     if (Details.capabilities.surfaceCapabilities.currentExtent.width == 0xFFFFFFFF) {
-        swapchainExtent.height = m_windowParent->GetHeight();
-        swapchainExtent.width = m_windowParent->GetWidth();
+        m_extent.height = m_windowParent->GetHeight();
+        m_extent.width = m_windowParent->GetWidth();
     }
 
     VkPresentModeKHR vk_requestedPresentMode = ConvertPresentMode(presentMode);
@@ -80,7 +85,7 @@ bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minIma
                                            .minImageCount = minImageCount,
                                            .imageFormat = vk_requestedFormat,
                                            .imageColorSpace = colorSpace,
-                                           .imageExtent = swapchainExtent,
+                                           .imageExtent = m_extent,
                                            .imageArrayLayers = 1,
                                            .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
                                            .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
@@ -127,6 +132,37 @@ VkPresentModeKHR VulkanSwapchain::ConvertPresentMode(PresentMode presentMode) {
         default:
             return VK_PRESENT_MODE_FIFO_KHR;
     }
+}
+
+Image* VulkanSwapchain::NextImage(Fence<SyncType::GpuToGpu>* fence) {
+    return NextImage(fence, std::numeric_limits<Uint64>::max());
+}
+
+Image* VulkanSwapchain::NextImage(Fence<SyncType::GpuToGpu>* fence, Uint64 timeout) {
+    const auto vk_fence = dynamic_cast<VulkanFence<SyncType::GpuToGpu>*>(fence);
+    if (auto err = HUH::vkAcquireNextImageKHR(*m_device, m_swapchain, timeout, *vk_fence, nullptr, &m_imageIndex);
+        err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "NextImage Acquire Error: {}", err)
+        return nullptr;
+    }
+    return m_images[m_imageIndex];
+}
+
+void VulkanSwapchain::Present(Queue* queue, Fence<SyncType::GpuToGpu>* fence) {
+    auto vk_queue = dynamic_cast<VulkanQueue*>(queue);
+    auto vk_fence = dynamic_cast<VulkanFence<SyncType::GpuToGpu>*>(fence);
+    VkSemaphore semaphores[] = {*vk_fence};
+    VkPresentInfoKHR presentInfo = {
+        .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+        .waitSemaphoreCount = 1,
+        .pWaitSemaphores = semaphores,
+        .swapchainCount = 1,
+        .pSwapchains = &m_swapchain,
+        .pImageIndices = &m_imageIndex,
+        .pResults = nullptr,
+    };
+
+    HUH::vkQueuePresentKHR(*vk_queue, &presentInfo);
 }
 
 VulkanSwapchain::VulkanSwapchain(VulkanDevice* device, Window* window, VkSurfaceKHR surface, VulkanDynamicRHI* parent)

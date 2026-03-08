@@ -7,6 +7,7 @@
 #include <HUH/RHI/vulkan/command_buffer.h>
 #include "HUH/RHI/vulkan/shader.h"
 #include "HUH/RHI/vulkan/swapchain.h"
+#include "HUH/RHI/vulkan/Types/fence.h"
 
 #include <HUH/enum_helper.h>
 
@@ -84,6 +85,9 @@ bool VulkanDevice::Init() {
     return true;
 }
 void VulkanDevice::Destroy() {
+    if (m_device) {
+        HUH::vkDeviceWaitIdle(m_device);
+    }
     Device::Destroy();
     if (m_device) {
         HUH::vkDestroyDevice(m_device, nullptr);
@@ -244,6 +248,16 @@ Swapchain* VulkanDevice::CreateSwapchain(Window& window) {
 #else
     return nullptr;
 #endif
+}
+
+Fence<SyncType::GpuToCpu>* VulkanDevice::CreateFenceGtC() {
+    m_createdFencesC.push_back(new VulkanFence<SyncType::GpuToCpu>(this));
+    return m_createdFencesC.back();
+}
+
+Fence<SyncType::GpuToGpu>* VulkanDevice::CreateFenceGtG() {
+    m_createdFencesG.push_back(new VulkanFence<SyncType::GpuToGpu>(this));
+    return m_createdFencesG.back();
 }
 
 Shader* VulkanDevice::CreateShader(void* byteCode, Uint64 size) {
