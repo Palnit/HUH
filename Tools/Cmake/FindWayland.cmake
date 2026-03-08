@@ -51,7 +51,7 @@ endif ()
 
 function(huh_wayland_create_protocol Target Visibility)
     set(options CLIENT SERVER PUBLIC_CODE PRIVATE_CODE)
-    set(oneValue PROTOCOL FILENAME)
+    set(oneValue PROTOCOLS_DIR PROTOCOL FILENAME)
     cmake_parse_arguments(ARGS "${options}" "${oneValue}" "" ${ARGN})
     if (NOT ARGS_CLIENT AND NOT ARGS_SERVER)
         message(FATAL_ERROR "Wayland create protocol error: you must specify one of CLIENT SERVER")
@@ -64,6 +64,9 @@ function(huh_wayland_create_protocol Target Visibility)
     endif ()
     if (NOT ARGS_FILENAME)
         message(FATAL_ERROR "Wayland create protocol error: you must specify the base file name of the protocol")
+    endif ()
+    if (NOT ARGS_PROTOCOLS_DIR)
+        message(FATAL_ERROR "Wayland create protocol error: you must specify the directory of the protocol")
     endif ()
 
     if (ARGS_PUBLIC_CODE)
@@ -83,15 +86,15 @@ function(huh_wayland_create_protocol Target Visibility)
     set(_SOURCE_NAME "${CMAKE_CURRENT_BINARY_DIR}/generated/src/wayland-protocols/${ARGS_FILENAME}.c")
 
     add_custom_command(OUTPUT ${_HEADER_NAME}
-            DEPENDS Wayland::Scanner "${WAYLAND_PROTOCOLS_DIR}/${ARGS_PROTOCOL}"
+            DEPENDS Wayland::Scanner "${ARGS_PROTOCOLS_DIR}/${ARGS_PROTOCOL}"
             COMMAND Wayland::Scanner
-            ARGS ${_HEADER_TYPE} "${WAYLAND_PROTOCOLS_DIR}/${ARGS_PROTOCOL}" ${_HEADER_NAME}
+            ARGS ${_HEADER_TYPE} "${ARGS_PROTOCOLS_DIR}/${ARGS_PROTOCOL}" ${_HEADER_NAME}
     )
 
     add_custom_command(OUTPUT ${_SOURCE_NAME}
-            DEPENDS Wayland::Scanner "${WAYLAND_PROTOCOLS_DIR}/${ARGS_PROTOCOL}"
+            DEPENDS Wayland::Scanner "${ARGS_PROTOCOLS_DIR}/${ARGS_PROTOCOL}"
             COMMAND Wayland::Scanner
-            ARGS ${_PROTOCOL_TYPE} "${WAYLAND_PROTOCOLS_DIR}/${ARGS_PROTOCOL}" ${_SOURCE_NAME}
+            ARGS ${_PROTOCOL_TYPE} "${ARGS_PROTOCOLS_DIR}/${ARGS_PROTOCOL}" ${_SOURCE_NAME}
     )
     target_sources(${Target} ${Visibility} ${_HEADER_NAME} ${_SOURCE_NAME})
 

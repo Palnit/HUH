@@ -1,6 +1,7 @@
 #pragma once
 
 #include "wayland-protocols/xdg-shell-client-protocol.h"
+#include "wayland-protocols/xdg-decoration-client-protocol.h"
 
 #include <HUH/event.h>
 #include <HUH/definitions.h>
@@ -76,11 +77,13 @@ protected:
     wl_surface* m_surface;
     xdg_surface* m_xdgSurface;
     xdg_toplevel* m_xdgToplevel;
+    zxdg_toplevel_decoration_v1* m_zxdgToplevelDecoration;
     bool close = false;
     static wl_compositor* s_waylandCompositor;
     static wl_display* s_waylandDisplay;
     static wl_registry* s_waylandRegistry;
     static xdg_wm_base* s_xdgWmBase;
+    static zxdg_decoration_manager_v1* s_zxdgDecorationManager;
     static const wl_registry_listener s_registryListener;
     static const xdg_wm_base_listener s_xdgWmBaseListener;
     static const xdg_surface_listener s_xdgSurfaceListener;

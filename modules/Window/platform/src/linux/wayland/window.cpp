@@ -2,6 +2,9 @@
 
 #include <cstring>
 #include <HUH/Window/Linux/Wayland/window.h>
+
+#include "wayland-protocols/xdg-decoration-client-protocol.h"
+
 #include <wayland-client.h>
 #include <bits/this_thread_sleep.h>
 #include <wayland-protocols/xdg-shell-client-protocol.h>
@@ -12,6 +15,7 @@ wl_display* WaylandWindow::s_waylandDisplay = nullptr;
 wl_registry* WaylandWindow::s_waylandRegistry = nullptr;
 wl_compositor* WaylandWindow::s_waylandCompositor = nullptr;
 xdg_wm_base* WaylandWindow::s_xdgWmBase = nullptr;
+zxdg_decoration_manager_v1* WaylandWindow::s_zxdgDecorationManager = nullptr;
 const wl_registry_listener WaylandWindow::s_registryListener = {
     .global = HandleWaylandGlobalRegister,
     .global_remove = HandleWaylandGlobalRegisterRemove,
@@ -45,6 +49,9 @@ void HandleWaylandGlobalRegister(void* data,
         WaylandWindow::s_xdgWmBase =
             static_cast<xdg_wm_base*>(wl_registry_bind(registry, name, &xdg_wm_base_interface, version));
         xdg_wm_base_add_listener(WaylandWindow::s_xdgWmBase, &WaylandWindow::s_xdgWmBaseListener, nullptr);
+    } else if (std::strcmp(interface, zxdg_decoration_manager_v1_interface.name) == 0) {
+        WaylandWindow::s_zxdgDecorationManager = static_cast<zxdg_decoration_manager_v1*>(
+            wl_registry_bind(registry, name, &zxdg_decoration_manager_v1_interface, version));
     }
 }
 
@@ -99,6 +106,9 @@ WaylandWindow::WaylandWindow(const std::string& name, const Int32 width, const I
     m_xdgSurface = xdg_wm_base_get_xdg_surface(s_xdgWmBase, m_surface);
     xdg_surface_add_listener(m_xdgSurface, &s_xdgSurfaceListener, this);
     m_xdgToplevel = xdg_surface_get_toplevel(m_xdgSurface);
+    m_zxdgToplevelDecoration =
+        zxdg_decoration_manager_v1_get_toplevel_decoration(s_zxdgDecorationManager, m_xdgToplevel);
+    zxdg_toplevel_decoration_v1_set_mode(m_zxdgToplevelDecoration, ZXDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
     xdg_toplevel_add_listener(m_xdgToplevel, &s_xdgToplevelListener, this);
     xdg_toplevel_set_min_size(m_xdgToplevel, m_width, m_height);
     // xdg_toplevel_set_max_size(m_xdgToplevel, m_width, m_height);
@@ -111,6 +121,7 @@ WaylandWindow::WaylandWindow(const std::string& name, const Int32 width, const I
 WaylandWindow::~WaylandWindow() {
     if (s_waylandDisplay) {
         HUH_ILOG(LogWaylandWindow, "Destroying Wayland Display connection")
+        zxdg_toplevel_decoration_v1_destroy(m_zxdgToplevelDecoration);
         xdg_toplevel_destroy(m_xdgToplevel);
         xdg_surface_destroy(m_xdgSurface);
         wl_surface_destroy(m_surface);
