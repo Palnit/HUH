@@ -10,6 +10,7 @@
 #define VK_ENABLE_BETA_EXTENSIONS
 // TODO CHECK THE MISSING DEFINES HEADERS TO FORWARD DECLARE THINGS
 #include <HUH/vulkan_loader.h>
+#include <HUH/dynamic_library.h>
 
 namespace HUH {
 

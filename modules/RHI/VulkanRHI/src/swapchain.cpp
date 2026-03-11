@@ -8,6 +8,7 @@
 #include <HUH/Window/window.h>
 #include <HUH/RHI/vulkan/Types/image.h>
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
+#undef max
 
 namespace HUH::RHI {
 

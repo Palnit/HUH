@@ -1,5 +1,6 @@
 #include <HUH/RHI/vulkan/Types/fence.h>
 #include <HUH/RHI/vulkan/device.h>
+#undef max
 
 namespace HUH::RHI {
 

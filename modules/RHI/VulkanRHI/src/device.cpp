@@ -223,11 +223,12 @@ Swapchain* VulkanDevice::CreateSwapchain(Window& window) {
                                               .hinstance = HUH::g_AppInstance,
                                               .hwnd = platform.WindowsHandle};
     VkSurfaceKHR surface;
-    if (auto err = HUH::vkCreateWin32SurfaceKHR(m_instance, &createInfoKHR, nullptr, &surface); err != VK_SUCCESS) {
+    if (auto err = HUH::vkCreateWin32SurfaceKHR(m_parent->m_instance, &createInfoKHR, nullptr, &surface);
+        err != VK_SUCCESS) {
         HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan surface creation failed: {}", HUH::ToString(err))
         return nullptr;
     }
-    m_createdSwapchains.push_back(new VulkanSwapchain(&window, surface, this));
+    m_createdSwapchains.push_back(new VulkanSwapchain(this, &window, surface, m_parent));
     return m_createdSwapchains.back();
 #elif defined(HUH_LINUX)
     WindowProto::PlatformVariables platform = window.GetPlatformVariables();

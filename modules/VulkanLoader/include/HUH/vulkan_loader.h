@@ -2,9 +2,9 @@
 
 #ifndef VK_NO_PROTOTYPES
 #define VK_NO_PROTOTYPES
+#include "HUH/definitions.h"
 #endif
 
-#include <HUH/dynamic_library.h>
 #include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_core.h>
 
@@ -1938,6 +1938,7 @@ namespace HUH {
 bool HUH_VULKANLOADER_API LoadVulkan();
 bool HUH_VULKANLOADER_API LoadVulkanInstance(VkInstance instance);
 
+class DynamicLibrary;
 extern HUH_VULKANLOADER_API HUH::DynamicLibrary g_vulkanLib;
 
 #define CreateVulkanFunc(Type) extern HUH_VULKANLOADER_API PFN_## Type Type;
