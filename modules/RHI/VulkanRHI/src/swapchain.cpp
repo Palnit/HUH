@@ -135,12 +135,12 @@ VkPresentModeKHR VulkanSwapchain::ConvertPresentMode(PresentMode presentMode) {
     }
 }
 
-Image* VulkanSwapchain::NextImage(Fence<SyncType::GpuToGpu>* fence) {
+Image* VulkanSwapchain::NextImage(Fence* fence) {
     return NextImage(fence, std::numeric_limits<Uint64>::max());
 }
 
-Image* VulkanSwapchain::NextImage(Fence<SyncType::GpuToGpu>* fence, Uint64 timeout) {
-    const auto vk_fence = dynamic_cast<VulkanFence<SyncType::GpuToGpu>*>(fence);
+Image* VulkanSwapchain::NextImage(Fence* fence, Uint64 timeout) {
+    const auto vk_fence = dynamic_cast<VulkanFence*>(fence);
     if (auto err = HUH::vkAcquireNextImageKHR(*m_device, m_swapchain, timeout, *vk_fence, nullptr, &m_imageIndex);
         err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "NextImage Acquire Error: {}", err)
@@ -149,9 +149,9 @@ Image* VulkanSwapchain::NextImage(Fence<SyncType::GpuToGpu>* fence, Uint64 timeo
     return m_images[m_imageIndex];
 }
 
-void VulkanSwapchain::Present(Queue* queue, Fence<SyncType::GpuToGpu>* fence) {
+void VulkanSwapchain::Present(Queue* queue, Fence* fence) {
     auto vk_queue = dynamic_cast<VulkanQueue*>(queue);
-    auto vk_fence = dynamic_cast<VulkanFence<SyncType::GpuToGpu>*>(fence);
+    auto vk_fence = dynamic_cast<VulkanFence*>(fence);
     VkSemaphore semaphores[] = {*vk_fence};
     VkPresentInfoKHR presentInfo = {
         .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,

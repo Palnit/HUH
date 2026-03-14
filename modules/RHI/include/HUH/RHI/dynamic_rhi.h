@@ -4,13 +4,11 @@
 #include <HUH/RHI/types.h>
 #include <HUH/definitions.h>
 #include <HUH/dynamic_library.h>
-#include <HUH/RHI/device.h>
-#include <HUH/RHI/pipeline.h>
-#include <HUH/RHI/command_buffer.h>
 
 namespace HUH {
 class Window;
 namespace RHI {
+class Device;
 
 enum class Format {
     UNKNOWN,
@@ -38,7 +36,7 @@ public:
 
 protected:
     DynamicRHI() = default;
-    virtual ~DynamicRHI() = default;
+    virtual ~DynamicRHI();
     std::vector<Device*> m_createdDevices;
     RenderApi m_renderApi = RenderApi::Unknown;
     static DynamicLibrary s_RHIImplSharedLibrary;

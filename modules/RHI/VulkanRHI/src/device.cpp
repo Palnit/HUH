@@ -251,14 +251,9 @@ Swapchain* VulkanDevice::CreateSwapchain(Window& window) {
 #endif
 }
 
-Fence<SyncType::GpuToCpu>* VulkanDevice::CreateFenceGtC() {
-    m_createdFencesC.push_back(new VulkanFence<SyncType::GpuToCpu>(this));
-    return m_createdFencesC.back();
-}
-
-Fence<SyncType::GpuToGpu>* VulkanDevice::CreateFenceGtG() {
-    m_createdFencesG.push_back(new VulkanFence<SyncType::GpuToGpu>(this));
-    return m_createdFencesG.back();
+Fence* VulkanDevice::CreateFence() {
+    m_createdFences.push_back(new VulkanFence(this));
+    return m_createdFences.back();
 }
 
 Shader* VulkanDevice::CreateShader(void* byteCode, Uint64 size) {

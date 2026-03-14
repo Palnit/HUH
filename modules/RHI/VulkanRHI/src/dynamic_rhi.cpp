@@ -142,6 +142,10 @@ VkFormat VulkanDynamicRHI::ConvertFormat(Format format) {
     }
 }
 
+VulkanDynamicRHI::~VulkanDynamicRHI() {
+    HUH_ILOG(LogVulkanRHI, "Destroying Vulkan RHI")
+}
+
 void VulkanDynamicRHI::Destroy() {
     DynamicRHI::Destroy();
     if (m_instance != VK_NULL_HANDLE) {

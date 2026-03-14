@@ -22,10 +22,10 @@ public:
 
     static VkPresentModeKHR ConvertPresentMode(PresentMode presentMode);
 
-    Image* NextImage(Fence<SyncType::GpuToGpu>* fence) override;
-    Image* NextImage(Fence<SyncType::GpuToGpu>* fence, Uint64 timeout) override;
+    Image* NextImage(Fence* fence) override;
+    Image* NextImage(Fence* fence, Uint64 timeout) override;
 
-    void Present(Queue* queue, Fence<SyncType::GpuToGpu>* fence) override;
+    void Present(Queue* queue, Fence* fence) override;
 
 protected:
     VulkanSwapchain(VulkanDevice* device, Window* window, VkSurfaceKHR surface, VulkanDynamicRHI* parent);

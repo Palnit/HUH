@@ -16,13 +16,13 @@ public:
     Device* GetDevice(size_t index) override;
     std::vector<Device*> GetDevices() override;
 
-    friend HUH::RHI::DynamicRHI* DynamicRHICreate();
+    HUH_VULKANRHI_API friend HUH::RHI::DynamicRHI* DynamicRHICreate();
 
     static VkFormat ConvertFormat(Format format);
 
 protected:
     VulkanDynamicRHI() = default;
-    ~VulkanDynamicRHI() override = default;
+    ~VulkanDynamicRHI() override;
     VkInstance m_instance = nullptr;
 };
 }// namespace HUH::RHI

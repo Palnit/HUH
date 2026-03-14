@@ -12,7 +12,6 @@ namespace HUH {
 class Window;
 namespace RHI {
 
-template<SyncType>
 class Fence;
 
 class Queue;
@@ -45,8 +44,7 @@ public:
     virtual class CommandBuffer* CreateCommandBuffer(Pipeline* pipeline) = 0;
     virtual class Swapchain* CreateSwapchain(Window& window) = 0;
 
-    virtual Fence<SyncType::GpuToCpu>* CreateFenceGtC() = 0;
-    virtual Fence<SyncType::GpuToGpu>* CreateFenceGtG() = 0;
+    virtual Fence* CreateFence() = 0;
 
     HUH_NODISCARD Queue* GetQueue(size_t index) const;
     HUH_NODISCARD size_t GetNumberOfQueues() const { return m_queues.size(); };
@@ -59,8 +57,7 @@ protected:
     std::vector<Pipeline*> m_createdPipelines;
     std::vector<CommandBuffer*> m_createdCommandBuffers;
     std::vector<class Swapchain*> m_createdSwapchains;
-    std::vector<Fence<SyncType::GpuToCpu>*> m_createdFencesC;
-    std::vector<Fence<SyncType::GpuToGpu>*> m_createdFencesG;
+    std::vector<Fence*> m_createdFences;
 };
 }// namespace RHI
 

@@ -9,10 +9,7 @@
 namespace HUH {
 namespace RHI {
 void Device::Destroy() {
-    for (auto fence : m_createdFencesC) {
-        delete fence;
-    }
-    for (auto fence : m_createdFencesG) {
+    for (auto fence : m_createdFences) {
         delete fence;
     }
     for (CommandBuffer* cmd : m_createdCommandBuffers) {

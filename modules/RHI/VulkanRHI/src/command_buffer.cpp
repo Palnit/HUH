@@ -112,12 +112,10 @@ void VulkanCommandBuffer::Destroy() {
     HUH::vkDestroyCommandPool(*m_device, m_commandPool, nullptr);
 }
 
-bool VulkanCommandBuffer::Submit(Fence<SyncType::GpuToGpu>* wait,
-                                 Fence<SyncType::GpuToGpu>* signal,
-                                 Fence<SyncType::GpuToCpu>* waitSignal) {
-    auto vk_wait_fence = dynamic_cast<VulkanFence<SyncType::GpuToGpu>*>(wait);
-    auto vk_signal_fence = dynamic_cast<VulkanFence<SyncType::GpuToGpu>*>(signal);
-    auto vk_wait_signal_fence = dynamic_cast<VulkanFence<SyncType::GpuToCpu>*>(waitSignal);
+bool VulkanCommandBuffer::Submit(Fence* wait, Fence* signal, Fence* waitSignal) {
+    auto vk_wait_fence = dynamic_cast<VulkanFence*>(wait);
+    auto vk_signal_fence = dynamic_cast<VulkanFence*>(signal);
+    auto vk_wait_signal_fence = dynamic_cast<VulkanFence*>(waitSignal);
     VkSemaphore waitSemaphores[] = {*vk_wait_fence};
     VkPipelineStageFlags waitFlags[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     VkSemaphore signalSemaphores[] = {*vk_signal_fence};

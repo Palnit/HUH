@@ -15,7 +15,7 @@ void VulkanImage::Destroy() {
     HUH::vkDestroyImageView(m_device->m_device, m_imageView, nullptr);
 }
 
-bool VulkanImage::Init(Intializer&& init) {
+bool VulkanImage::Init(Initializer&& init) {
     // TODO proper vulkan image creation from real image or swapchain image
     m_device = dynamic_cast<VulkanDevice*>(init.Device);
     m_size = init.Size;

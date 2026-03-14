@@ -1,6 +1,8 @@
 #pragma once
 
 #include <HUH/RHI/dynamic_rhi.h>
+#include <HUH/types.h>
+#include <HUH/Math/vector.h>
 #include <HUH/RHI/rhi_module.h>
 
 namespace HUH::RHI {
@@ -11,13 +13,13 @@ public:
     friend class DynamicRHI;
     friend class Swapchain;
 
-    struct Intializer {
+    struct Initializer {
         HUH::RHI::Device* Device = nullptr;
         HUH::RHI::Format Format = Format::UNKNOWN;
         Uint32 MipLevels = 0;
         HUH::Vector2u32 Size;
     };
-    virtual bool Init(Intializer&& init) = 0;
+    virtual bool Init(Initializer&& init) = 0;
     virtual void Destroy() = 0;
 
 protected:

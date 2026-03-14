@@ -10,7 +10,7 @@ public:
     friend class VulkanSwapchain;
     friend class VulkanCommandBuffer;
 
-    bool Init(Intializer&& init) override;
+    bool Init(Initializer&& init) override;
     void Destroy() override;
 
 protected:

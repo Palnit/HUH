@@ -4,40 +4,28 @@
 
 namespace HUH::RHI {
 
-template<SyncType>
-class HUH_VULKANRHI_API VulkanFence {
-    static_assert(false, "Unknown Sync Type");
-};
-
-template<>
-class HUH_VULKANRHI_API VulkanFence<SyncType::GpuToCpu> : public Fence<SyncType::GpuToCpu> {
+class HUH_VULKANRHI_API VulkanFence : public Fence {
 public:
     friend class VulkanDevice;
 
     bool Wait() override;
     bool Wait(Uint64 timeout) override;
 
-    operator VkFence() const { return m_fence; };
+    operator VkFence() const { return m_fence; }
+    operator VkSemaphore() const { return m_semaphore; }
+
+    operator VkFence();
+    operator VkSemaphore();
 
 protected:
+    void CreateFence(VkFenceCreateFlags flags);
+    void CreateSemaphore();
+
     VulkanFence(class VulkanDevice* device);
     ~VulkanFence() override;
 
     VulkanDevice* m_device;
     VkFence m_fence = nullptr;
-};
-
-template<>
-class HUH_VULKANRHI_API VulkanFence<SyncType::GpuToGpu> : public Fence<SyncType::GpuToGpu> {
-public:
-    friend class VulkanDevice;
-
-    operator VkSemaphore() const { return m_semaphore; };
-
-protected:
-    VulkanFence(class VulkanDevice* device);
-    ~VulkanFence() override;
-    VulkanDevice* m_device;
     VkSemaphore m_semaphore = nullptr;
 };
 

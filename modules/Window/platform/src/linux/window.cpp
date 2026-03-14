@@ -5,6 +5,7 @@ namespace HUH {
 
 DynamicLibrary Window::s_lib;
 Window::Window(const std::string& name, const Int32 width, const Int32 height) : WindowProto(name, width, height) {
+    // Look into magic so we can change the impl into morphing the 'this' pointer if possible
     if (!s_lib.IsLoaded() || s_createImpl == nullptr) {
         const std::string sessionType = std::getenv("XDG_SESSION_TYPE");
         if (sessionType == "wayland") {

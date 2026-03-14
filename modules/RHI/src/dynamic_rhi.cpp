@@ -16,6 +16,9 @@ DynamicRHI* DefaultCreate() {
     return nullptr;
 }
 DynamicRHI::CreateStub* DynamicRHI::Create = &DefaultCreate;
+
+DynamicRHI::~DynamicRHI(){HUH_ILOG(LogRHI, "Destroying RHI")}
+
 DynamicLibrary DynamicRHI::s_RHIImplSharedLibrary;
 void DynamicRHI::LoadRHI(const RenderApi api) {
     std::string rhiApiName;

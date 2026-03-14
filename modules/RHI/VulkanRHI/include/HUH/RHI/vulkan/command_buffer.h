@@ -17,9 +17,7 @@ public:
     void AddRenderTarget(Image* renderTarget) override;
     bool Init(Queue* queue) override;
     void Destroy() override;
-    bool Submit(Fence<SyncType::GpuToGpu>* wait,
-                Fence<SyncType::GpuToGpu>* signal,
-                Fence<SyncType::GpuToCpu>* waitSignal) override;
+    bool Submit(Fence* wait, Fence* signal, Fence* waitSignal) override;
     void Reset() override;
 
 protected:

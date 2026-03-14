@@ -51,7 +51,7 @@ if (HUH_LINUX)
                 ${WAYLAND_WINDOW_INC_PATH}/definitions.h
         )
         set(WAYLAND_SOURCE_FILES
-                platform/src/linux/wayland/window.cpp
+                platform/src/linux/Wayland/window.cpp
         )
         add_library(HUH-WaylandWindow SHARED ${WAYLAND_SOURCE_FILES} ${WAYLAND_HEADER_FILES})
         add_library(HUH::WaylandWindow ALIAS HUH-WaylandWindow)

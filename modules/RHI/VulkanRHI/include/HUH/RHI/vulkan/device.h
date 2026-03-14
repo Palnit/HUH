@@ -65,8 +65,7 @@ public:
     // ReSharper disable once CppNonExplicitConversionOperator
     operator VkDevice() const { return m_device; }
 
-    Fence<SyncType::GpuToCpu>* CreateFenceGtC() override;
-    Fence<SyncType::GpuToGpu>* CreateFenceGtG() override;
+    Fence* CreateFence() override;
 
 protected:
     explicit VulkanDevice(class VulkanDynamicRHI* parent, VkPhysicalDevice physicalDevice);

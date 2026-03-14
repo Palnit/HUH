@@ -1,4 +1,4 @@
-# find wayland from: https://gist.github.com/mariobadr/acc3c8adf4b4e722705be38c3deac59a with little modifications
+# find Wayland from: https://gist.github.com/mariobadr/acc3c8adf4b4e722705be38c3deac59a with little modifications
 find_path(
         WAYLAND_CLIENT_INCLUDE_DIR
         NAMES wayland-client.h

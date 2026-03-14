@@ -95,8 +95,8 @@ WaylandWindow::WaylandWindow(const std::string& name, const Int32 width, const I
     if (s_waylandDisplay == nullptr) {
         s_waylandDisplay = wl_display_connect(nullptr);
         if (!s_waylandDisplay) {
-            HUH_ELOG(LogWaylandWindow, "Couldn't connect to wayland display");
-            throw std::runtime_error("Couldn't connect to wayland display");
+            HUH_ELOG(LogWaylandWindow, "Couldn't connect to Wayland display");
+            throw std::runtime_error("Couldn't connect to Wayland display");
         }
         s_waylandRegistry = wl_display_get_registry(s_waylandDisplay);
         wl_registry_add_listener(s_waylandRegistry, &s_registryListener, nullptr);
