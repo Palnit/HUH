@@ -142,6 +142,23 @@ VkFormat VulkanDynamicRHI::ConvertFormat(Format format) {
     }
 }
 
+Format VulkanDynamicRHI::ConvertFormat(VkFormat format) {
+    switch (format) {
+        case VK_FORMAT_R8G8B8A8_UNORM:
+            return Format::R8G8B8A8_UNORM;
+        case VK_FORMAT_R8G8B8A8_SRGB:
+            return Format::R8G8B8A8_SRGB;
+        case VK_FORMAT_B8G8R8A8_UNORM:
+            return Format::B8G8R8A8_UNORM;
+        case VK_FORMAT_B8G8R8A8_SRGB:
+            return Format::B8G8R8A8_SRGB;
+        case VK_FORMAT_UNDEFINED:
+            return Format::UNKNOWN;
+        default:
+            return Format::UNKNOWN;
+    }
+}
+
 VulkanDynamicRHI::~VulkanDynamicRHI() {
     HUH_ILOG(LogVulkanRHI, "Destroying Vulkan RHI")
 }

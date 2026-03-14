@@ -13,10 +13,8 @@
 namespace HUH::RHI {
 
 bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minImageCount) {
-    if (!m_device) {
-        HUH_ELOG(LogVulkanRHI, "None vulkan device give to vulkan swapchain")
-        return false;
-    }
+
+    m_minImageCount = minImageCount;
     HUH::vkGetPhysicalDeviceSurfaceCapabilities2KHR(m_device->m_physicalDevice, &m_surface, &Details.capabilities);
     Uint32 size = 0;
     HUH::vkGetPhysicalDeviceSurfaceFormats2KHR(m_device->m_physicalDevice, &m_surface, &size, nullptr);
@@ -43,12 +41,12 @@ bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minIma
     }
 #endif
 
-    const auto vk_requestedFormat = VulkanDynamicRHI::ConvertFormat(format);
-    VkColorSpaceKHR colorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+    m_format = VulkanDynamicRHI::ConvertFormat(format);
+    m_colorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
     bool foundFormat = false;
     for (auto surfaceFormat : Details.surfaceFormats) {
-        if (surfaceFormat.surfaceFormat.format == vk_requestedFormat) {
-            colorSpace = surfaceFormat.surfaceFormat.colorSpace;
+        if (surfaceFormat.surfaceFormat.format == m_format) {
+            m_colorSpace = surfaceFormat.surfaceFormat.colorSpace;
             foundFormat = true;
         }
     }
@@ -59,63 +57,24 @@ bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minIma
         return false;
     }
 
-    if (minImageCount < Details.capabilities.surfaceCapabilities.minImageCount
-        || minImageCount > Details.capabilities.surfaceCapabilities.maxImageCount) {
+    if (m_minImageCount < Details.capabilities.surfaceCapabilities.minImageCount
+        || m_minImageCount > Details.capabilities.surfaceCapabilities.maxImageCount) {
         HUH_ELOG(LogVulkanRHI, "Invalid Image Count Requested: {}, Min Image Count: {}, Max Image Count {}",
-                 minImageCount, Details.capabilities.surfaceCapabilities.minImageCount,
+                 m_minImageCount, Details.capabilities.surfaceCapabilities.minImageCount,
                  Details.capabilities.surfaceCapabilities.maxImageCount);
         return false;
     }
     m_extent = Details.capabilities.surfaceCapabilities.currentExtent;
 
-    if (Details.capabilities.surfaceCapabilities.currentExtent.width == 0xFFFFFFFF) {
-        m_extent.height = m_windowParent->GetHeight();
-        m_extent.width = m_windowParent->GetWidth();
-    }
-
     VkPresentModeKHR vk_requestedPresentMode = ConvertPresentMode(presentMode);
-    VkPresentModeKHR foundPresentMode = VK_PRESENT_MODE_FIFO_KHR;
+    m_presentMode = VK_PRESENT_MODE_FIFO_KHR;
     for (auto vk_presentMode : Details.presentModes) {
         if (vk_presentMode == vk_requestedPresentMode) {
-            foundPresentMode = vk_presentMode;
+            m_presentMode = vk_presentMode;
         }
     }
 
-    VkSwapchainCreateInfoKHR createInfo = {.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-                                           .surface = m_surface.surface,
-                                           .minImageCount = minImageCount,
-                                           .imageFormat = vk_requestedFormat,
-                                           .imageColorSpace = colorSpace,
-                                           .imageExtent = m_extent,
-                                           .imageArrayLayers = 1,
-                                           .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-                                           .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
-                                           .queueFamilyIndexCount = 0,
-                                           .pQueueFamilyIndices = nullptr,
-                                           .preTransform = Details.capabilities.surfaceCapabilities.currentTransform,
-                                           .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-                                           .presentMode = foundPresentMode,
-                                           .clipped = true,
-                                           .oldSwapchain = VK_NULL_HANDLE};
-    if (auto err = HUH::vkCreateSwapchainKHR(m_device->m_device, &createInfo, nullptr, &m_swapchain);
-        err != VK_SUCCESS) {
-        HUH_ELOG(LogVulkanRHI, "Swapchain Creation Error: {}", err)
-        return false;
-    }
-
-    Uint32 imageCount = 0;
-    std::vector<VkImage> images;
-    HUH::vkGetSwapchainImagesKHR(m_device->m_device, m_swapchain, &imageCount, nullptr);
-    images.resize(imageCount);
-    HUH::vkGetSwapchainImagesKHR(m_device->m_device, m_swapchain, &imageCount, images.data());
-    for (auto image : images) {
-        m_images.push_back(new VulkanImage(image));
-        m_images.back()->Init({m_device, format, 1, {m_extent.width, m_extent.height}});
-    }
-
-    HUH_ILOG(LogVulkanRHI, "Swapchain Creation Successful")
-
-    return true;
+    return CreateSwapchain();
 }
 
 void VulkanSwapchain::Destroy() {
@@ -164,6 +123,54 @@ void VulkanSwapchain::Present(Queue* queue, Fence* fence) {
     };
 
     HUH::vkQueuePresentKHR(*vk_queue, &presentInfo);
+}
+
+bool VulkanSwapchain::CreateSwapchain() {
+    HUH::vkGetPhysicalDeviceSurfaceCapabilities2KHR(m_device->m_physicalDevice, &m_surface, &Details.capabilities);
+    if (Details.capabilities.surfaceCapabilities.currentExtent.width == 0xFFFFFFFF) {
+        m_extent.height = m_windowParent->GetHeight();
+        m_extent.width = m_windowParent->GetWidth();
+    }
+
+    VkSwapchainCreateInfoKHR createInfo = {.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+                                           .surface = m_surface.surface,
+                                           .minImageCount = m_minImageCount,
+                                           .imageFormat = m_format,
+                                           .imageColorSpace = m_colorSpace,
+                                           .imageExtent = m_extent,
+                                           .imageArrayLayers = 1,
+                                           .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+                                           .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
+                                           .queueFamilyIndexCount = 0,
+                                           .pQueueFamilyIndices = nullptr,
+                                           .preTransform = Details.capabilities.surfaceCapabilities.currentTransform,
+                                           .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+                                           .presentMode = m_presentMode,
+                                           .clipped = true,
+                                           .oldSwapchain = m_swapchain};
+    if (auto err = HUH::vkCreateSwapchainKHR(m_device->m_device, &createInfo, nullptr, &m_swapchain);
+        err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Swapchain Creation Error: {}", err)
+        return false;
+    }
+
+    Uint32 imageCount = 0;
+    std::vector<VkImage> images;
+    HUH::vkGetSwapchainImagesKHR(m_device->m_device, m_swapchain, &imageCount, nullptr);
+    images.resize(imageCount);
+    HUH::vkGetSwapchainImagesKHR(m_device->m_device, m_swapchain, &imageCount, images.data());
+    for (auto image : images) {
+        m_images.push_back(new VulkanImage(image));
+        m_images.back()->Init(
+            {m_device, VulkanDynamicRHI::ConvertFormat(m_format), 1, {m_extent.width, m_extent.height}});
+    }
+
+    HUH_ILOG(LogVulkanRHI, "Swapchain Creation Successful")
+    return true;
+}
+
+bool VulkanSwapchain::RecreateSwapchain() {
+    return true;
 }
 
 VulkanSwapchain::VulkanSwapchain(VulkanDevice* device, Window* window, VkSurfaceKHR surface, VulkanDynamicRHI* parent)

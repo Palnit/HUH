@@ -28,6 +28,8 @@ public:
     void Present(Queue* queue, Fence* fence) override;
 
 protected:
+    bool CreateSwapchain();
+    bool RecreateSwapchain();
     VulkanSwapchain(VulkanDevice* device, Window* window, VkSurfaceKHR surface, VulkanDynamicRHI* parent);
     ~VulkanSwapchain() override;
 
@@ -35,6 +37,10 @@ protected:
     VkSwapchainKHR m_swapchain = nullptr;
     VulkanDynamicRHI* m_parent;
     VulkanDevice* m_device;
+    VkColorSpaceKHR m_colorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+    VkPresentModeKHR m_presentMode = VK_PRESENT_MODE_FIFO_KHR;
+    VkFormat m_format = VK_FORMAT_UNDEFINED;
+    Uint32 m_minImageCount;
     VkExtent2D m_extent = {};
     Uint32 m_imageIndex = 0;
 };

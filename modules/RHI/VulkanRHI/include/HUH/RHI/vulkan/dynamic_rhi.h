@@ -19,6 +19,7 @@ public:
     HUH_VULKANRHI_API friend HUH::RHI::DynamicRHI* DynamicRHICreate();
 
     static VkFormat ConvertFormat(Format format);
+    static Format ConvertFormat(VkFormat format);
 
 protected:
     VulkanDynamicRHI() = default;
