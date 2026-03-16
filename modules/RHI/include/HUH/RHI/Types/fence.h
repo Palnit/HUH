@@ -12,6 +12,7 @@ public:
 
     virtual bool Wait() = 0;
     virtual bool Wait(Uint64 timeout) = 0;
+    virtual void Reset() = 0;
 
 protected:
     Fence() = default;

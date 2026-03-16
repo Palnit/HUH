@@ -20,10 +20,10 @@ HUH_VULKANLOADER_API std::string ToString(VkPresentModeKHR inEnum);
 
 }// namespace HUH
 
-ENUM_FORMATER(VkResult)
-ENUM_FORMATER(VkFormat)
-ENUM_FORMATER(VkShaderStageFlagBits)
+HUH_ENUM_FORMATER(VkResult)
+HUH_ENUM_FORMATER(VkFormat)
+HUH_ENUM_FORMATER(VkShaderStageFlagBits)
 #if defined(VK_KHR_surface)
-ENUM_FORMATER(VkColorSpaceKHR)
-ENUM_FORMATER(VkPresentModeKHR)
+HUH_ENUM_FORMATER(VkColorSpaceKHR)
+HUH_ENUM_FORMATER(VkPresentModeKHR)
 #endif

@@ -1,5 +1,5 @@
 #include <HUH/RHI/device.h>
-#include <HUH/RHI/command_buffer.h>
+#include <HUH/RHI/command_pool.h>
 #include <HUH/RHI/pipeline.h>
 #include <HUH/RHI/queue.h>
 #include <HUH/RHI/swapchain.h>
@@ -12,7 +12,7 @@ void Device::Destroy() {
     for (auto fence : m_createdFences) {
         delete fence;
     }
-    for (CommandBuffer* cmd : m_createdCommandBuffers) {
+    for (CommandPool* cmd : m_createdCommandBuffers) {
         cmd->Destroy();
         delete cmd;
     }

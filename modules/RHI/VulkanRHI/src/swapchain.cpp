@@ -13,7 +13,7 @@
 namespace HUH::RHI {
 
 bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minImageCount) {
-
+    m_format = format;
     m_minImageCount = minImageCount;
     HUH::vkGetPhysicalDeviceSurfaceCapabilities2KHR(m_device->m_physicalDevice, &m_surface, &Details.capabilities);
     Uint32 size = 0;
@@ -41,19 +41,19 @@ bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minIma
     }
 #endif
 
-    m_format = VulkanDynamicRHI::ConvertFormat(format);
+    m_vkFormat = VulkanDynamicRHI::ConvertFormat(format);
     m_colorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
     bool foundFormat = false;
     for (auto surfaceFormat : Details.surfaceFormats) {
-        if (surfaceFormat.surfaceFormat.format == m_format) {
+        if (surfaceFormat.surfaceFormat.format == m_vkFormat) {
             m_colorSpace = surfaceFormat.surfaceFormat.colorSpace;
             foundFormat = true;
         }
     }
 
     if (!foundFormat) {
-        // TODO LOG FORMAT AS STRING
-        HUH_ELOG(LogVulkanRHI, "Invalid format requested of swapchain");
+        // TODO FUCKING LOG?
+        HUH_ELOG(LogVulkanRHI, "Invalid format requested of swapchain ");
         return false;
     }
 
@@ -73,6 +73,8 @@ bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minIma
             m_presentMode = vk_presentMode;
         }
     }
+
+    m_eventHandler = m_windowParent->OnSizeChange.Add([&](auto, auto, auto) { RecreateSwapchain(); });
 
     return CreateSwapchain();
 }
@@ -102,6 +104,13 @@ Image* VulkanSwapchain::NextImage(Fence* fence, Uint64 timeout) {
     const auto vk_fence = dynamic_cast<VulkanFence*>(fence);
     if (auto err = HUH::vkAcquireNextImageKHR(*m_device, m_swapchain, timeout, *vk_fence, nullptr, &m_imageIndex);
         err != VK_SUCCESS) {
+        if (err == VK_ERROR_OUT_OF_DATE_KHR) {
+            if (!RecreateSwapchain()) {
+                HUH_ELOG(LogVulkanRHI, "NextImage Acquire Error: Failed to recrate swapchain")
+                return nullptr;
+            }
+            return NextImage(fence, timeout);
+        }
         HUH_ELOG(LogVulkanRHI, "NextImage Acquire Error: {}", err)
         return nullptr;
     }
@@ -122,7 +131,13 @@ void VulkanSwapchain::Present(Queue* queue, Fence* fence) {
         .pResults = nullptr,
     };
 
-    HUH::vkQueuePresentKHR(*vk_queue, &presentInfo);
+    if (auto err = HUH::vkQueuePresentKHR(*vk_queue, &presentInfo); err != VK_SUCCESS) {
+        if (err == VK_ERROR_OUT_OF_DATE_KHR) {
+            RecreateSwapchain();
+            return;
+        }
+        HUH_ELOG(LogVulkanRHI, "Persent Error: {}", err)
+    }
 }
 
 bool VulkanSwapchain::CreateSwapchain() {
@@ -130,12 +145,14 @@ bool VulkanSwapchain::CreateSwapchain() {
     if (Details.capabilities.surfaceCapabilities.currentExtent.width == 0xFFFFFFFF) {
         m_extent.height = m_windowParent->GetHeight();
         m_extent.width = m_windowParent->GetWidth();
+    } else {
+        m_extent = Details.capabilities.surfaceCapabilities.currentExtent;
     }
 
     VkSwapchainCreateInfoKHR createInfo = {.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
                                            .surface = m_surface.surface,
                                            .minImageCount = m_minImageCount,
-                                           .imageFormat = m_format,
+                                           .imageFormat = m_vkFormat,
                                            .imageColorSpace = m_colorSpace,
                                            .imageExtent = m_extent,
                                            .imageArrayLayers = 1,
@@ -162,7 +179,7 @@ bool VulkanSwapchain::CreateSwapchain() {
     for (auto image : images) {
         m_images.push_back(new VulkanImage(image));
         m_images.back()->Init(
-            {m_device, VulkanDynamicRHI::ConvertFormat(m_format), 1, {m_extent.width, m_extent.height}});
+            {m_device, VulkanDynamicRHI::ConvertFormat(m_vkFormat), 1, {m_extent.width, m_extent.height}});
     }
 
     HUH_ILOG(LogVulkanRHI, "Swapchain Creation Successful")
@@ -170,7 +187,11 @@ bool VulkanSwapchain::CreateSwapchain() {
 }
 
 bool VulkanSwapchain::RecreateSwapchain() {
-    return true;
+    HUH::vkDeviceWaitIdle(*m_device);
+    Swapchain::Destroy();
+    HUH::vkDestroySwapchainKHR(m_device->m_device, m_swapchain, nullptr);
+
+    return CreateSwapchain();
 }
 
 VulkanSwapchain::VulkanSwapchain(VulkanDevice* device, Window* window, VkSurfaceKHR surface, VulkanDynamicRHI* parent)

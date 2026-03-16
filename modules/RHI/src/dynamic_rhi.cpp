@@ -1,4 +1,4 @@
-#include "HUH/RHI/command_buffer.h"
+#include "HUH/RHI/command_pool.h"
 
 #include <HUH/RHI/dynamic_rhi.h>
 
@@ -10,7 +10,8 @@
 #include <HUH/RHI/device.h>
 #include <HUH/RHI/swapchain.h>
 
-namespace HUH::RHI {
+namespace HUH {
+namespace RHI {
 DynamicRHI* DefaultCreate() {
     HUH_LOG(LogRHI, Logging::Level::Warning, "No RHI Library Loaded Try using LoadRHI Or Look at error logs.")
     return nullptr;
@@ -47,5 +48,23 @@ void DynamicRHI::Destroy() {
         delete device;
     }
 }
+}// namespace RHI
 
-}// namespace HUH::RHI
+std::string ToString(RHI::Format in_enum) {
+    switch (in_enum) {
+        case RHI::Format::UNKNOWN:
+            return "Unknown";
+        case RHI::Format::R8G8B8A8_UNORM:
+            return "R8G8B8A8_UNORM";
+        case RHI::Format::R8G8B8A8_SRGB:
+            return "R8G8B8A8_SRGB";
+        case RHI::Format::B8G8R8A8_UNORM:
+            return "B8G8R8A8_UNORM";
+        case RHI::Format::B8G8R8A8_SRGB:
+            return "B8G8R8A8_SRGB";
+        default:
+            return "Unknown";
+    }
+}
+
+}// namespace HUH

@@ -4,6 +4,7 @@
 #include <HUH/RHI/types.h>
 #include <HUH/definitions.h>
 #include <HUH/dynamic_library.h>
+#include <format>
 
 namespace HUH {
 class Window;
@@ -41,5 +42,8 @@ protected:
     RenderApi m_renderApi = RenderApi::Unknown;
     static DynamicLibrary s_RHIImplSharedLibrary;
 };
+
 }// namespace RHI
+
+std::string ToString(RHI::Format in_enum);
 }// namespace HUH

@@ -1,3 +1,5 @@
+#include "HUH/event.h"
+
 #include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/swapchain.h>
 #include <vector>
@@ -39,9 +41,10 @@ protected:
     VulkanDevice* m_device;
     VkColorSpaceKHR m_colorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
     VkPresentModeKHR m_presentMode = VK_PRESENT_MODE_FIFO_KHR;
-    VkFormat m_format = VK_FORMAT_UNDEFINED;
+    VkFormat m_vkFormat = VK_FORMAT_UNDEFINED;
     Uint32 m_minImageCount;
     VkExtent2D m_extent = {};
     Uint32 m_imageIndex = 0;
+    HUH::EventHandler m_eventHandler;
 };
 }// namespace HUH::RHI

@@ -1,12 +1,7 @@
-#include <HUH/RHI/vulkan/command_buffer.h>
-#include <HUH/RHI/vulkan/pipeline.h>
-
-#include <HUH/RHI/vulkan/swapchain.h>
+#include <HUH/RHI/vulkan/command_pool.h>
 #include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/vulkan/device.h>
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
-
-#include "HUH/RHI/vulkan/shader.h"
 
 #include <vector>
 #include <HUH/types.h>

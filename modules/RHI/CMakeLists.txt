@@ -10,7 +10,7 @@ set(HEADER_FILES
         ${RHI_INC_PATH}/swapchain.h
         ${RHI_INC_PATH}/shader.h
         ${RHI_INC_PATH}/pipeline.h
-        ${RHI_INC_PATH}/command_buffer.h
+        ${RHI_INC_PATH}/command_pool.h
         ${RHI_INC_PATH}/Types/image.h
         ${RHI_INC_PATH}/Types/fence.h
 )
@@ -21,7 +21,7 @@ set(SOURCE_FILES
         src/swapchain.cpp
         src/shader.cpp
         src/pipeline.cpp
-        src/command_buffer.cpp
+        src/command_pool.cpp
         src/Types/image.cpp
         src/Types/fence.cpp
 )

@@ -10,6 +10,7 @@ public:
 
     bool Wait() override;
     bool Wait(Uint64 timeout) override;
+    void Reset() override;
 
     operator VkFence() const { return m_fence; }
     operator VkSemaphore() const { return m_semaphore; }

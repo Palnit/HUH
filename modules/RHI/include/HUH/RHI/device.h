@@ -41,10 +41,11 @@ public:
     virtual Queue* CreateQueue(Queue::Type type) = 0;
     virtual class Shader* CreateShader(void* byteCode, Uint64 size) = 0;
     virtual class Pipeline* CreatePipeline() = 0;
-    virtual class CommandBuffer* CreateCommandBuffer(Pipeline* pipeline) = 0;
+    virtual class CommandPool* CreateCommandPool(Pipeline* pipeline) = 0;
     virtual class Swapchain* CreateSwapchain(Window& window) = 0;
 
     virtual Fence* CreateFence() = 0;
+    virtual std::vector<Fence*> CreateFence(Uint32 num) = 0;
 
     HUH_NODISCARD Queue* GetQueue(size_t index) const;
     HUH_NODISCARD size_t GetNumberOfQueues() const { return m_queues.size(); };
@@ -55,7 +56,7 @@ protected:
     std::vector<Queue*> m_queues;
     std::vector<Shader*> m_createdShaders;
     std::vector<Pipeline*> m_createdPipelines;
-    std::vector<CommandBuffer*> m_createdCommandBuffers;
+    std::vector<CommandPool*> m_createdCommandBuffers;
     std::vector<class Swapchain*> m_createdSwapchains;
     std::vector<Fence*> m_createdFences;
 };
@@ -66,5 +67,5 @@ std::string HUH_RHI_API ToString(RHI::Device::Vendor inEnum);
 
 }// namespace HUH
 
-ENUM_FORMATER(HUH::RHI::Device::Type)
-ENUM_FORMATER(HUH::RHI::Device::Vendor)
+HUH_ENUM_FORMATER(HUH::RHI::Device::Type)
+HUH_ENUM_FORMATER(HUH::RHI::Device::Vendor)

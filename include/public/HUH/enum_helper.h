@@ -24,7 +24,7 @@ bool CheckFlag(const EnumName flags, const EnumName contains) {
     return (flags & contains) != 0;
 }
 
-#define ENUM_FORMATER(EnumName) \
+#define HUH_ENUM_FORMATER(EnumName) \
 template<> \
 struct std::formatter<EnumName> : std::formatter<std::string> { \
     auto format(EnumName p, format_context& ctx) const { \

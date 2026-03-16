@@ -15,8 +15,13 @@ bool VulkanFence::Wait(const Uint64 timeout) {
         HUH::vkResetFences(*m_device, 1, &m_fence);
         return false;
     }
-    HUH::vkResetFences(*m_device, 1, &m_fence);
     return true;
+}
+
+void VulkanFence::Reset() {
+    if (m_fence) {
+        HUH::vkResetFences(*m_device, 1, &m_fence);
+    }
 }
 
 VulkanFence::operator VkFence() {
@@ -30,7 +35,7 @@ VulkanFence::operator VkSemaphore() {
 }
 
 void VulkanFence::CreateFence(VkFenceCreateFlags flags) {
-    if (m_fence != nullptr) {
+    if (m_fence) {
         return;
     }
     VkFenceCreateInfo fenceCreateInfo{.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, .flags = flags};
@@ -41,7 +46,7 @@ void VulkanFence::CreateFence(VkFenceCreateFlags flags) {
 }
 
 void VulkanFence::CreateSemaphore() {
-    if (m_semaphore != nullptr) {
+    if (m_semaphore) {
         return;
     }
     VkSemaphoreCreateInfo semaphoreCreateInfo{.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};

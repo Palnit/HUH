@@ -59,13 +59,14 @@ public:
 
     Shader* CreateShader(void* byteCode, Uint64 size) override;
     Pipeline* CreatePipeline() override;
-    CommandBuffer* CreateCommandBuffer(Pipeline* pipeline) override;
+    CommandPool* CreateCommandPool(Pipeline* pipeline) override;
     Swapchain* CreateSwapchain(Window& window) override;
 
     // ReSharper disable once CppNonExplicitConversionOperator
     operator VkDevice() const { return m_device; }
 
     Fence* CreateFence() override;
+    std::vector<Fence*> CreateFence(Uint32 num) override;
 
 protected:
     explicit VulkanDevice(class VulkanDynamicRHI* parent, VkPhysicalDevice physicalDevice);

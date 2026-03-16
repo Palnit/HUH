@@ -3,7 +3,6 @@
 #include <HUH/RHI/dynamic_rhi.h>
 #include <HUH/types.h>
 #include <HUH/Math/vector.h>
-#include <HUH/RHI/rhi_module.h>
 
 namespace HUH::RHI {
 class Device;

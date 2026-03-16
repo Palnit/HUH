@@ -7,5 +7,6 @@ void Swapchain::Destroy() {
         image->Destroy();
         delete image;
     }
+    m_images.clear();
 }
 }// namespace HUH::RHI

@@ -6,9 +6,9 @@ namespace HUH::RHI {
 class VulkanPipeline : public Pipeline {
 public:
     friend class VulkanDevice;
-    friend class VulkanCommandBuffer;
+    friend class VulkanCommandPool;
     friend class VulkanImage;
-    bool Init() override;
+    bool Init(std::vector<Format> formats) override;
     void Destroy() override;
     void AddShader(class Shader* shader) override;
 
@@ -19,7 +19,5 @@ protected:
     VkPipelineLayout m_layout = nullptr;
     VkPipeline m_pipeline = nullptr;
     std::vector<VkPipelineShaderStageCreateInfo> m_shaderStages;
-    // TODO refactor this to separate class maybe ?
-    VkRenderPass m_renderPass = nullptr;
 };
 }// namespace HUH::RHI

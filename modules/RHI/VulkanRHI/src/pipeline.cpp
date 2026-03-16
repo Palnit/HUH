@@ -2,10 +2,13 @@
 
 #include <HUH/types.h>
 #include <HUH/RHI/vulkan/pipeline.h>
+
+#include "HUH/RHI/vulkan/dynamic_rhi.h"
+
 #include <HUH/RHI/vulkan/device.h>
 
 namespace HUH::RHI {
-bool VulkanPipeline::Init() {
+bool VulkanPipeline::Init(std::vector<Format> formats) {
     // TODO REFACTOR THIS TO MAKE IT WORK WITHOUT ME HAVING TO DO MAGIC
     std::vector<VkDynamicState> dynamicStates{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo = {
@@ -94,69 +97,38 @@ bool VulkanPipeline::Init() {
         return false;
     }
 
-    // TODO REFACTOR THIS TO SEPARATE CLASS
-    VkAttachmentDescription attachments{
-        .format = VK_FORMAT_R8G8B8A8_SRGB,
-        .samples = VK_SAMPLE_COUNT_1_BIT,
-        .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-        .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-        .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-        .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-        .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-        .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-    };
-
-    VkAttachmentReference colorAttachmentRef{};
-    colorAttachmentRef.attachment = 0;
-    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-    VkSubpassDescription subpass{};
-    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    subpass.colorAttachmentCount = 1;
-    subpass.pColorAttachments = &colorAttachmentRef;
-
-    VkSubpassDependency dependency{};
-    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-    dependency.dstSubpass = 0;
-    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependency.srcAccessMask = 0;
-    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-    VkRenderPassCreateInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo.attachmentCount = 1;
-    renderPassInfo.pAttachments = &attachments;
-    renderPassInfo.subpassCount = 1;
-    renderPassInfo.pSubpasses = &subpass;
-    renderPassInfo.dependencyCount = 1;
-    renderPassInfo.pDependencies = &dependency;
-
-    if (auto err = HUH::vkCreateRenderPass(m_device->m_device, &renderPassInfo, nullptr, &m_renderPass);
-        err != VK_SUCCESS) {
-        HUH_ELOG(LogVulkanRHI, "Error creating render pass: {}", err);
+    std::vector<VkFormat> vk_formats;
+    vk_formats.reserve(formats.size());
+    for (auto& format : formats) {
+        vk_formats.push_back(VulkanDynamicRHI::ConvertFormat(format));
     }
 
-    VkGraphicsPipelineCreateInfo pipelineInfo{};
-    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    pipelineInfo.stageCount = 2;
-    pipelineInfo.pStages = m_shaderStages.data();
-    pipelineInfo.pVertexInputState = &vertexInputCreateInfo;
-    pipelineInfo.pInputAssemblyState = &inputAssemblyCreateInfo;
-    pipelineInfo.pViewportState = &viewportStateCreateInfo;
-    pipelineInfo.pRasterizationState = &rasterizationStateCreateInfo;
-    pipelineInfo.pMultisampleState = &multisampleStateCreateInfo;
-    pipelineInfo.pDepthStencilState = nullptr;// Optional
-    pipelineInfo.pColorBlendState = &colorBlending;
-    pipelineInfo.pDynamicState = &dynamicStateCreateInfo;
-    pipelineInfo.layout = m_layout;
-    pipelineInfo.renderPass = m_renderPass;
-    pipelineInfo.subpass = 0;
-    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;// Optional
-    pipelineInfo.basePipelineIndex = -1;             // Optional
+    VkPipelineRenderingCreateInfo pipelineRenderingCreateInfo{
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO,
+        .colorAttachmentCount = static_cast<Uint32>(vk_formats.size()),
+        .pColorAttachmentFormats = vk_formats.data()};
 
-    if (auto err =
-            vkCreateGraphicsPipelines(m_device->m_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_pipeline);
+    VkGraphicsPipelineCreateInfo pipelineInfo{
+        .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+        .pNext = &pipelineRenderingCreateInfo,
+        .stageCount = 2,
+        .pStages = m_shaderStages.data(),
+        .pVertexInputState = &vertexInputCreateInfo,
+        .pInputAssemblyState = &inputAssemblyCreateInfo,
+        .pViewportState = &viewportStateCreateInfo,
+        .pRasterizationState = &rasterizationStateCreateInfo,
+        .pMultisampleState = &multisampleStateCreateInfo,
+        .pDepthStencilState = nullptr,// Optional
+        .pColorBlendState = &colorBlending,
+        .pDynamicState = &dynamicStateCreateInfo,
+        .layout = m_layout,
+        .renderPass = nullptr,
+        .subpass = 0,
+        .basePipelineHandle = nullptr,// Optional
+        .basePipelineIndex = -1,      // Optional
+    };
+
+    if (auto err = vkCreateGraphicsPipelines(m_device->m_device, nullptr, 1, &pipelineInfo, nullptr, &m_pipeline);
         err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "Error creating graphics pipeline: {}", err);
         return false;
@@ -169,7 +141,6 @@ bool VulkanPipeline::Init() {
 void VulkanPipeline::Destroy() {
     HUH::vkDestroyPipeline(m_device->m_device, m_pipeline, nullptr);
     HUH::vkDestroyPipelineLayout(m_device->m_device, m_layout, nullptr);
-    HUH::vkDestroyRenderPass(m_device->m_device, m_renderPass, nullptr);
 }
 
 void VulkanPipeline::AddShader(class Shader* shader) {
@@ -179,4 +150,5 @@ void VulkanPipeline::AddShader(class Shader* shader) {
 VulkanPipeline::~VulkanPipeline() {
     HUH_ILOG(LogVulkanRHI, "VulkanPipeline Destroyed")
 }
+
 }// namespace HUH::RHI

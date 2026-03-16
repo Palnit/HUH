@@ -4,7 +4,7 @@
 #include <HUH/RHI/vulkan/device.h>
 
 #include "HUH/RHI/vulkan/dynamic_rhi.h"
-#include <HUH/RHI/vulkan/command_buffer.h>
+#include <HUH/RHI/vulkan/command_pool.h>
 #include "HUH/RHI/vulkan/shader.h"
 #include "HUH/RHI/vulkan/swapchain.h"
 #include "HUH/RHI/vulkan/Types/fence.h"
@@ -256,6 +256,17 @@ Fence* VulkanDevice::CreateFence() {
     return m_createdFences.back();
 }
 
+std::vector<Fence*> VulkanDevice::CreateFence(Uint32 num) {
+    std::vector<Fence*> fences;
+    fences.reserve(num);
+    for (size_t i = 0; i < num; i++) {
+        auto fence = new VulkanFence(this);
+        m_createdFences.push_back(fence);
+        fences.push_back(fence);
+    }
+    return fences;
+}
+
 Shader* VulkanDevice::CreateShader(void* byteCode, Uint64 size) {
     m_createdShaders.push_back(new VulkanShader(this, byteCode, size));
     return m_createdShaders.back();
@@ -266,9 +277,9 @@ Pipeline* VulkanDevice::CreatePipeline() {
     return m_createdPipelines.back();
 }
 
-CommandBuffer* VulkanDevice::CreateCommandBuffer(Pipeline* pipeline) {
+CommandPool* VulkanDevice::CreateCommandPool(Pipeline* pipeline) {
     auto vk_pipeline = dynamic_cast<VulkanPipeline*>(pipeline);
-    m_createdCommandBuffers.push_back(new VulkanCommandBuffer(this, vk_pipeline));
+    m_createdCommandBuffers.push_back(new VulkanCommandPool(this, vk_pipeline));
     return m_createdCommandBuffers.back();
 }
 
