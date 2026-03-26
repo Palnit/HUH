@@ -7,7 +7,7 @@
 #include <HUH/RHI/command_pool.h>
 
 namespace HUH::RHI {
-class VulkanCommandPool : public CommandPool {
+class HUH_VULKANRHI_API VulkanCommandPool : public CommandPool {
 public:
     friend class VulkanPipeline;
     friend class VulkanDevice;

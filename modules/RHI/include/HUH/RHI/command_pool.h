@@ -4,7 +4,7 @@
 
 namespace HUH::RHI {
 class Fence;
-class CommandPool {
+class HUH_RHI_API CommandPool {
 public:
     class CommandBuffer {
     public:

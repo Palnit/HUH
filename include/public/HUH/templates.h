@@ -19,20 +19,18 @@ struct ClassFuncTypeHelper<false, ClassType, RetType(Args...)> {
 template<bool IsConst, typename ClassType, typename Function>
 using ClassFuncTypeHelper_t = ClassFuncTypeHelper<IsConst, ClassType, Function>::Type;
 
-template<typename MemberPtr>
-struct ClassMemberTypeHelper;
-
-template<class ClassType, class MemberType>
-struct ClassMemberTypeHelper<MemberType ClassType::*> {
-    typedef MemberType MType;
-    typedef ClassType CType;
+template<typename T, typename R, R T::* M>
+constexpr std::size_t offset_of() {
+    return reinterpret_cast<std::size_t>(&(((T*)0)->*M));
 };
 
-template<class ClassType, class MemberType, MemberType ClassType::* M>
-struct ClassMemberHelper {};
+template<auto M>
+struct ClassMemberTypeHelper;
 
-template<typename MemberPtr>
-struct ClassMemberHelper<ClassMemberTypeHelper<MemberPtr>::CType, ClassMemberTypeHelper<MemberPtr>::MType, MemberPtr> {
+template<class ClassType, class MemberType, MemberType ClassType::* M>
+struct ClassMemberTypeHelper<M> {
+    typedef MemberType Type;
+    inline static size_t Offset = offset_of<ClassType, MemberType, M>();
 };
 
 // Copy Cv
