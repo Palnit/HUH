@@ -8,7 +8,7 @@
 #include <HUH/RHI/vulkan/device.h>
 
 namespace HUH::RHI {
-bool VulkanPipeline::Init(std::vector<Format> formats) {
+bool VulkanPipeline::Init(Initializer&& initializer) {
     // TODO REFACTOR THIS TO MAKE IT WORK WITHOUT ME HAVING TO DO MAGIC
     std::vector<VkDynamicState> dynamicStates{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo = {
@@ -98,8 +98,8 @@ bool VulkanPipeline::Init(std::vector<Format> formats) {
     }
 
     std::vector<VkFormat> vk_formats;
-    vk_formats.reserve(formats.size());
-    for (auto& format : formats) {
+    vk_formats.reserve(initializer.formats.size());
+    for (auto& format : initializer.formats) {
         vk_formats.push_back(VulkanDynamicRHI::ConvertFormat(format));
     }
 

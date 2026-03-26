@@ -3,12 +3,19 @@
 #include <HUH/RHI/rhi_module.h>
 #include <HUH/RHI/dynamic_rhi.h>
 
+class VertexFactory;
+
 namespace HUH::RHI {
 class Pipeline {
 public:
+    struct Initializer {
+        std::vector<Format> formats;
+        VertexFactory& vertexFactory;
+    };
+
     friend class CommandPool;
     friend class Device;
-    virtual bool Init(std::vector<Format> formats) = 0;
+    virtual bool Init(Initializer&& initializer) = 0;
     virtual void Destroy() = 0;
     virtual void AddShader(class Shader* shader) = 0;
 

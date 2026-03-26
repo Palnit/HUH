@@ -60,7 +60,6 @@ bool VulkanCommandPool::VulkanCommandBuffer::Begin() {
     HUH::vkCmdBeginRendering(m_commandBuffer, &renderingInfo);
     HUH::vkCmdBindPipeline(m_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_parent->m_pipeline->m_pipeline);
 
-    // TODO REFACTOR THIS TO NOT BE TEMPORARY
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;

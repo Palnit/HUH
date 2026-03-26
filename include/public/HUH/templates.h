@@ -19,6 +19,22 @@ struct ClassFuncTypeHelper<false, ClassType, RetType(Args...)> {
 template<bool IsConst, typename ClassType, typename Function>
 using ClassFuncTypeHelper_t = ClassFuncTypeHelper<IsConst, ClassType, Function>::Type;
 
+template<typename MemberPtr>
+struct ClassMemberTypeHelper;
+
+template<class ClassType, class MemberType>
+struct ClassMemberTypeHelper<MemberType ClassType::*> {
+    typedef MemberType MType;
+    typedef ClassType CType;
+};
+
+template<class ClassType, class MemberType, MemberType ClassType::* M>
+struct ClassMemberHelper {};
+
+template<typename MemberPtr>
+struct ClassMemberHelper<ClassMemberTypeHelper<MemberPtr>::CType, ClassMemberTypeHelper<MemberPtr>::MType, MemberPtr> {
+};
+
 // Copy Cv
 
 template<typename From, typename To>

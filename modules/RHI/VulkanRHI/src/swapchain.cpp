@@ -189,7 +189,6 @@ bool VulkanSwapchain::CreateSwapchain() {
 bool VulkanSwapchain::RecreateSwapchain() {
     HUH::vkDeviceWaitIdle(*m_device);
     Swapchain::Destroy();
-    HUH::vkDestroySwapchainKHR(m_device->m_device, m_swapchain, nullptr);
 
     return CreateSwapchain();
 }

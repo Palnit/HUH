@@ -8,7 +8,7 @@ public:
     friend class VulkanDevice;
     friend class VulkanCommandPool;
     friend class VulkanImage;
-    bool Init(std::vector<Format> formats) override;
+    bool Init(Initializer&& initializer) override;
     void Destroy() override;
     void AddShader(class Shader* shader) override;
 
