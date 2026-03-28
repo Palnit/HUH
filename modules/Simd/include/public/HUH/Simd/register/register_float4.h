@@ -15,13 +15,21 @@ public:
     template<std::size_t size, std::enable_if_t<size == 4, bool> = true>
     HUH_FORCE_INLINE Register(const float (&t)[size]) noexcept : data(_mm_loadu_ps(t)) {}
 
-    explicit Register(float x, float y, float z, float w) : data(_mm_setr_ps(x, y, z, w)) {}
+    template<std::size_t size, std::enable_if_t<size == 4, bool> = true>
+    static HUH_FORCE_INLINE Register AlignedLoad(const float (&t)[size]) noexcept {
+        return _mm_load_ps(t);
+    }
+
+    HUH_FORCE_INLINE Register(const float x, const float y, const float z, const float w)
+        : data(_mm_setr_ps(x, y, z, w)) {}
 
     HUH_FORCE_INLINE Register(__m128 v) : data(v) {}
 
     HUH_FORCE_INLINE operator __m128() const { return data; }
 
     HUH_FORCE_INLINE void Store(float* ptr) const { _mm_storeu_ps(ptr, data); }
+
+    HUH_FORCE_INLINE void AlignedStore(float* ptr) const { _mm_store_ps(ptr, data); }
 
     HUH_FORCE_INLINE Register& operator+=(const Register& rhs) noexcept { return *this = (*this + rhs); }
 

@@ -38,8 +38,8 @@ read.huh <- function(file, skip, chunk, keep_rows) {
 }
 
 
-scalar_data <- read.huh("/home/palnit/Desktop/code/HUHPlayground/cmake-build-debug/lib/HUH/modules/Math/benchmarks/Scalar.csv", 10, 16, c("real_time", "time_unit"))
-simd_data <- read.huh("/home/palnit/Desktop/code/HUHPlayground/cmake-build-debug/lib/HUH/modules/Math/benchmarks/Simd.csv", 10, 16, c("real_time", "time_unit"))
+scalar_data <- read.huh("/home/palnit/Desktop/code/HUHPlayground/cmake-build-debug/lib/HUH/modules/Math/benchmarks/Scalar.csv", 9, 16, c("real_time", "time_unit"))
+simd_data <- read.huh("/home/palnit/Desktop/code/HUHPlayground/cmake-build-debug/lib/HUH/modules/Math/benchmarks/Simd.csv", 9, 16, c("real_time", "time_unit"))
 
 for (i in 1:length(scalar_data)) {
 

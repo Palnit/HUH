@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 // ClassFuncTypeHelpe
 
 namespace HUH {
@@ -20,8 +22,8 @@ template<bool IsConst, typename ClassType, typename Function>
 using ClassFuncTypeHelper_t = ClassFuncTypeHelper<IsConst, ClassType, Function>::Type;
 
 template<typename T, typename R, R T::* M>
-constexpr std::size_t offset_of() {
-    return reinterpret_cast<std::size_t>(&(((T*)0)->*M));
+constexpr size_t offset_of() {
+    return reinterpret_cast<size_t>(&(((T*)0)->*M));
 };
 
 template<auto M>
@@ -30,6 +32,7 @@ struct ClassMemberTypeHelper;
 template<class ClassType, class MemberType, MemberType ClassType::* M>
 struct ClassMemberTypeHelper<M> {
     typedef MemberType Type;
+    typedef ClassType StructType;
     inline static size_t Offset = offset_of<ClassType, MemberType, M>();
 };
 

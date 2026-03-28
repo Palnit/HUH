@@ -1,5 +1,7 @@
 #pragma once
 
+#include "templates.h"
+
 #include <functional>
 #include <type_traits>
 
@@ -86,5 +88,8 @@ concept HasMultiplication = requires(T a, U b) { b * a; };
 
 template<typename T, typename U>
 concept HasDivision = requires(T a, U b) { b / a; };
+
+template<auto T>
+concept IsMemberPtr = requires() { typename HUH::ClassMemberTypeHelper<T>::Type; };
 
 }// namespace HUH
