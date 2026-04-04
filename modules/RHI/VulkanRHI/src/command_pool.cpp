@@ -1,12 +1,12 @@
 #include <HUH/Math/vector.h>
+
+#include <HUH/RHI/Types/image.h>
+#include <HUH/RHI/vulkan/Types/fence.h>
+#include <HUH/RHI/vulkan/Types/image.h>
 #include <HUH/RHI/vulkan/command_pool.h>
-
-#include "HUH/RHI/Types/image.h"
-#include "HUH/RHI/vulkan/queue.h"
-#include "HUH/RHI/vulkan/Types/fence.h"
-#include "HUH/RHI/vulkan/Types/image.h"
-
 #include <HUH/RHI/vulkan/device.h>
+#include <HUH/RHI/vulkan/pipeline.h>
+#include <HUH/RHI/vulkan/queue.h>
 
 namespace HUH::RHI {
 
@@ -152,31 +152,6 @@ bool VulkanCommandPool::Init(Uint32 bufferCount, Queue* queue) {
 void VulkanCommandPool::Destroy() {
     HUH::vkDestroyCommandPool(*m_device, m_commandPool, nullptr);
 }
-
-bool VulkanCommandPool::VulkanCommandBuffer::Submit(Fence* wait, Fence* signal, Fence* waitSignal) {
-    auto vk_wait_fence = dynamic_cast<VulkanFence*>(wait);
-    auto vk_signal_fence = dynamic_cast<VulkanFence*>(signal);
-    auto vk_wait_signal_fence = dynamic_cast<VulkanFence*>(waitSignal);
-    VkSemaphore waitSemaphores[] = {*vk_wait_fence};
-    VkPipelineStageFlags waitFlags[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-    VkSemaphore signalSemaphores[] = {*vk_signal_fence};
-    VkSubmitInfo submitInfo = {
-        .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-        .waitSemaphoreCount = 1,
-        .pWaitSemaphores = waitSemaphores,
-        .pWaitDstStageMask = waitFlags,
-        .commandBufferCount = 1,
-        .pCommandBuffers = &m_commandBuffer,
-        .signalSemaphoreCount = 1,
-        .pSignalSemaphores = signalSemaphores,
-    };
-
-    if (auto err = HUH::vkQueueSubmit(*m_parent->m_queue, 1, &submitInfo, *vk_wait_signal_fence); err != VK_SUCCESS) {
-        HUH_ELOG(LogVulkanRHI, "Submit Error: {}", err)
-        return false;
-    }
-    return true;
-}// namespace HUH::RHI
 
 void VulkanCommandPool::VulkanCommandBuffer::VulkanCommandBuffer::Reset() {
     HUH::vkResetCommandBuffer(m_commandBuffer, 0);

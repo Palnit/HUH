@@ -1,7 +1,8 @@
 #pragma once
 
-#include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/queue.h>
+#include <HUH/RHI/vulkan/fwd.h>
+#include <HUH/RHI/vulkan/vulkan_defines.h>
 
 namespace HUH::RHI {
 
@@ -12,6 +13,7 @@ class HUH_VULKANRHI_API VulkanQueue final : public Queue {
 
 public:
     operator VkQueue();
+    bool Submit(CommandPool::CommandBuffer* commandPool, Fence* wait, Fence* signal, Fence* waitSignal) override;
 
 private:
     VulkanQueue(class VulkanDevice* device,
@@ -25,7 +27,8 @@ private:
           m_properties(properties) {}
     ~VulkanQueue() override {
         HUH_ILOG(LogVulkanRHI, "Destroying VulkanQueue: Family {}, Queue {}", m_familyIndex, m_queueIndex);
-    };
+    }
+
     VulkanDevice* m_device;
     size_t m_familyIndex = 0;
     size_t m_queueIndex = 0;

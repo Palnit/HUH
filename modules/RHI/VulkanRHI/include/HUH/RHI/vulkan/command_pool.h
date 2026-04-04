@@ -1,10 +1,9 @@
 #pragma once
-#include "pipeline.h"
-#include "queue.h"
-#include "HUH/Types/tuple.h"
 
-#include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/command_pool.h>
+#include <HUH/RHI/vulkan/fwd.h>
+#include <HUH/RHI/vulkan/vulkan_defines.h>
+#include <HUH/Types/tuple.h>
 
 namespace HUH::RHI {
 class HUH_VULKANRHI_API VulkanCommandPool : public CommandPool {
@@ -14,16 +13,16 @@ public:
     class VulkanCommandBuffer : public CommandBuffer {
     public:
         friend class VulkanCommandPool;
+        friend class VulkanQueue;
         bool Begin() override;
         void End() override;
         void AddRenderTarget(Image* renderTarget) override;
-        bool Submit(Fence* wait, Fence* signal, Fence* waitSignal) override;
         void Reset() override;
 
     protected:
         VulkanCommandPool* m_parent;
         VkCommandBuffer m_commandBuffer;
-        class VulkanImage* m_renderTarget = nullptr;
+        VulkanImage* m_renderTarget = nullptr;
 
         VulkanCommandBuffer(VulkanCommandPool* parent, VkCommandBuffer commandBuffer)
             : CommandBuffer(),

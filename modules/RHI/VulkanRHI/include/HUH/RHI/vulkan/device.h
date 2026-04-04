@@ -1,9 +1,10 @@
 #pragma once
 
-#include <unordered_map>
-#include <HUH/definitions.h>
 #include <HUH/RHI/device.h>
+#include <HUH/RHI/vulkan/fwd.h>
 #include <HUH/RHI/vulkan/vulkan_defines.h>
+#include <HUH/definitions.h>
+#include <unordered_map>
 
 namespace HUH::RHI {
 class HUH_VULKANRHI_API VulkanDevice final : public Device {
@@ -53,7 +54,7 @@ public:
     HUH_NODISCARD Device::MemoryStatistics GetMemoryStatistics() override;
     bool Init() override;
     void Destroy() override;
-    Queue* CreateQueue(Queue::Type type) override;
+    Queue* RequestQueue(Queue::Type type) override;
 
     void QueryVulkanPropertiesAndFeatures();
 
@@ -68,13 +69,18 @@ public:
     Fence* CreateFence() override;
     std::vector<Fence*> CreateFence(Uint32 num) override;
 
+    MemoryAllocator* CreateMemoryAllocator() override;
+    Buffer* CreateBuffer(Buffer::Type type, Uint64 Size) override;
+
 protected:
-    explicit VulkanDevice(class VulkanDynamicRHI* parent, VkPhysicalDevice physicalDevice);
+    explicit VulkanDevice(VulkanDynamicRHI* parent, VkPhysicalDevice physicalDevice);
     ~VulkanDevice() override;
 
     VulkanDynamicRHI* m_parent;
     VkPhysicalDevice m_physicalDevice = nullptr;
     VkDevice m_device = nullptr;
+    // TODO: replace with 2
+    VkPhysicalDeviceMemoryProperties m_memoryProperties;
     std::vector<VkQueueFamilyProperties> m_queueFamilies;
     std::unordered_map<size_t, size_t> m_familyQueueCount;
 };

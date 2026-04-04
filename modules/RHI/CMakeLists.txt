@@ -2,6 +2,7 @@ set(RHI_INC_PATH "include/HUH/RHI")
 
 
 set(HEADER_FILES
+        ${RHI_INC_PATH}/fwd.h
         ${RHI_INC_PATH}/dynamic_rhi.h
         ${RHI_INC_PATH}/types.h
         ${RHI_INC_PATH}/device.h
@@ -12,8 +13,10 @@ set(HEADER_FILES
         ${RHI_INC_PATH}/pipeline.h
         ${RHI_INC_PATH}/command_pool.h
         ${RHI_INC_PATH}/vertex_factory.h
+        ${RHI_INC_PATH}/memory_allocator.h
         ${RHI_INC_PATH}/Types/image.h
         ${RHI_INC_PATH}/Types/fence.h
+        ${RHI_INC_PATH}/Types/buffer.h
 )
 set(SOURCE_FILES
         src/dynamic_rhi.cpp
@@ -24,8 +27,10 @@ set(SOURCE_FILES
         src/pipeline.cpp
         src/command_pool.cpp
         src/vertex_factory.cpp
+        src/memory_allocator.cpp
         src/Types/image.cpp
         src/Types/fence.cpp
+        src/Types/buffer.cpp
 )
 
 add_library(HUH-RHI SHARED ${HEADER_FILES} ${SOURCE_FILES})

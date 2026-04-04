@@ -1,4 +1,5 @@
 #pragma once
+#include <HUH/RHI/vulkan/fwd.h>
 #include "HUH/RHI/Types/fence.h"
 #include "HUH/RHI/vulkan/vulkan_defines.h"
 
@@ -22,7 +23,7 @@ protected:
     void CreateFence(VkFenceCreateFlags flags);
     void CreateSemaphore();
 
-    VulkanFence(class VulkanDevice* device);
+    VulkanFence(VulkanDevice* device);
     ~VulkanFence() override;
 
     VulkanDevice* m_device;

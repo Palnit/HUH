@@ -1,6 +1,9 @@
 #pragma once
-#include <HUH/RHI/vulkan/vulkan_defines.h>
+
 #include <HUH/RHI/pipeline.h>
+#include <HUH/RHI/vertex_factory.h>
+#include <HUH/RHI/vulkan/fwd.h>
+#include <HUH/RHI/vulkan/vulkan_defines.h>
 
 namespace HUH::RHI {
 class VulkanPipeline : public Pipeline {
@@ -13,9 +16,11 @@ public:
     void AddShader(class Shader* shader) override;
 
 protected:
-    VulkanPipeline(class VulkanDevice* device) : m_device(device) {}
+    VulkanPipeline(VulkanDevice* device) : m_device(device) {}
     ~VulkanPipeline() override;
-    class VulkanDevice* m_device;
+    VkFormat ConvertToFormat(const VertexFactory::Descriptor& descriptor);
+
+    VulkanDevice* m_device;
     VkPipelineLayout m_layout = nullptr;
     VkPipeline m_pipeline = nullptr;
     std::vector<VkPipelineShaderStageCreateInfo> m_shaderStages;

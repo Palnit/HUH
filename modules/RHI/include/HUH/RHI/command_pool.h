@@ -1,9 +1,9 @@
 #pragma once
 #include <HUH/Math/vector.h>
+#include <HUH/RHI/fwd.h>
 #include <vector>
 
 namespace HUH::RHI {
-class Fence;
 class HUH_RHI_API CommandPool {
 public:
     class CommandBuffer {
@@ -15,7 +15,6 @@ public:
         virtual void AddRenderTarget(class Image* renderTarget) = 0;
         void SetViewPort(Vector2u32 viewPort) { m_viewPort = viewPort; };
         void SetScissor(Vector2u32 Scissor) { m_scissor = Scissor; };
-        virtual bool Submit(Fence* wait, Fence* signal, Fence* waitSignal) = 0;
         virtual void Reset() = 0;
 
         Vector2u32 m_viewPort{0, 0};

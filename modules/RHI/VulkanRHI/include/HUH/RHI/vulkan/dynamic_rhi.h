@@ -1,7 +1,8 @@
 #pragma once
 
-#include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/dynamic_rhi.h>
+#include <HUH/RHI/vulkan/fwd.h>
+#include <HUH/RHI/vulkan/vulkan_defines.h>
 
 namespace HUH::RHI {
 

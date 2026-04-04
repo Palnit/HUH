@@ -2,22 +2,13 @@
 
 #include <vector>
 #include <HUH/RHI/types.h>
+#include <HUH/RHI/fwd.h>
 #include <HUH/definitions.h>
 #include <HUH/dynamic_library.h>
-#include <format>
 
 namespace HUH {
 class Window;
 namespace RHI {
-class Device;
-
-enum class Format {
-    UNKNOWN,
-    R8G8B8A8_UNORM,
-    R8G8B8A8_SRGB,
-    B8G8R8A8_UNORM,
-    B8G8R8A8_SRGB,
-};
 
 class HUH_RHI_API DynamicRHI {
 public:

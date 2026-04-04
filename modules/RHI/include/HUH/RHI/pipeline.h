@@ -1,9 +1,7 @@
 #pragma once
 
-#include <HUH/RHI/rhi_module.h>
+#include <HUH/RHI/fwd.h>
 #include <HUH/RHI/dynamic_rhi.h>
-
-class VertexFactory;
 
 namespace HUH::RHI {
 class Pipeline {

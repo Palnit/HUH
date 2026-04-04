@@ -1,13 +1,122 @@
-#include "HUH/RHI/vulkan/shader.h"
-
-#include <HUH/types.h>
 #include <HUH/RHI/vulkan/pipeline.h>
+#include <HUH/RHI/vulkan/shader.h>
+#include <HUH/types.h>
 
-#include "HUH/RHI/vulkan/dynamic_rhi.h"
+#include "HUH/RHI/vertex_factory.h"
 
+#include <HUH/RHI/vertex_factory.h>
 #include <HUH/RHI/vulkan/device.h>
+#include <HUH/RHI/vulkan/dynamic_rhi.h>
 
 namespace HUH::RHI {
+
+VkFormat VulkanPipeline::ConvertToFormat(const VertexFactory::Descriptor& descriptor) {
+    switch (descriptor.vectorFormat) {
+        case VertexFactory::VectorFormat::X:
+            switch (descriptor.format) {
+                case VertexFactory::Format::U8:
+                    return VK_FORMAT_R8_UINT;
+                case VertexFactory::Format::U16:
+                    return VK_FORMAT_R16_UINT;
+                case VertexFactory::Format::U32:
+                    return VK_FORMAT_R32_UINT;
+                case VertexFactory::Format::U64:
+                    return VK_FORMAT_R64_UINT;
+                case VertexFactory::Format::I8:
+                    return VK_FORMAT_R8_SINT;
+                case VertexFactory::Format::I16:
+                    return VK_FORMAT_R16_SINT;
+                case VertexFactory::Format::I32:
+                    return VK_FORMAT_R32_SINT;
+                case VertexFactory::Format::I64:
+                    return VK_FORMAT_R64_SINT;
+                case VertexFactory::Format::F32:
+                    return VK_FORMAT_R32_SFLOAT;
+                case VertexFactory::Format::F64:
+                    return VK_FORMAT_R64_SFLOAT;
+                default:
+                    return VK_FORMAT_UNDEFINED;
+            }
+        case VertexFactory::VectorFormat::XY:
+            switch (descriptor.format) {
+                case VertexFactory::Format::U8:
+                    return VK_FORMAT_R8G8_UINT;
+                case VertexFactory::Format::U16:
+                    return VK_FORMAT_R16G16_UINT;
+                case VertexFactory::Format::U32:
+                    return VK_FORMAT_R32G32_UINT;
+                case VertexFactory::Format::U64:
+                    return VK_FORMAT_R64G64_UINT;
+                case VertexFactory::Format::I8:
+                    return VK_FORMAT_R8G8_SINT;
+                case VertexFactory::Format::I16:
+                    return VK_FORMAT_R16G16_SINT;
+                case VertexFactory::Format::I32:
+                    return VK_FORMAT_R32G32_SINT;
+                case VertexFactory::Format::I64:
+                    return VK_FORMAT_R64G64_SINT;
+                case VertexFactory::Format::F32:
+                    return VK_FORMAT_R32G32_SFLOAT;
+                case VertexFactory::Format::F64:
+                    return VK_FORMAT_R64G64_SFLOAT;
+                default:
+                    return VK_FORMAT_UNDEFINED;
+            }
+        case VertexFactory::VectorFormat::XYZ:
+            switch (descriptor.format) {
+                case VertexFactory::Format::U8:
+                    return VK_FORMAT_R8G8B8_UINT;
+                case VertexFactory::Format::U16:
+                    return VK_FORMAT_R16G16B16_UINT;
+                case VertexFactory::Format::U32:
+                    return VK_FORMAT_R32G32B32_UINT;
+                case VertexFactory::Format::U64:
+                    return VK_FORMAT_R64G64B64_UINT;
+                case VertexFactory::Format::I8:
+                    return VK_FORMAT_R8G8B8_SINT;
+                case VertexFactory::Format::I16:
+                    return VK_FORMAT_R16G16B16_SINT;
+                case VertexFactory::Format::I32:
+                    return VK_FORMAT_R32G32B32_SINT;
+                case VertexFactory::Format::I64:
+                    return VK_FORMAT_R64G64B64_SINT;
+                case VertexFactory::Format::F32:
+                    return VK_FORMAT_R32G32B32_SFLOAT;
+                case VertexFactory::Format::F64:
+                    return VK_FORMAT_R64G64B64_SFLOAT;
+                default:
+                    return VK_FORMAT_UNDEFINED;
+            }
+        case VertexFactory::VectorFormat::XYZW:
+            switch (descriptor.format) {
+                case VertexFactory::Format::U8:
+                    return VK_FORMAT_R8G8B8A8_UINT;
+                case VertexFactory::Format::U16:
+                    return VK_FORMAT_R16G16B16A16_UINT;
+                case VertexFactory::Format::U32:
+                    return VK_FORMAT_R32G32B32A32_UINT;
+                case VertexFactory::Format::U64:
+                    return VK_FORMAT_R64G64B64A64_UINT;
+                case VertexFactory::Format::I8:
+                    return VK_FORMAT_R8G8B8A8_SINT;
+                case VertexFactory::Format::I16:
+                    return VK_FORMAT_R16G16B16A16_SINT;
+                case VertexFactory::Format::I32:
+                    return VK_FORMAT_R32G32B32A32_SINT;
+                case VertexFactory::Format::I64:
+                    return VK_FORMAT_R64G64B64A64_SINT;
+                case VertexFactory::Format::F32:
+                    return VK_FORMAT_R32G32B32A32_SFLOAT;
+                case VertexFactory::Format::F64:
+                    return VK_FORMAT_R64G64B64A64_SFLOAT;
+                default:
+                    return VK_FORMAT_UNDEFINED;
+            }
+        default:
+            return VK_FORMAT_UNDEFINED;
+    }
+}
+
 bool VulkanPipeline::Init(Initializer&& initializer) {
     // TODO REFACTOR THIS TO MAKE IT WORK WITHOUT ME HAVING TO DO MAGIC
     std::vector<VkDynamicState> dynamicStates{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
@@ -21,19 +130,41 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
         .viewportCount = 1,
         .scissorCount = 1,
     };
+    std::vector<VkVertexInputBindingDescription> bindingDescription;
+    std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
 
-    // TODO REFACTOR TO VERTEX FACTORY
+    Uint32 binding = 0;
+    for (auto stream : initializer.vertexFactory.m_streams) {
+        bindingDescription.emplace_back();
+        bindingDescription.back().binding = binding;
+        bindingDescription.back().inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+        bindingDescription.back().stride = stream.Stride;
+        Uint32 attribute = 0;
+        for (auto descriptor : stream.descriptors) {
+            attributeDescriptions.emplace_back();
+            attributeDescriptions.back().binding = binding;
+            attributeDescriptions.back().location = attribute++;
+            attributeDescriptions.back().format = ConvertToFormat(descriptor);
+            attributeDescriptions.back().offset = descriptor.Offset;
+        }
+        binding++;
+    }
+
     VkPipelineVertexInputStateCreateInfo vertexInputCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-        .vertexBindingDescriptionCount = 0,
-        .pVertexBindingDescriptions = nullptr,
-        .vertexAttributeDescriptionCount = 0,
-        .pVertexAttributeDescriptions = nullptr};
+        .vertexBindingDescriptionCount = static_cast<Uint32>(bindingDescription.size()),
+        .pVertexBindingDescriptions = bindingDescription.data(),
+        .vertexAttributeDescriptionCount = static_cast<Uint32>(attributeDescriptions.size()),
+        .pVertexAttributeDescriptions = attributeDescriptions.data(),
+    };
+
+    // TODO REFACTOR TO VERTEX FACTORY
     VkPipelineInputAssemblyStateCreateInfo inputAssemblyCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
         .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
         .primitiveRestartEnable = VK_FALSE,
     };
+
     VkPipelineRasterizationStateCreateInfo rasterizationStateCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
         .depthClampEnable = VK_FALSE,
@@ -147,6 +278,7 @@ void VulkanPipeline::AddShader(class Shader* shader) {
     auto vk_shader = dynamic_cast<VulkanShader*>(shader);
     m_shaderStages.push_back(vk_shader->m_shaderStageInfo);
 }
+
 VulkanPipeline::~VulkanPipeline() {
     HUH_ILOG(LogVulkanRHI, "VulkanPipeline Destroyed")
 }

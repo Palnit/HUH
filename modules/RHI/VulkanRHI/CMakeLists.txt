@@ -1,6 +1,7 @@
 set(VULKAN_RHI_INC_PATH "include/HUH/RHI/vulkan")
 
 set(VULKAN_RHI_HEADER_FILES
+        ${VULKAN_RHI_INC_PATH}/fwd.h
         ${VULKAN_RHI_INC_PATH}/dynamic_rhi.h
         ${VULKAN_RHI_INC_PATH}/vulkan_defines.h
         ${VULKAN_RHI_INC_PATH}/device.h
@@ -9,8 +10,10 @@ set(VULKAN_RHI_HEADER_FILES
         ${VULKAN_RHI_INC_PATH}/shader.h
         ${VULKAN_RHI_INC_PATH}/pipeline.h
         ${VULKAN_RHI_INC_PATH}/command_pool.h
+        ${VULKAN_RHI_INC_PATH}/memory_allocator.h
         ${VULKAN_RHI_INC_PATH}/Types/image.h
         ${VULKAN_RHI_INC_PATH}/Types/fence.h
+        ${VULKAN_RHI_INC_PATH}/Types/buffer.h
 )
 set(VULKAN_RHI_SOURCE_FILES
         src/dynamic_rhi.cpp
@@ -20,8 +23,10 @@ set(VULKAN_RHI_SOURCE_FILES
         src/shader.cpp
         src/pipeline.cpp
         src/command_pool.cpp
+        src/memory_allocator.cpp
         src/Types/image.cpp
         src/Types/fence.cpp
+        src/Types/buffer.cpp
 )
 
 if (TARGET HUH::VulkanLoader)

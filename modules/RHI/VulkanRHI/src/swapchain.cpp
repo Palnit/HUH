@@ -50,6 +50,8 @@ bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minIma
             foundFormat = true;
         }
     }
+    // TODO COLOR SPACE
+    m_colorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
 
     if (!foundFormat) {
         // TODO FUCKING LOG?

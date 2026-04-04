@@ -1,13 +1,16 @@
-#include <HUH/string_operations.h>
-#include <HUH/RHI/vulkan/queue.h>
-#include <HUH/VulkanHelpers/string_converters.h>
+#include <HUH/RHI/vulkan/Types/fence.h>
+#include <HUH/RHI/vulkan/command_pool.h>
 #include <HUH/RHI/vulkan/device.h>
 
-#include "HUH/RHI/vulkan/dynamic_rhi.h"
-#include <HUH/RHI/vulkan/command_pool.h>
-#include "HUH/RHI/vulkan/shader.h"
-#include "HUH/RHI/vulkan/swapchain.h"
-#include "HUH/RHI/vulkan/Types/fence.h"
+#include "HUH/RHI/vulkan/Types/buffer.h"
+
+#include <HUH/RHI/vulkan/dynamic_rhi.h>
+#include <HUH/RHI/vulkan/pipeline.h>
+#include <HUH/RHI/vulkan/queue.h>
+#include <HUH/RHI/vulkan/shader.h>
+#include <HUH/RHI/vulkan/swapchain.h>
+#include <HUH/VulkanHelpers/string_converters.h>
+#include <HUH/string_operations.h>
 
 #include <HUH/enum_helper.h>
 
@@ -93,7 +96,7 @@ void VulkanDevice::Destroy() {
         HUH::vkDestroyDevice(m_device, nullptr);
     }
 }
-Queue* VulkanDevice::CreateQueue(Queue::Type type) {
+Queue* VulkanDevice::RequestQueue(Queue::Type type) {
     if (m_device) {
         HUH_ELOG(LogVulkanRHI, "Trying to create Vulkan queue after device init is not allowed");
         return nullptr;
@@ -265,6 +268,23 @@ std::vector<Fence*> VulkanDevice::CreateFence(Uint32 num) {
         fences.push_back(fence);
     }
     return fences;
+}
+
+MemoryAllocator* VulkanDevice::CreateMemoryAllocator() {
+}
+
+Buffer* VulkanDevice::CreateBuffer(Buffer::Type type, Uint64 Size) {
+    VkBuffer buffer;
+    VkBufferCreateInfo bufferCreateInfo{.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+                                        .pNext = nullptr,
+                                        .size = Size,
+                                        .usage = VulkanBuffer::ConvertBufferType(type),
+                                        .sharingMode = VK_SHARING_MODE_EXCLUSIVE};
+    if (auto err = HUH::vkCreateBuffer(m_device, &bufferCreateInfo, nullptr, &buffer); err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Vulkan buffer creation failed: {}", HUH::ToString(err))
+    }
+    m_createdBuffers.push_back(new VulkanBuffer(Size, buffer, this));
+    return m_createdBuffers.back();
 }
 
 Shader* VulkanDevice::CreateShader(void* byteCode, Uint64 size) {

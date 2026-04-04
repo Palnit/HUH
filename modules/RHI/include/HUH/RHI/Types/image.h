@@ -3,9 +3,9 @@
 #include <HUH/RHI/dynamic_rhi.h>
 #include <HUH/types.h>
 #include <HUH/Math/vector.h>
+#include <HUH/RHI/fwd.h>
 
 namespace HUH::RHI {
-class Device;
 
 class Image {
 public:

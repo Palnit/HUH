@@ -1,14 +1,25 @@
 #include <HUH/RHI/device.h>
+
+#include "HUH/RHI/memory_allocator.h"
+
+#include <HUH/RHI/Types/fence.h>
 #include <HUH/RHI/command_pool.h>
 #include <HUH/RHI/pipeline.h>
 #include <HUH/RHI/queue.h>
-#include <HUH/RHI/swapchain.h>
 #include <HUH/RHI/shader.h>
-#include <HUH/RHI/Types/fence.h>
+#include <HUH/RHI/swapchain.h>
 
 namespace HUH {
 namespace RHI {
 void Device::Destroy() {
+    for (Buffer* buffer : m_createdBuffers) {
+        buffer->Destroy();
+        delete buffer;
+    }
+    for (MemoryAllocator* memoryAllocator : m_createdMemoryAllocators) {
+        memoryAllocator->Destroy();
+        delete memoryAllocator;
+    }
     for (auto fence : m_createdFences) {
         delete fence;
     }

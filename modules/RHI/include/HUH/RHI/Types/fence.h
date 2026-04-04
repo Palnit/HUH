@@ -1,11 +1,10 @@
 #pragma once
-#include "HUH/types.h"
-#include "HUH/RHI/types.h"
+#include <HUH/types.h>
+#include <HUH/RHI/types.h>
 #include <HUH/concepts.h>
+#include <HUH/RHI/fwd.h>
 
 namespace HUH::RHI {
-class Device;
-
 class Fence {
 public:
     friend class Device;

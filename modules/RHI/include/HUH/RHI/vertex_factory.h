@@ -1,8 +1,8 @@
 #pragma once
-#include "HUH/concepts.h"
-#include "HUH/logging.h"
-#include "HUH/Math/vector.h"
 
+#include <HUH/RHI/fwd.h>
+#include <HUH/concepts.h>
+#include <HUH/Math/vector.h>
 #include <vector>
 #include <HUH/types.h>
 
@@ -13,6 +13,9 @@ public:
     enum class Format { U8, U16, U32, U64, I8, I16, I32, I64, F32, F64 };
     enum class VectorFormat { X, XY, XYZ, XYZW };
     VertexFactory() = default;
+
+    friend class Pipeline;
+    friend class VulkanPipeline;
 
     template<auto... T>
         requires(IsMemberPtr<T> && ...)

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/Types/image.h>
+#include <HUH/RHI/vulkan/fwd.h>
+#include <HUH/RHI/vulkan/vulkan_defines.h>
 
 namespace HUH::RHI {
 class HUH_VULKANRHI_API VulkanImage : public Image {
@@ -21,6 +22,6 @@ protected:
 
     VkImage m_image;
     VkImageView m_imageView = nullptr;
-    class VulkanDevice* m_device = nullptr;
+    VulkanDevice* m_device = nullptr;
 };
 }// namespace HUH::RHI
