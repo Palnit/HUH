@@ -2,12 +2,12 @@
 #include <HUH/RHI/vulkan/swapchain.h>
 
 #include "HUH/RHI/Types/fence.h"
-#include "HUH/RHI/vulkan/queue.h"
 #include "HUH/RHI/vulkan/Types/fence.h"
+#include "HUH/RHI/vulkan/queue.h"
 
-#include <HUH/Window/window.h>
 #include <HUH/RHI/vulkan/Types/image.h>
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
+#include <HUH/Window/window.h>
 #undef max
 
 namespace HUH::RHI {
@@ -76,13 +76,17 @@ bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minIma
         }
     }
 
-    m_eventHandler = m_windowParent->OnSizeChange.Add([&](auto, auto, auto) { RecreateSwapchain(); });
+    m_sizeChangeEventHandler = m_windowParent->OnSizeChange.Add([&](auto, auto, auto) { RecreateSwapchain(); });
+    m_closeEventHandler =
+        m_windowParent->OnClose.Add([&](auto) { m_windowParent->OnSizeChange.Remove(m_sizeChangeEventHandler); });
 
     return CreateSwapchain();
 }
 
 void VulkanSwapchain::Destroy() {
     Swapchain::Destroy();
+    m_windowParent->OnSizeChange.Remove(m_sizeChangeEventHandler);
+    m_windowParent->OnClose.Remove(m_closeEventHandler);
     HUH::vkDestroySwapchainKHR(m_device->m_device, m_swapchain, nullptr);
     HUH::vkDestroySurfaceKHR(m_parent->m_instance, m_surface.surface, nullptr);
 }

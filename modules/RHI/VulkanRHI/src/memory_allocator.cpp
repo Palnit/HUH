@@ -9,15 +9,58 @@ void VulkanMemoryAllocator::Destroy() {
 }
 
 bool VulkanMemoryAllocator::Allocate(Buffer* buffer, Type type) {
-    auto vk_buffer = dynamic_cast<VulkanBuffer*>(buffer);
-    auto requirments = vk_buffer->GetMemoryRequirements();
+    const auto vk_buffer = dynamic_cast<VulkanBuffer*>(buffer);
+    const auto requirements = vk_buffer->GetMemoryRequirements();
+    const auto typeIndex = FindMemoryType(requirements, ConvertMemoryType(type));
+    // TODO customizable base size
+    const Uint32 size = requirements.size > 64000000 ? requirements.size : 64000000;
+    auto it = m_deviceMemoryTypeMap.find(typeIndex);
+    if (it == m_deviceMemoryTypeMap.end()) {
+        vk_buffer->m_allocation = AddAllocation(typeIndex, size);
+    } else {
+        for (auto tmp : it->second) {
+            if (!tmp->FreeBlocks.empty()) {
+                vk_buffer->m_allocation = tmp;
+                break;
+            }
+        }
+        if (vk_buffer->m_allocation == nullptr) {
+            vk_buffer->m_allocation = AddAllocation(typeIndex, size);
+        }
+    }
+    auto block = vk_buffer->m_allocation->Allocate(requirements.size, requirements.alignment);
+    if (block.Size == 0) {
+        vk_buffer->m_allocation = AddAllocation(typeIndex, size);
+    }
+    block = vk_buffer->m_allocation->Allocate(requirements.size, requirements.alignment);
+    if (block.Size == 0) {
+        HUH_ELOG(LogVulkanRHI, "Error Could Not Allocate Memory!")
+        return false;
+    }
+    vk_buffer->m_allocator = this;
+    vk_buffer->m_allocatedBlock = block;
+    if (auto err = HUH::vkBindBufferMemory(*m_device, *vk_buffer, vk_buffer->m_allocation->Memory, block.Offset);
+        err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Failed to bind memory Error: {}", err)
+        return false;
+    }
+    return true;
 }
 
 bool VulkanMemoryAllocator::Free(Buffer* buffer) {
+    // TODO:: actual free from device and buffer deletion.
+    const auto vk_buffer = dynamic_cast<VulkanBuffer*>(buffer);
+    vk_buffer->m_allocation->Free(vk_buffer->m_allocatedBlock);
+    return true;
 }
 
 VkMemoryPropertyFlags VulkanMemoryAllocator::ConvertMemoryType(MemoryAllocator::Type type) {
     VkMemoryPropertyFlags flags = 0;
+    if (HUH::CheckAllFlag(type, RHI::MemoryAllocator::Type::Device | RHI::MemoryAllocator::Type::Host)) {
+        flags |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+            | VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        return flags;
+    }
     if (HUH::CheckFlag(type, RHI::MemoryAllocator::Type::Device)) {
         flags |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
     }
@@ -27,14 +70,68 @@ VkMemoryPropertyFlags VulkanMemoryAllocator::ConvertMemoryType(MemoryAllocator::
     return flags;
 }
 
-Uint64 VulkanMemoryAllocator::FindMemoryType(VkMemoryRequirements requirements, VkMemoryPropertyFlags properties) {
+Uint32 VulkanMemoryAllocator::FindMemoryType(VkMemoryRequirements requirements,
+                                             VkMemoryPropertyFlags properties) const {
+    for (uint32_t i = 0; i < m_device->m_memoryProperties.memoryTypeCount; i++) {
+        if ((requirements.memoryTypeBits & (1 << i))
+            && (m_device->m_memoryProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+            return i;
+        }
+    }
+    throw std::runtime_error("Not a valid VkMemoryPropertyFlagBits");
 }
 
-VulkanMemoryAllocator::MemoryBlock VulkanMemoryAllocator::Allocation::Allocate(Uint64 size, Uint64 alignment) {
+VulkanMemoryAllocator::Allocation* VulkanMemoryAllocator::AddAllocation(Uint32 memoryTypeIndex, Uint32 size) {
+    VkMemoryAllocateInfo allocInfo{
+        .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+        .allocationSize = size,
+        .memoryTypeIndex = memoryTypeIndex,
+    };
+    auto* allocation = new Allocation();
+    allocation->FreeBlocks.emplace_back(0, size);
+    if (auto err = HUH::vkAllocateMemory(*m_device, &allocInfo, nullptr, &allocation->Memory); err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Failed to allocate memory allocation Error: {}", err)
+        return nullptr;
+    }
+    auto it = m_deviceMemoryTypeMap.find(memoryTypeIndex);
+    if (it == m_deviceMemoryTypeMap.end()) {
+        m_deviceMemoryTypeMap.insert({memoryTypeIndex, {allocation}});
+    } else {
+        it->second.push_back(allocation);
+    }
+    return allocation;
+}
+
+VulkanMemoryAllocator::MemoryBlock VulkanMemoryAllocator::Allocation::Allocate(Uint32 size, Uint32 alignment) {
+    std::vector<MemoryBlock> TmpBlocks;
+    MemoryBlock block{};
+    for (auto it = FreeBlocks.begin(); it != FreeBlocks.end(); ++it) {
+        if (it->Size >= size) {
+            if (it->Offset % alignment == 0) {
+                block.Offset = it->Offset;
+                block.Size = size;
+                TmpBlocks.push_back({it->Offset + size, it->Size - size});
+                FreeBlocks.erase(it);
+                break;
+            }
+            if (it->Size - it->Offset % alignment >= size) {
+                auto offset = it->Offset % alignment;
+                block.Offset = it->Offset + offset;
+                block.Size = size;
+                TmpBlocks.push_back({it->Offset, offset});
+                TmpBlocks.push_back({it->Offset + offset + size, it->Size - offset - size});
+                FreeBlocks.erase(it);
+                break;
+            }
+        }
+    }
+    FreeBlocks.insert(FreeBlocks.end(), TmpBlocks.begin(), TmpBlocks.end());
+    return block;
 }
 
 bool VulkanMemoryAllocator::Allocation::Free(MemoryBlock block) {
     FreeBlocks.push_back(block);
+    // TODO: merging strategy ?
     return true;
 }
 
@@ -42,6 +139,13 @@ VulkanMemoryAllocator::VulkanMemoryAllocator(VulkanDevice* device) : m_device(de
 }
 
 VulkanMemoryAllocator::~VulkanMemoryAllocator() {
+    for (auto [type, vec] : m_deviceMemoryTypeMap) {
+        for (auto alloc : vec) {
+            HUH::vkFreeMemory(*m_device, alloc->Memory, nullptr);
+            delete alloc;
+            alloc = nullptr;
+        }
+    }
 }
 
 }// namespace HUH::RHI

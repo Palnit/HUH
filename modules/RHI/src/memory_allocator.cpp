@@ -2,7 +2,7 @@
 
 namespace HUH {
 namespace RHI {}
-std::string HUH::ToString(RHI::MemoryAllocator::Type type) {
+std::string ToString(RHI::MemoryAllocator::Type type) {
     std::string result = "";
     if (HUH::CheckFlag(type, RHI::MemoryAllocator::Type::Device)) {
         result += "Device | ";

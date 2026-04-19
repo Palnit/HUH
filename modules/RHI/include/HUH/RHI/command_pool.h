@@ -15,6 +15,8 @@ public:
         virtual void AddRenderTarget(class Image* renderTarget) = 0;
         void SetViewPort(Vector2u32 viewPort) { m_viewPort = viewPort; };
         void SetScissor(Vector2u32 Scissor) { m_scissor = Scissor; };
+        virtual void BindBuffer(class Buffer* buffer) = 0;
+        virtual void Draw(Uint32 vertexCount, Uint32 instanceCount) = 0;
         virtual void Reset() = 0;
 
         Vector2u32 m_viewPort{0, 0};

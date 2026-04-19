@@ -12,8 +12,9 @@ class HUH_RHI_API MemoryAllocator {
 public:
     friend class Device;
     enum Type {
-        Device,
-        Host,
+        UNKNOWN = 0,
+        Device = 1 << 0,
+        Host = 1 << 1,
     };
     virtual bool Allocate(Buffer* buffer, Type type) = 0;
     virtual bool Free(Buffer* buffer) = 0;

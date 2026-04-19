@@ -1,7 +1,7 @@
 #include "HUH/event.h"
 
-#include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/swapchain.h>
+#include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <vector>
 
 namespace HUH::RHI {
@@ -45,6 +45,7 @@ protected:
     Uint32 m_minImageCount;
     VkExtent2D m_extent = {};
     Uint32 m_imageIndex = 0;
-    HUH::EventHandler m_eventHandler;
+    HUH::EventHandler m_sizeChangeEventHandler;
+    HUH::EventHandler m_closeEventHandler;
 };
 }// namespace HUH::RHI

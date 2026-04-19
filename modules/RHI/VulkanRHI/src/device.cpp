@@ -190,6 +190,7 @@ Queue* VulkanDevice::RequestQueue(Queue::Type type) {
 void VulkanDevice::QueryVulkanPropertiesAndFeatures() {
     HUH::vkGetPhysicalDeviceProperties2KHR(m_physicalDevice, &Properties.properties_1_0);
     HUH::vkGetPhysicalDeviceFeatures2KHR(m_physicalDevice, &Features.features_1_0);
+    HUH::vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &m_memoryProperties);
     Features.features_1_0.features.robustBufferAccess = false;
 }
 
@@ -271,6 +272,8 @@ std::vector<Fence*> VulkanDevice::CreateFence(Uint32 num) {
 }
 
 MemoryAllocator* VulkanDevice::CreateMemoryAllocator() {
+    m_createdMemoryAllocators.push_back(new VulkanMemoryAllocator(this));
+    return m_createdMemoryAllocators.back();
 }
 
 Buffer* VulkanDevice::CreateBuffer(Buffer::Type type, Uint64 Size) {

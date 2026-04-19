@@ -12,20 +12,18 @@ public:
     bool Allocate(Buffer* buffer, Type type) override;
     bool Free(Buffer* buffer) override;
 
-    static VkMemoryPropertyFlags ConvertMemoryType(MemoryAllocator::Type type);
-    Uint64 FindMemoryType(VkMemoryRequirements requirements, VkMemoryPropertyFlags properties);
-
-    class MemoryBlock {
-        Uint64 offset = 0;
-        Uint64 size = 0;
+    struct MemoryBlock {
+        Uint32 Offset = 0;
+        Uint32 Size = 0;
     };
 
-    class Allocation {
-        VkDeviceMemory memory = nullptr;
-        Uint64 Size = 0;
-        Uint64 Offset = 0;
+    struct Allocation {
+        friend class VulkanBuffer;
+        Allocation() { HUH_TLOG("Allocation"); }
+        ~Allocation() { HUH_TLOG("¬Allocation"); }
+        VkDeviceMemory Memory = nullptr;
 
-        MemoryBlock Allocate(Uint64 size, Uint64 alignment);
+        MemoryBlock Allocate(Uint32 size, Uint32 alignment);
         bool Free(MemoryBlock block);
 
         std::vector<MemoryBlock> FreeBlocks;
@@ -34,7 +32,11 @@ public:
 protected:
     VulkanMemoryAllocator(VulkanDevice* m_device);
     ~VulkanMemoryAllocator() override;
+
+    static VkMemoryPropertyFlags ConvertMemoryType(MemoryAllocator::Type type);
+    HUH_NODISCARD Uint32 FindMemoryType(VkMemoryRequirements requirements, VkMemoryPropertyFlags properties) const;
+    VulkanMemoryAllocator::Allocation* AddAllocation(Uint32 memoryTypeIndex, Uint32 size);
     VulkanDevice* m_device;
-    std::map<Uint64, std::vector<Allocation>> m_deviceMemoryTypeMap;
+    std::map<Uint32, std::vector<Allocation*>> m_deviceMemoryTypeMap;
 };
 }// namespace HUH::RHI

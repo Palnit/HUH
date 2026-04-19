@@ -4,6 +4,9 @@
 #include <HUH/RHI/vulkan/Types/fence.h>
 #include <HUH/RHI/vulkan/Types/image.h>
 #include <HUH/RHI/vulkan/command_pool.h>
+
+#include "HUH/RHI/vulkan/Types/buffer.h"
+
 #include <HUH/RHI/vulkan/device.h>
 #include <HUH/RHI/vulkan/pipeline.h>
 #include <HUH/RHI/vulkan/queue.h>
@@ -74,9 +77,6 @@ bool VulkanCommandPool::VulkanCommandBuffer::Begin() {
     scissor.offset = {0, 0};
     scissor.extent = extent;
     vkCmdSetScissor(m_commandBuffer, 0, 1, &scissor);
-
-    // TODO SEPARATE DRAW
-    vkCmdDraw(m_commandBuffer, 3, 1, 0, 0);
 
     return true;
 }
@@ -153,8 +153,20 @@ void VulkanCommandPool::Destroy() {
     HUH::vkDestroyCommandPool(*m_device, m_commandPool, nullptr);
 }
 
-void VulkanCommandPool::VulkanCommandBuffer::VulkanCommandBuffer::Reset() {
+void VulkanCommandPool::VulkanCommandBuffer::Reset() {
     HUH::vkResetCommandBuffer(m_commandBuffer, 0);
+}
+
+void VulkanCommandPool::VulkanCommandBuffer::BindBuffer(Buffer* buffer) {
+    // TODO offsets
+    auto vk_buffer = dynamic_cast<VulkanBuffer*>(buffer);
+    VkBuffer buffers[] = {*vk_buffer};
+    VkDeviceSize offsets[] = {0};
+    vkCmdBindVertexBuffers(m_commandBuffer, 0, 1, buffers, offsets);
+}
+
+void VulkanCommandPool::VulkanCommandBuffer::Draw(Uint32 vertexCount, Uint32 instanceCount) {
+    vkCmdDraw(m_commandBuffer, vertexCount, instanceCount, 0, 0);
 }
 
 VulkanCommandPool::VulkanCommandPool(VulkanDevice* device, VulkanPipeline* pipeline)

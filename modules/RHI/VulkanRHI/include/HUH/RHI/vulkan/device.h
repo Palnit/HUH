@@ -13,6 +13,8 @@ class HUH_VULKANRHI_API VulkanDevice final : public Device {
     friend class VulkanShader;
     friend class VulkanImage;
     friend class VulkanPipeline;
+    friend class VulkanCommandPool;
+    friend class VulkanMemoryAllocator;
 
 public:
     struct VulkanDeviceProperties {

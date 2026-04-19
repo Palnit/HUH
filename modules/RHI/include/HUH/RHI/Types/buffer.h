@@ -9,8 +9,16 @@ class Buffer {
 public:
     friend class Device;
     friend class MemoryAllocator;
-    enum Type { VERTEX, INDEX, UNIFORM, SRC, DST };
+    enum Type {
+        Unknown = 0,
+        VERTEX = 1 << 0,
+        INDEX = 1 << 1,
+        UNIFORM = 1 << 2,
+        SRC = 1 << 3,
+        DST = 1 << 4,
+    };
     virtual void Destroy() = 0;
+    virtual void CopyData(void* data) = 0;
 
 protected:
     Buffer(Uint64 size);

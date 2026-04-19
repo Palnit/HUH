@@ -18,6 +18,8 @@ public:
         void End() override;
         void AddRenderTarget(Image* renderTarget) override;
         void Reset() override;
+        void BindBuffer(Buffer* buffer) override;
+        void Draw(Uint32 vertexCount, Uint32 instanceCount) override;
 
     protected:
         VulkanCommandPool* m_parent;
