@@ -14,6 +14,8 @@ class HUH_VULKANRHI_API VulkanQueue final : public Queue {
 public:
     operator VkQueue();
     bool Submit(CommandPool::CommandBuffer* commandPool, Fence* wait, Fence* signal, Fence* waitSignal) override;
+    bool Submit(CommandPool::CommandBuffer* commandPool) override;
+    void WaitIdle() override;
 
 private:
     VulkanQueue(class VulkanDevice* device,

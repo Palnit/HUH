@@ -1,5 +1,5 @@
-#include <HUH/RHI/vulkan/shader.h>
 #include <HUH/RHI/vulkan/device.h>
+#include <HUH/RHI/vulkan/shader.h>
 
 namespace HUH::RHI {
 
@@ -15,7 +15,7 @@ bool VulkanShader::Init(Stage stage, const std::string& entryFunctionName) {
         return false;
     }
 
-    m_shaderStageInfo.stage = ShaderStageToVkShaderStage(m_stage);
+    m_shaderStageInfo.stage = ConvertStageBits(m_stage);
     m_shaderStageInfo.module = m_shaderModule;
     m_shaderStageInfo.pName = entryFunctionName.c_str();
 
@@ -26,8 +26,8 @@ void VulkanShader::Destroy() {
     HUH::vkDestroyShaderModule(m_device->m_device, m_shaderModule, nullptr);
 }
 
-VkShaderStageFlagBits VulkanShader::ShaderStageToVkShaderStage(Stage stage) {
-    auto vk_stage = static_cast<VkShaderStageFlagBits>(0);
+VkShaderStageFlags VulkanShader::ConvertStage(Stage stage) {
+    auto vk_stage = static_cast<VkShaderStageFlags>(0);
     if (CheckFlag(stage, Shader::Fragment)) {
         vk_stage |= VK_SHADER_STAGE_FRAGMENT_BIT;
     }
@@ -45,5 +45,21 @@ VkShaderStageFlagBits VulkanShader::ShaderStageToVkShaderStage(Stage stage) {
 
 VulkanShader::~VulkanShader() {
     HUH_ILOG(LogVulkanRHI, "VulkanShader Destroyed");
+}
+VkShaderStageFlagBits VulkanShader::ConvertStageBits(Stage stage) {
+    auto vk_stage = static_cast<VkShaderStageFlagBits>(0);
+    if (CheckFlag(stage, Shader::Fragment)) {
+        vk_stage |= VK_SHADER_STAGE_FRAGMENT_BIT;
+    }
+    if (CheckFlag(stage, Shader::Vertex)) {
+        vk_stage |= VK_SHADER_STAGE_VERTEX_BIT;
+    }
+    if (CheckFlag(stage, Shader::Geometry)) {
+        vk_stage |= VK_SHADER_STAGE_GEOMETRY_BIT;
+    }
+    if (CheckFlag(stage, Shader::Compute)) {
+        vk_stage |= VK_SHADER_STAGE_COMPUTE_BIT;
+    }
+    return vk_stage;
 }
 }// namespace HUH::RHI

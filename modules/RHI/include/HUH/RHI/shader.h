@@ -1,7 +1,5 @@
 #pragma once
-#include <HUH/RHI/fwd.h>
-#include <HUH/RHI/rhi_module.h>
-#include <HUH/enum_helper.h>
+#include <HUH/enum_define.h>
 #include <HUH/types.h>
 
 namespace HUH::RHI {

@@ -41,7 +41,7 @@ bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minIma
     }
 #endif
 
-    m_vkFormat = VulkanDynamicRHI::ConvertFormat(format);
+    m_vkFormat = VulkanDynamicRHI::ConvertFormat(m_format);
     m_colorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
     bool foundFormat = false;
     for (auto surfaceFormat : Details.surfaceFormats) {
@@ -155,6 +155,7 @@ bool VulkanSwapchain::CreateSwapchain() {
         m_extent = Details.capabilities.surfaceCapabilities.currentExtent;
     }
 
+    auto oldSwapchain = m_swapchain;
     VkSwapchainCreateInfoKHR createInfo = {.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
                                            .surface = m_surface.surface,
                                            .minImageCount = m_minImageCount,
@@ -170,12 +171,14 @@ bool VulkanSwapchain::CreateSwapchain() {
                                            .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
                                            .presentMode = m_presentMode,
                                            .clipped = true,
-                                           .oldSwapchain = m_swapchain};
+                                           .oldSwapchain = oldSwapchain};
     if (auto err = HUH::vkCreateSwapchainKHR(m_device->m_device, &createInfo, nullptr, &m_swapchain);
         err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "Swapchain Creation Error: {}", err)
         return false;
     }
+
+    HUH::vkDestroySwapchainKHR(m_device->m_device, oldSwapchain, nullptr);
 
     Uint32 imageCount = 0;
     std::vector<VkImage> images;

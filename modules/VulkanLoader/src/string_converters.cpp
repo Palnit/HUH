@@ -1,5 +1,6 @@
-#include <HUH/vulkan_loader.h>
 #include <HUH/VulkanHelpers/string_converters.h>
+#include <HUH/enum_helper.h>
+#include <HUH/vulkan_loader.h>
 
 namespace HUH {
 

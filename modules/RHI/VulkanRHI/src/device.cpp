@@ -3,6 +3,7 @@
 #include <HUH/RHI/vulkan/device.h>
 
 #include "HUH/RHI/vulkan/Types/buffer.h"
+#include "HUH/RHI/vulkan/render_pass.h"
 
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
 #include <HUH/RHI/vulkan/pipeline.h>
@@ -12,6 +13,7 @@
 #include <HUH/VulkanHelpers/string_converters.h>
 #include <HUH/string_operations.h>
 
+#include <HUH/RHI/vulkan/render_pass.h>
 #include <HUH/enum_helper.h>
 
 #ifdef HUH_WIN
@@ -290,6 +292,11 @@ Buffer* VulkanDevice::CreateBuffer(Buffer::Type type, Uint64 Size) {
     return m_createdBuffers.back();
 }
 
+RenderPass* VulkanDevice::CreateRenderPass() {
+    m_createdRenderPasses.push_back(new VulkanRenderPass(this));
+    return m_createdRenderPasses.back();
+}
+
 Shader* VulkanDevice::CreateShader(void* byteCode, Uint64 size) {
     m_createdShaders.push_back(new VulkanShader(this, byteCode, size));
     return m_createdShaders.back();
@@ -300,9 +307,8 @@ Pipeline* VulkanDevice::CreatePipeline() {
     return m_createdPipelines.back();
 }
 
-CommandPool* VulkanDevice::CreateCommandPool(Pipeline* pipeline) {
-    auto vk_pipeline = dynamic_cast<VulkanPipeline*>(pipeline);
-    m_createdCommandBuffers.push_back(new VulkanCommandPool(this, vk_pipeline));
+CommandPool* VulkanDevice::CreateCommandPool() {
+    m_createdCommandBuffers.push_back(new VulkanCommandPool(this));
     return m_createdCommandBuffers.back();
 }
 

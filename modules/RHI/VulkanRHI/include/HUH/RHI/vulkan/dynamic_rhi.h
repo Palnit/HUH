@@ -21,6 +21,7 @@ public:
 
     static VkFormat ConvertFormat(Format format);
     static Format ConvertFormat(VkFormat format);
+    static VkAccessFlags ConvertAccess(AccessType access);
 
 protected:
     VulkanDynamicRHI() = default;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <HUH/RHI/command_pool.h>
 #include <HUH/RHI/fwd.h>
 #include <HUH/definitions.h>
 
@@ -17,10 +18,9 @@ public:
         VideoEncode = 1 << 4
     };
 
-    virtual bool Submit(class CommandPool::CommandBuffer* commandPool,
-                        Fence* wait,
-                        Fence* signal,
-                        Fence* waitSignal) = 0;
+    virtual bool Submit(CommandPool::CommandBuffer* commandPool, Fence* wait, Fence* signal, Fence* waitSignal) = 0;
+    virtual bool Submit(CommandPool::CommandBuffer* commandPool) = 0;
+    virtual void WaitIdle() = 0;
 
 protected:
     Queue() = default;

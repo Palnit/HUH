@@ -38,13 +38,13 @@ public:
     virtual Queue* RequestQueue(Queue::Type type) = 0;
     virtual Shader* CreateShader(void* byteCode, Uint64 size) = 0;
     virtual Pipeline* CreatePipeline() = 0;
-    virtual CommandPool* CreateCommandPool(Pipeline* pipeline) = 0;
+    virtual CommandPool* CreateCommandPool() = 0;
     virtual Swapchain* CreateSwapchain(Window& window) = 0;
     virtual MemoryAllocator* CreateMemoryAllocator() = 0;
     virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size) = 0;
-
     virtual Fence* CreateFence() = 0;
     virtual std::vector<Fence*> CreateFence(Uint32 num) = 0;
+    virtual RenderPass* CreateRenderPass() = 0;
 
     HUH_NODISCARD Queue* GetQueue(size_t index) const;
     HUH_NODISCARD size_t GetNumberOfQueues() const { return m_queues.size(); };
@@ -60,6 +60,7 @@ protected:
     std::vector<Fence*> m_createdFences;
     std::vector<Buffer*> m_createdBuffers;
     std::vector<MemoryAllocator*> m_createdMemoryAllocators;
+    std::vector<RenderPass*> m_createdRenderPasses;
 };
 }// namespace RHI
 

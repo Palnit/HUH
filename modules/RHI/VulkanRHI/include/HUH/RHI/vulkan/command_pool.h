@@ -16,15 +16,19 @@ public:
         friend class VulkanQueue;
         bool Begin() override;
         void End() override;
-        void AddRenderTarget(Image* renderTarget) override;
+        void BeginRendering(RenderPass* renderPass, Image* renderTarget) override;
+        void EndRendering() override;
         void Reset() override;
-        void BindBuffer(Buffer* buffer) override;
+        void BindVertexBuffer(Buffer* buffer) override;
+        void BindIndexBuffer(Buffer* buffer) override;
         void Draw(Uint32 vertexCount, Uint32 instanceCount) override;
+        void DrawIndexed(Uint32 indexCount, Uint32 instanceCount) override;
+        void BindPipeline(class Pipeline* pipeline) override;
+        void CopyBuffer(Buffer* srcBuffer, Buffer* dstBuffer) override;
 
     protected:
         VulkanCommandPool* m_parent;
         VkCommandBuffer m_commandBuffer;
-        VulkanImage* m_renderTarget = nullptr;
 
         VulkanCommandBuffer(VulkanCommandPool* parent, VkCommandBuffer commandBuffer)
             : CommandBuffer(),
@@ -37,11 +41,10 @@ public:
     void Destroy() override;
 
 protected:
-    explicit VulkanCommandPool(VulkanDevice* device, VulkanPipeline* pipeline);
+    explicit VulkanCommandPool(VulkanDevice* device);
     ~VulkanCommandPool() override;
 
     VulkanDevice* m_device;
-    VulkanPipeline* m_pipeline;
     VulkanQueue* m_queue = nullptr;
     VkCommandPool m_commandPool = nullptr;
 };

@@ -27,18 +27,23 @@ void VulkanBuffer::Destroy() {
         HUH::vkDestroyBuffer(*m_device, m_buffer, nullptr);
     }
 }
-
-void VulkanBuffer::CopyData(void* data) {
-    void* tmp;
-    if (auto err =
-            HUH::vkMapMemory(*m_device, m_allocation->Memory, m_allocatedBlock.Offset, m_allocatedBlock.Size, 0, &tmp);
+void VulkanBuffer::MapData() {
+    if (auto err = HUH::vkMapMemory(*m_device, m_allocation->Memory, m_allocatedBlock.Offset, m_allocatedBlock.Size, 0,
+                                    &m_mappedData);
         err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "Error while mapping vulkan memory Error: {}", err)
-        return;
     }
-    std::memcpy(tmp, data, m_size);
+}
+void VulkanBuffer::UnMapData() {
     // TODO flush
     HUH::vkUnmapMemory(*m_device, m_allocation->Memory);
+    m_mappedData = nullptr;
+}
+
+void VulkanBuffer::CopyData(void* data) {
+    MapData();
+    std::memcpy(m_mappedData, data, m_size);
+    UnMapData();
 }
 
 VkMemoryRequirements VulkanBuffer::GetMemoryRequirements() const {

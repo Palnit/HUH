@@ -32,7 +32,7 @@ protected:
     virtual ~Swapchain() = default;
     Window* m_windowParent;
     std::vector<Image*> m_images;
-    Format m_format = Format::UNKNOWN;
+    Format m_format = Format::Unknown;
 };
 }// namespace RHI
 

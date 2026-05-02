@@ -1,10 +1,9 @@
 #pragma once
 
-#include <HUH/RHI/fwd.h>
-#include <HUH/concepts.h>
 #include <HUH/Math/vector.h>
-#include <vector>
+#include <HUH/concepts.h>
 #include <HUH/types.h>
+#include <vector>
 
 namespace HUH::RHI {
 

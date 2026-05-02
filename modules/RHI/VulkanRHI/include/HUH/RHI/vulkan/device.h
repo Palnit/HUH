@@ -15,6 +15,7 @@ class HUH_VULKANRHI_API VulkanDevice final : public Device {
     friend class VulkanPipeline;
     friend class VulkanCommandPool;
     friend class VulkanMemoryAllocator;
+    friend class VulkanRenderPass;
 
 public:
     struct VulkanDeviceProperties {
@@ -62,7 +63,7 @@ public:
 
     Shader* CreateShader(void* byteCode, Uint64 size) override;
     Pipeline* CreatePipeline() override;
-    CommandPool* CreateCommandPool(Pipeline* pipeline) override;
+    CommandPool* CreateCommandPool() override;
     Swapchain* CreateSwapchain(Window& window) override;
 
     // ReSharper disable once CppNonExplicitConversionOperator
@@ -73,6 +74,7 @@ public:
 
     MemoryAllocator* CreateMemoryAllocator() override;
     Buffer* CreateBuffer(Buffer::Type type, Uint64 Size) override;
+    RenderPass* CreateRenderPass() override;
 
 protected:
     explicit VulkanDevice(VulkanDynamicRHI* parent, VkPhysicalDevice physicalDevice);

@@ -3,10 +3,9 @@
 #include <HUH/types.h>
 
 #include "HUH/RHI/vertex_factory.h"
+#include "HUH/RHI/vulkan/render_pass.h"
 
-#include <HUH/RHI/vertex_factory.h>
 #include <HUH/RHI/vulkan/device.h>
-#include <HUH/RHI/vulkan/dynamic_rhi.h>
 
 namespace HUH::RHI {
 
@@ -116,6 +115,69 @@ VkFormat VulkanPipeline::ConvertToFormat(const VertexFactory::Descriptor& descri
             return VK_FORMAT_UNDEFINED;
     }
 }
+VkPipelineStageFlags VulkanPipeline::ConvertToPipelineStage(const Pipeline::Stages& stages) {
+    VkPipelineStageFlags result = 0;
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::TopOfPipe)) {
+        result |= VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::DrawIndirect)) {
+        result |= VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::VertexInput)) {
+        result |= VK_PIPELINE_STAGE_VERTEX_INPUT_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::VertexShader)) {
+        result |= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::TessellationControlShader)) {
+        result |= VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::TessellationEvaluationShader)) {
+        result |= VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::GeometryShader)) {
+        result |= VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::FragmentShader)) {
+        result |= VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::EarlyFragmentTests)) {
+        result |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::LateFragmentTests)) {
+        result |= VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::ColorAttachmentOutput)) {
+        result |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::ComputeShader)) {
+        result |= VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::Transfer)) {
+        result |= VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::BottomOfPipe)) {
+        result |= VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::Host)) {
+        result |= VK_PIPELINE_STAGE_HOST_BIT;
+    }
+    if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::AllGraphics)) {
+        result |= VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT;
+    }
+    return result;
+}
+
+VkDescriptorType VulkanPipeline::ConvertDescriptorType(const Pipeline::DescriptorTypes& descriptor) {
+    switch (descriptor) {
+        case DescriptorTypes::Uniform:
+            return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        case DescriptorTypes::Sampler:
+            return VK_DESCRIPTOR_TYPE_SAMPLER;
+        default:
+            return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    }
+}
 
 bool VulkanPipeline::Init(Initializer&& initializer) {
     // TODO REFACTOR THIS TO MAKE IT WORK WITHOUT ME HAVING TO DO MAGIC
@@ -214,13 +276,37 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
     colorBlending.blendConstants[2] = 0.0f;// Optional
     colorBlending.blendConstants[3] = 0.0f;// Optional
 
-    // TODO Uniforms
-    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0;           // Optional
-    pipelineLayoutInfo.pSetLayouts = nullptr;        // Optional
-    pipelineLayoutInfo.pushConstantRangeCount = 0;   // Optional
-    pipelineLayoutInfo.pPushConstantRanges = nullptr;// Optional
+    std::vector<VkDescriptorSetLayoutBinding> descriptorSetLayoutBindings;
+    for (auto descriptor : initializer.descriptorTypes) {
+        VkDescriptorSetLayoutBinding pipelineLayoutBinding{
+            .binding = static_cast<Uint32>(descriptorSetLayoutBindings.size()),
+            .descriptorType = ConvertDescriptorType(descriptor.type),
+            .descriptorCount = descriptor.count,
+            .stageFlags = VulkanShader::ConvertStage(descriptor.stage),
+            .pImmutableSamplers = nullptr,
+        };
+        descriptorSetLayoutBindings.push_back(pipelineLayoutBinding);
+    }
+
+    if (!descriptorSetLayoutBindings.empty()) {
+        VkDescriptorSetLayoutCreateInfo layoutInfo{
+            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+            .bindingCount = static_cast<Uint32>(descriptorSetLayoutBindings.size()),
+            .pBindings = descriptorSetLayoutBindings.data(),
+        };
+        if (auto err = HUH::vkCreateDescriptorSetLayout(*m_device, &layoutInfo, nullptr, &m_descriptorSetLayout);
+            err != VK_SUCCESS) {
+            HUH_ELOG(LogVulkanRHI, "Error Creating Descriptor Set Layout {}", err)
+        }
+    }
+
+    VkPipelineLayoutCreateInfo pipelineLayoutInfo{
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        .setLayoutCount = static_cast<Uint32>(m_descriptorSetLayout == nullptr ? 0 : 1),
+        .pSetLayouts = m_descriptorSetLayout == nullptr ? nullptr : &m_descriptorSetLayout,
+        .pushConstantRangeCount = 0,
+        .pPushConstantRanges = nullptr,
+    };
 
     if (auto err = HUH::vkCreatePipelineLayout(m_device->m_device, &pipelineLayoutInfo, nullptr, &m_layout);
         err != VK_SUCCESS) {
@@ -228,20 +314,9 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
         return false;
     }
 
-    std::vector<VkFormat> vk_formats;
-    vk_formats.reserve(initializer.formats.size());
-    for (auto& format : initializer.formats) {
-        vk_formats.push_back(VulkanDynamicRHI::ConvertFormat(format));
-    }
-
-    VkPipelineRenderingCreateInfo pipelineRenderingCreateInfo{
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO,
-        .colorAttachmentCount = static_cast<Uint32>(vk_formats.size()),
-        .pColorAttachmentFormats = vk_formats.data()};
-
+    auto vk_renderPass = dynamic_cast<VulkanRenderPass*>(initializer.renderPass);
     VkGraphicsPipelineCreateInfo pipelineInfo{
         .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-        .pNext = &pipelineRenderingCreateInfo,
         .stageCount = 2,
         .pStages = m_shaderStages.data(),
         .pVertexInputState = &vertexInputCreateInfo,
@@ -253,7 +328,8 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
         .pColorBlendState = &colorBlending,
         .pDynamicState = &dynamicStateCreateInfo,
         .layout = m_layout,
-        .renderPass = nullptr,
+        .renderPass = *vk_renderPass,
+        // TODO renderpass subpass index ?
         .subpass = 0,
         .basePipelineHandle = nullptr,// Optional
         .basePipelineIndex = -1,      // Optional
@@ -272,6 +348,7 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
 void VulkanPipeline::Destroy() {
     HUH::vkDestroyPipeline(m_device->m_device, m_pipeline, nullptr);
     HUH::vkDestroyPipelineLayout(m_device->m_device, m_layout, nullptr);
+    HUH::vkDestroyDescriptorSetLayout(m_device->m_device, m_descriptorSetLayout, nullptr);
 }
 
 void VulkanPipeline::AddShader(class Shader* shader) {

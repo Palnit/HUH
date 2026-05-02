@@ -14,7 +14,7 @@ public:
 
     struct Initializer {
         HUH::RHI::Device* Device = nullptr;
-        HUH::RHI::Format Format = Format::UNKNOWN;
+        HUH::RHI::Format Format = Format::Unknown;
         Uint32 MipLevels = 0;
         HUH::Vector2u32 Size;
     };

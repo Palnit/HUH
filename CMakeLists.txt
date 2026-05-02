@@ -41,6 +41,7 @@ set(HEADER_FILES
         include/public/HUH/types.h
         include/public/HUH/templates.h
         include/public/HUH/concepts.h
+        include/public/HUH/enum_define.h
         include/public/HUH/enum_helper.h
 )
 

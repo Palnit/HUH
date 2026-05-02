@@ -1,5 +1,4 @@
 #pragma once
-#include "command_pool.h"
 
 namespace HUH::RHI {
 class DynamicRHI;
@@ -14,5 +13,6 @@ class MemoryAllocator;
 class Image;
 class Fence;
 class Buffer;
+class RenderPass;
 
 }// namespace HUH::RHI

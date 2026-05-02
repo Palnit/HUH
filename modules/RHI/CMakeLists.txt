@@ -17,6 +17,8 @@ set(HEADER_FILES
         ${RHI_INC_PATH}/Types/image.h
         ${RHI_INC_PATH}/Types/fence.h
         ${RHI_INC_PATH}/Types/buffer.h
+        ${RHI_INC_PATH}/render_pass.h
+        ${RHI_INC_PATH}/Types/barrier.h
 )
 set(SOURCE_FILES
         src/dynamic_rhi.cpp
@@ -31,6 +33,8 @@ set(SOURCE_FILES
         src/Types/image.cpp
         src/Types/fence.cpp
         src/Types/buffer.cpp
+        src/render_pass.cpp
+        src/Types/barrier.cpp
 )
 
 add_library(HUH-RHI SHARED ${HEADER_FILES} ${SOURCE_FILES})

@@ -52,7 +52,7 @@ void DynamicRHI::Destroy() {
 
 std::string ToString(RHI::Format in_enum) {
     switch (in_enum) {
-        case RHI::Format::UNKNOWN:
+        case RHI::Format::Unknown:
             return "Unknown";
         case RHI::Format::R8G8B8A8_UNORM:
             return "R8G8B8A8_UNORM";

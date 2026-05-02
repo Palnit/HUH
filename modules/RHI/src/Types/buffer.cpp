@@ -1,5 +1,10 @@
 #include <HUH/RHI/Types/buffer.h>
 
+#include "HUH/RHI/rhi_module.h"
+#include "HUH/logging.h"
+
+#include <HUH/enum_helper.h>
+
 namespace HUH {
 namespace RHI {
 Buffer::Buffer(Uint64 size) : m_size(size) {

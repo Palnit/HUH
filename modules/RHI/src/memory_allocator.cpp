@@ -1,4 +1,5 @@
 #include <HUH/RHI/memory_allocator.h>
+#include <HUH/enum_helper.h>
 
 namespace HUH {
 namespace RHI {}

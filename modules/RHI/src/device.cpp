@@ -1,6 +1,7 @@
 #include <HUH/RHI/device.h>
 
 #include "HUH/RHI/memory_allocator.h"
+#include "HUH/RHI/render_pass.h"
 
 #include <HUH/RHI/Types/fence.h>
 #include <HUH/RHI/command_pool.h>
@@ -30,6 +31,10 @@ void Device::Destroy() {
     for (Pipeline* pipeline : m_createdPipelines) {
         pipeline->Destroy();
         delete pipeline;
+    }
+    for (RenderPass* renderPass : m_createdRenderPasses) {
+        renderPass->Destroy();
+        delete renderPass;
     }
     for (Shader* shader : m_createdShaders) {
         shader->Destroy();

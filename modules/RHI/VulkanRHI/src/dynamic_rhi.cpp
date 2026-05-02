@@ -1,11 +1,11 @@
+#include <HUH/RHI/types.h>
 #include <HUH/RHI/vulkan/command_pool.h>
-#include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/RHI/vulkan/device.h>
 #include <HUH/RHI/vulkan/dynamic_rhi.h>
+#include <HUH/RHI/vulkan/vulkan_defines.h>
 
-#include <vector>
-#include <HUH/types.h>
 #include <HUH/string_operations.h>
+#include <vector>
 
 namespace HUH::RHI {
 bool VulkanDynamicRHI::Init() {
@@ -130,7 +130,7 @@ VkFormat VulkanDynamicRHI::ConvertFormat(Format format) {
             return VK_FORMAT_B8G8R8A8_UNORM;
         case Format::B8G8R8A8_SRGB:
             return VK_FORMAT_B8G8R8A8_SRGB;
-        case Format::UNKNOWN:
+        case Format::Unknown:
             return VK_FORMAT_UNDEFINED;
         default:
             return VK_FORMAT_UNDEFINED;
@@ -148,10 +148,62 @@ Format VulkanDynamicRHI::ConvertFormat(VkFormat format) {
         case VK_FORMAT_B8G8R8A8_SRGB:
             return Format::B8G8R8A8_SRGB;
         case VK_FORMAT_UNDEFINED:
-            return Format::UNKNOWN;
+            return Format::Unknown;
         default:
-            return Format::UNKNOWN;
+            return Format::Unknown;
     }
+}
+VkAccessFlags VulkanDynamicRHI::ConvertAccess(AccessType access) {
+    VkAccessFlags result = 0;
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::IndexRead)) {
+        result |= VkAccessFlagBits::VK_ACCESS_INDEX_READ_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::VertexAttributeRead)) {
+        result |= VkAccessFlagBits::VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::UniformRead)) {
+        result |= VkAccessFlagBits::VK_ACCESS_UNIFORM_READ_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::InputRead)) {
+        result |= VkAccessFlagBits::VK_ACCESS_INPUT_ATTACHMENT_READ_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::ShaderRead)) {
+        result |= VkAccessFlagBits::VK_ACCESS_SHADER_READ_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::ShaderWrite)) {
+        result |= VkAccessFlagBits::VK_ACCESS_SHADER_WRITE_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::ColorRead)) {
+        result |= VkAccessFlagBits::VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::ColorWrite)) {
+        result |= VkAccessFlagBits::VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::DepthStencilRead)) {
+        result |= VkAccessFlagBits::VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::DepthStencilWrite)) {
+        result |= VkAccessFlagBits::VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::TransferRead)) {
+        result |= VkAccessFlagBits::VK_ACCESS_TRANSFER_READ_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::TransferWrite)) {
+        result |= VkAccessFlagBits::VK_ACCESS_TRANSFER_WRITE_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::HostRead)) {
+        result |= VkAccessFlagBits::VK_ACCESS_HOST_READ_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::HostWrite)) {
+        result |= VkAccessFlagBits::VK_ACCESS_HOST_WRITE_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::MemoryRead)) {
+        result |= VkAccessFlagBits::VK_ACCESS_MEMORY_READ_BIT;
+    }
+    if (HUH::CheckFlag(access, HUH::RHI::AccessType::MemoryWrite)) {
+        result |= VkAccessFlagBits::VK_ACCESS_MEMORY_WRITE_BIT;
+    }
+    return result;
 }
 
 VulkanDynamicRHI::~VulkanDynamicRHI() {

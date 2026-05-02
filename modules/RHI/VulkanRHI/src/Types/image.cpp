@@ -1,8 +1,8 @@
 #include <HUH/RHI/vulkan/Types/image.h>
-
-#include "HUH/RHI/vulkan/device.h"
-#include "HUH/RHI/vulkan/dynamic_rhi.h"
-#include "HUH/RHI/vulkan/pipeline.h"
+#include <HUH/RHI/vulkan/device.h>
+#include <HUH/RHI/vulkan/dynamic_rhi.h>
+#include <HUH/RHI/vulkan/pipeline.h>
+#include <HUH/RHI/vulkan/render_pass.h>
 
 namespace HUH::RHI {
 
@@ -13,6 +13,28 @@ void VulkanImage::Destroy() {
     if (m_created) {
     }
     HUH::vkDestroyImageView(m_device->m_device, m_imageView, nullptr);
+    HUH::vkDestroyFramebuffer(*m_device, m_frameBuffer, nullptr);
+}
+
+VkFramebuffer VulkanImage::GetFrameBuffer(const VulkanRenderPass* renderPass) {
+    if (m_frameBuffer) {
+        return m_frameBuffer;
+    }
+    VkImageView imageViews[] = {m_imageView};
+    VkFramebufferCreateInfo framebufferCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+        .renderPass = *renderPass,
+        .attachmentCount = 1,
+        .pAttachments = imageViews,
+        .width = m_size.X(),
+        .height = m_size.Y(),
+        .layers = 1,
+    };
+    if (auto err = HUH::vkCreateFramebuffer(*m_device, &framebufferCreateInfo, nullptr, &m_frameBuffer);
+        err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Error creating vulkan framebuffer: {}", err)
+    }
+    return m_frameBuffer;
 }
 
 bool VulkanImage::Init(Initializer&& init) {

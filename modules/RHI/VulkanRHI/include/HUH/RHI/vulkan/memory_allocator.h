@@ -19,8 +19,6 @@ public:
 
     struct Allocation {
         friend class VulkanBuffer;
-        Allocation() { HUH_TLOG("Allocation"); }
-        ~Allocation() { HUH_TLOG("¬Allocation"); }
         VkDeviceMemory Memory = nullptr;
 
         MemoryBlock Allocate(Uint32 size, Uint32 alignment);

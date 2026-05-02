@@ -15,6 +15,7 @@ public:
     void Destroy() override;
 
     operator VkImageView() const { return m_imageView; }
+    VkFramebuffer GetFrameBuffer(const VulkanRenderPass* renderPass);
 
 protected:
     explicit VulkanImage(VkImage image) : Image(false), m_image(image) {}
@@ -22,6 +23,7 @@ protected:
 
     VkImage m_image;
     VkImageView m_imageView = nullptr;
+    VkFramebuffer m_frameBuffer = nullptr;
     VulkanDevice* m_device = nullptr;
 };
 }// namespace HUH::RHI

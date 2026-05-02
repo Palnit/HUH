@@ -1,7 +1,8 @@
 #pragma once
 
 #include <HUH/RHI/fwd.h>
-#include <HUH/enum_helper.h>
+#include <HUH/enum_define.h>
+#include <HUH/types.h>
 
 namespace HUH {
 namespace RHI {
@@ -18,13 +19,18 @@ public:
         DST = 1 << 4,
     };
     virtual void Destroy() = 0;
+    virtual void MapData() = 0;
     virtual void CopyData(void* data) = 0;
+    virtual void UnMapData() = 0;
+    HUH_NODISCARD Uint64 GetSize() const { return m_size; }
+    HUH_NODISCARD void* GetMappedData() const { return m_mappedData; }
 
 protected:
     Buffer(Uint64 size);
     virtual ~Buffer() = default;
     MemoryAllocator* m_allocator = nullptr;
     Uint64 m_size = 0;
+    void* m_mappedData = nullptr;
 };
 
 }// namespace RHI

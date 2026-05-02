@@ -13,9 +13,12 @@ public:
     friend class VulkanMemoryAllocator;
     static VkBufferUsageFlags ConvertBufferType(Buffer::Type type);
     void Destroy() override;
+    void MapData() override;
     void CopyData(void* data) override;
+    void UnMapData() override;
     HUH_NODISCARD VkMemoryRequirements GetMemoryRequirements() const;
     operator VkBuffer() const { return m_buffer; }
+    VulkanMemoryAllocator::MemoryBlock GetMemoryBlock() const { return m_allocatedBlock; }
 
 protected:
     VulkanBuffer(Uint64 size, VkBuffer buffer, VulkanDevice* device);

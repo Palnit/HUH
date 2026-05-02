@@ -38,5 +38,24 @@ bool VulkanQueue::Submit(CommandPool::CommandBuffer* commandPool, Fence* wait, F
     }
     return true;
 }
+bool VulkanQueue::Submit(CommandPool::CommandBuffer* commandPool) {
+
+    auto vk_CommandBuffer = dynamic_cast<VulkanCommandPool::VulkanCommandBuffer*>(commandPool);
+    VkSubmitInfo submitInfo = {
+        .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+        .commandBufferCount = 1,
+        .pCommandBuffers = &vk_CommandBuffer->m_commandBuffer,
+    };
+
+    if (auto err = HUH::vkQueueSubmit(*this, 1, &submitInfo, nullptr); err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Submit Error: {}", err)
+        return false;
+    }
+    return true;
+}
+
+void VulkanQueue::WaitIdle() {
+    HUH::vkQueueWaitIdle(*this);
+}
 
 }// namespace HUH::RHI

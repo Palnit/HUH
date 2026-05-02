@@ -12,5 +12,6 @@ class VulkanMemoryAllocator;
 class VulkanImage;
 class VulkanFence;
 class VulkanBuffer;
+class VulkanRenderPass;
 
 }// namespace HUH::RHI

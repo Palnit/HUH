@@ -15,12 +15,19 @@ public:
     void Destroy() override;
     void AddShader(class Shader* shader) override;
 
+    // ReSharper disable once CppMemberFunctionMayBeConst CppNonExplicitConversionOperator
+    operator VkPipeline() { return m_pipeline; }
+    // TODO move to dynamic rhi
+    static VkFormat ConvertToFormat(const VertexFactory::Descriptor& descriptor);
+    static VkPipelineStageFlags ConvertToPipelineStage(const Pipeline::Stages& stages);
+    static VkDescriptorType ConvertDescriptorType(const Pipeline::DescriptorTypes& descriptor);
+
 protected:
     VulkanPipeline(VulkanDevice* device) : m_device(device) {}
     ~VulkanPipeline() override;
-    VkFormat ConvertToFormat(const VertexFactory::Descriptor& descriptor);
 
     VulkanDevice* m_device;
+    VkDescriptorSetLayout m_descriptorSetLayout = nullptr;
     VkPipelineLayout m_layout = nullptr;
     VkPipeline m_pipeline = nullptr;
     std::vector<VkPipelineShaderStageCreateInfo> m_shaderStages;

@@ -1,9 +1,9 @@
 #pragma once
 #include <HUH/definitions.h>
+#include <HUH/enum_define.h>
 #include <HUH/vulkan_loader.h>
-#include <string>
-#include <HUH/enum_helper.h>
 #include <format>
+#include <string>
 
 namespace HUH {
 

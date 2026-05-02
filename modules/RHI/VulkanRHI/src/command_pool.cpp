@@ -6,13 +6,13 @@
 #include <HUH/RHI/vulkan/command_pool.h>
 
 #include "HUH/RHI/vulkan/Types/buffer.h"
+#include "HUH/RHI/vulkan/render_pass.h"
 
 #include <HUH/RHI/vulkan/device.h>
 #include <HUH/RHI/vulkan/pipeline.h>
 #include <HUH/RHI/vulkan/queue.h>
 
 namespace HUH::RHI {
-
 bool VulkanCommandPool::VulkanCommandBuffer::Begin() {
     VkCommandBufferBeginInfo beginInfo = {
         .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -22,95 +22,44 @@ bool VulkanCommandPool::VulkanCommandBuffer::Begin() {
         HUH_ELOG(LogVulkanRHI, "CommandBuffer Begin Error: {}", err)
         return false;
     }
-
-    // TODO REFACTOR BARRIERS TO DIFFERENT CLASS
-    VkImageMemoryBarrier2 imageMemoryBarrier{.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2,
-                                             .srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,
-                                             .srcAccessMask = VK_ACCESS_2_NONE,
-                                             .dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,
-                                             .dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,
-                                             .oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-                                             .newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                                             .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-                                             .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-                                             .image = m_renderTarget->m_image,
-                                             .subresourceRange = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                                                                  .baseMipLevel = 0,
-                                                                  .levelCount = 1,
-                                                                  .baseArrayLayer = 0,
-                                                                  .layerCount = 1}};
-    VkDependencyInfo imageDependencyInfo{
-        .sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO,
-        .dependencyFlags = {},
-        .imageMemoryBarrierCount = 1,
-        .pImageMemoryBarriers = &imageMemoryBarrier,
-    };
-    HUH::vkCmdPipelineBarrier2(m_commandBuffer, &imageDependencyInfo);
-
-    VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
-    VkRenderingAttachmentInfo renderingAttachmentInfo = {.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
-                                                         .imageView = m_renderTarget->m_imageView,
-                                                         .imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                                                         .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-                                                         .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-                                                         .clearValue = clearColor};
-    VkRenderingInfo renderingInfo{.sType = VK_STRUCTURE_TYPE_RENDERING_INFO,
-                                  .renderArea = {.extent = {.width = m_viewPort.X(), .height = m_viewPort.Y()}},
-                                  .layerCount = 1,
-                                  .colorAttachmentCount = 1,
-                                  .pColorAttachments = &renderingAttachmentInfo};
-
-    HUH::vkCmdBeginRendering(m_commandBuffer, &renderingInfo);
-    HUH::vkCmdBindPipeline(m_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_parent->m_pipeline->m_pipeline);
-
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = static_cast<float>(m_viewPort.X());
-    viewport.height = static_cast<float>(m_viewPort.Y());
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
-    vkCmdSetViewport(m_commandBuffer, 0, 1, &viewport);
-
-    VkExtent2D extent{m_scissor.X(), m_scissor.Y()};
-    VkRect2D scissor{};
-    scissor.offset = {0, 0};
-    scissor.extent = extent;
-    vkCmdSetScissor(m_commandBuffer, 0, 1, &scissor);
-
     return true;
 }
 
 void VulkanCommandPool::VulkanCommandBuffer::End() {
-    HUH::vkCmdEndRendering(m_commandBuffer);
-    VkImageMemoryBarrier2 imageMemoryBarrier{.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2,
-                                             .srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,
-                                             .srcAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,
-                                             .dstStageMask = VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT,
-                                             .dstAccessMask = VK_ACCESS_2_NONE,
-                                             .oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                                             .newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-                                             .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-                                             .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-                                             .image = m_renderTarget->m_image,
-                                             .subresourceRange = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                                                                  .baseMipLevel = 0,
-                                                                  .levelCount = 1,
-                                                                  .baseArrayLayer = 0,
-                                                                  .layerCount = 1}};
-    VkDependencyInfo imageDependencyInfo{
-        .sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO,
-        .dependencyFlags = {},
-        .imageMemoryBarrierCount = 1,
-        .pImageMemoryBarriers = &imageMemoryBarrier,
-    };
-    HUH::vkCmdPipelineBarrier2(m_commandBuffer, &imageDependencyInfo);
-
     HUH::vkEndCommandBuffer(m_commandBuffer);
 }
 
-void VulkanCommandPool::VulkanCommandBuffer::AddRenderTarget(Image* renderTarget) {
-    m_renderTarget = dynamic_cast<VulkanImage*>(renderTarget);
+void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPass, Image* renderTarget) {
+    auto vk_image = dynamic_cast<VulkanImage*>(renderTarget);
+    auto vk_renderPass = dynamic_cast<VulkanRenderPass*>(renderPass);
+
+    VkViewport viewport{.x = 0.0f,
+                        .y = 0.0f,
+                        .width = static_cast<float>(m_viewPort.X()),
+                        .height = static_cast<float>(m_viewPort.Y()),
+                        .minDepth = 0.0f,
+                        .maxDepth = 1.0f};
+    vkCmdSetViewport(m_commandBuffer, 0, 1, &viewport);
+
+    VkRect2D scissor{.offset = {0, 0}, .extent = {m_scissor.X(), m_scissor.Y()}};
+    HUH::vkCmdSetScissor(m_commandBuffer, 0, 1, &scissor);
+
+    VkClearValue clearColor = {.color = {{m_clearColor.X(), m_clearColor.Y(), m_clearColor.Z(), m_clearColor.W()}}};
+    VkRenderPassBeginInfo renderPassInfo = {.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+                                            .renderPass = *vk_renderPass,
+                                            .framebuffer = vk_image->GetFrameBuffer(vk_renderPass),
+                                            .renderArea =
+                                                {
+                                                    .offset = {0, 0},
+                                                    .extent = {m_scissor.X(), m_scissor.Y()},
+                                                },
+                                            .clearValueCount = 1,
+                                            .pClearValues = &clearColor};
+    HUH::vkCmdBeginRenderPass(m_commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+}
+
+void VulkanCommandPool::VulkanCommandBuffer::EndRendering() {
+    vkCmdEndRenderPass(m_commandBuffer);
 }
 
 VulkanCommandPool::VulkanCommandBuffer::~VulkanCommandBuffer() {
@@ -157,7 +106,7 @@ void VulkanCommandPool::VulkanCommandBuffer::Reset() {
     HUH::vkResetCommandBuffer(m_commandBuffer, 0);
 }
 
-void VulkanCommandPool::VulkanCommandBuffer::BindBuffer(Buffer* buffer) {
+void VulkanCommandPool::VulkanCommandBuffer::BindVertexBuffer(Buffer* buffer) {
     // TODO offsets
     auto vk_buffer = dynamic_cast<VulkanBuffer*>(buffer);
     VkBuffer buffers[] = {*vk_buffer};
@@ -165,13 +114,36 @@ void VulkanCommandPool::VulkanCommandBuffer::BindBuffer(Buffer* buffer) {
     vkCmdBindVertexBuffers(m_commandBuffer, 0, 1, buffers, offsets);
 }
 
+void VulkanCommandPool::VulkanCommandBuffer::BindIndexBuffer(Buffer* buffer) {
+    auto vk_buffer = dynamic_cast<VulkanBuffer*>(buffer);
+    vkCmdBindIndexBuffer(m_commandBuffer, *vk_buffer, 0, VK_INDEX_TYPE_UINT32);
+}
+
 void VulkanCommandPool::VulkanCommandBuffer::Draw(Uint32 vertexCount, Uint32 instanceCount) {
     vkCmdDraw(m_commandBuffer, vertexCount, instanceCount, 0, 0);
 }
 
-VulkanCommandPool::VulkanCommandPool(VulkanDevice* device, VulkanPipeline* pipeline)
-    : m_device(device),
-      m_pipeline(pipeline) {
+void VulkanCommandPool::VulkanCommandBuffer::DrawIndexed(Uint32 indexCount, Uint32 instanceCount) {
+    vkCmdDrawIndexed(m_commandBuffer, indexCount, instanceCount, 0, 0, 0);
+}
+
+void VulkanCommandPool::VulkanCommandBuffer::BindPipeline(class Pipeline* pipeline) {
+    auto vk_pipeline = dynamic_cast<VulkanPipeline*>(pipeline);
+    HUH::vkCmdBindPipeline(m_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *vk_pipeline);
+}
+
+void VulkanCommandPool::VulkanCommandBuffer::CopyBuffer(Buffer* srcBuffer, Buffer* dstBuffer) {
+    auto vk_srcBuffer = dynamic_cast<VulkanBuffer*>(srcBuffer);
+    auto vk_dstBuffer = dynamic_cast<VulkanBuffer*>(dstBuffer);
+    if (vk_srcBuffer->GetSize() != vk_dstBuffer->GetSize()) {
+        HUH_WLOG(LogVulkanRHI, "The size of the two buffer to copy are not equal: src: {} dst: {}",
+                 vk_srcBuffer->GetMemoryBlock().Size, vk_dstBuffer->GetMemoryBlock().Size)
+    }
+    VkBufferCopy copyRegion = {.srcOffset = 0, .dstOffset = 0, .size = vk_srcBuffer->GetSize()};
+    vkCmdCopyBuffer(m_commandBuffer, *vk_srcBuffer, *vk_dstBuffer, 1, &copyRegion);
+}
+
+VulkanCommandPool::VulkanCommandPool(VulkanDevice* device) : m_device(device) {
 }
 
 VulkanCommandPool::~VulkanCommandPool() {

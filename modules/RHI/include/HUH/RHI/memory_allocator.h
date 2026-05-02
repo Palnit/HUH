@@ -1,9 +1,8 @@
 #pragma once
 
-#include "HUH/enum_helper.h"
-
 #include <HUH/RHI/fwd.h>
 #include <HUH/RHI/types.h>
+#include <HUH/enum_define.h>
 #include <map>
 
 namespace HUH {
@@ -15,6 +14,8 @@ public:
         UNKNOWN = 0,
         Device = 1 << 0,
         Host = 1 << 1,
+        TransferSrc = 1 << 2,
+        TransferDst = 1 << 3,
     };
     virtual bool Allocate(Buffer* buffer, Type type) = 0;
     virtual bool Free(Buffer* buffer) = 0;
