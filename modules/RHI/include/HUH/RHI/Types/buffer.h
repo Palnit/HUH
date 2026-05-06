@@ -6,7 +6,7 @@
 
 namespace HUH {
 namespace RHI {
-class Buffer {
+class HUH_RHI_API Buffer {
 public:
     friend class Device;
     friend class MemoryAllocator;

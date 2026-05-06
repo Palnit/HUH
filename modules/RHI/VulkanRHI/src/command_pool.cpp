@@ -32,11 +32,12 @@ void VulkanCommandPool::VulkanCommandBuffer::End() {
 void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPass, Image* renderTarget) {
     auto vk_image = dynamic_cast<VulkanImage*>(renderTarget);
     auto vk_renderPass = dynamic_cast<VulkanRenderPass*>(renderPass);
+    auto size = vk_image->GetSize();
 
     VkViewport viewport{.x = 0.0f,
                         .y = 0.0f,
-                        .width = static_cast<float>(m_viewPort.X()),
-                        .height = static_cast<float>(m_viewPort.Y()),
+                        .width = static_cast<float>(size.X()),
+                        .height = static_cast<float>(size.Y()),
                         .minDepth = 0.0f,
                         .maxDepth = 1.0f};
     vkCmdSetViewport(m_commandBuffer, 0, 1, &viewport);
@@ -51,7 +52,8 @@ void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPa
                                             .renderArea =
                                                 {
                                                     .offset = {0, 0},
-                                                    .extent = {m_scissor.X(), m_scissor.Y()},
+                                                    // This might need scisor i dont know yet what to do windows
+                                                    .extent = {size.X(), size.Y()},
                                                 },
                                             .clearValueCount = 1,
                                             .pClearValues = &clearColor};

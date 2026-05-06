@@ -20,6 +20,7 @@ public:
     };
     virtual bool Init(Initializer&& init) = 0;
     virtual void Destroy() = 0;
+    HUH::Vector2u32 GetSize()const { return m_size; }
 
 protected:
     Image(bool created) : m_created(created) {}

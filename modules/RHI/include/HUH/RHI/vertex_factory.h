@@ -25,7 +25,7 @@ public:
                 Stride = sizeof(typename HUH::ClassMemberTypeHelper<T>::StructType);
             }(),
             ...);
-        m_streams.emplace_back(Stride);
+        m_streams.emplace_back(static_cast<HUH::Uint32>(Stride));
         (
             [&] {
                 AddVertexStreamInternal<typename HUH::ClassMemberTypeHelper<T>::Type>(
@@ -48,7 +48,7 @@ public:
 
 private:
     template<typename T>
-    HUH_FORCE_INLINE constexpr void AddVertexStreamInternal(size_t Offset) {
+    HUH_FORCE_INLINE constexpr void AddVertexStreamInternal(HUH::Uint32 Offset) {
         if constexpr (HUH::Same<T, Uint8>) {
             m_streams.back().descriptors.emplace_back(Format::U8, VectorFormat::X, Offset);
         } else if constexpr (HUH::Same<T, Uint16>) {
