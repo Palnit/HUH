@@ -10,6 +10,7 @@ class HUH_RHI_API Buffer {
 public:
     friend class Device;
     friend class MemoryAllocator;
+    friend class Pipeline;
     enum Type {
         Unknown = 0,
         VERTEX = 1 << 0,
@@ -21,6 +22,7 @@ public:
     virtual void Destroy() = 0;
     virtual void MapData() = 0;
     virtual void CopyData(void* data) = 0;
+    virtual void UploadData(void* data) = 0;
     virtual void UnMapData() = 0;
     HUH_NODISCARD Uint64 GetSize() const { return m_size; }
     HUH_NODISCARD void* GetMappedData() const { return m_mappedData; }

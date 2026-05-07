@@ -4,6 +4,13 @@
 namespace HUH {
 namespace RHI {}
 
+void RHI::Pipeline::Destroy() {
+    for (Buffer* buffer : m_createdBuffers) {
+        buffer->Destroy();
+        delete buffer;
+    }
+}
+
 std::string ToString(RHI::Pipeline::Stages type) {
     std::string result = "";
     if (HUH::CheckFlag(type, RHI::Pipeline::Stages::Unknown)) {

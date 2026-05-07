@@ -13,10 +13,6 @@
 namespace HUH {
 namespace RHI {
 void Device::Destroy() {
-    for (Buffer* buffer : m_createdBuffers) {
-        buffer->Destroy();
-        delete buffer;
-    }
     for (MemoryAllocator* memoryAllocator : m_createdMemoryAllocators) {
         memoryAllocator->Destroy();
         delete memoryAllocator;

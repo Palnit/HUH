@@ -3,11 +3,14 @@
 #include <HUH/types.h>
 
 #include "HUH/RHI/vertex_factory.h"
+#include "HUH/RHI/vulkan/Types/buffer.h"
 #include "HUH/RHI/vulkan/render_pass.h"
 
 #include <HUH/RHI/vulkan/device.h>
 
 namespace HUH::RHI {
+
+constexpr Uint32 DefaultMaxSets = 16;
 
 VkFormat VulkanPipeline::ConvertToFormat(const VertexFactory::Descriptor& descriptor) {
     switch (descriptor.vectorFormat) {
@@ -178,6 +181,19 @@ VkDescriptorType VulkanPipeline::ConvertDescriptorType(const Pipeline::Descripto
             return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     }
 }
+void VulkanPipeline::CreateDescriptorSet() {
+    VkDescriptorSetAllocateInfo allocInfo{
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+        .descriptorPool = m_descriptorPool,
+        .descriptorSetCount = 1,
+        .pSetLayouts = &m_descriptorSetLayout,
+    };
+    m_descriptorSets.emplace_back(nullptr, std::vector<bool>(m_descriptorSetLayoutBindings.size(), false));
+    if (auto err = HUH::vkAllocateDescriptorSets(*m_device, &allocInfo, &m_descriptorSets.back().set);
+        err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Failed to create descriptor set: {}")
+    }
+}
 
 bool VulkanPipeline::Init(Initializer&& initializer) {
     // TODO REFACTOR THIS TO MAKE IT WORK WITHOUT ME HAVING TO DO MAGIC
@@ -276,23 +292,22 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
     colorBlending.blendConstants[2] = 0.0f;// Optional
     colorBlending.blendConstants[3] = 0.0f;// Optional
 
-    std::vector<VkDescriptorSetLayoutBinding> descriptorSetLayoutBindings;
     for (auto descriptor : initializer.descriptorTypes) {
         VkDescriptorSetLayoutBinding pipelineLayoutBinding{
-            .binding = static_cast<Uint32>(descriptorSetLayoutBindings.size()),
+            .binding = static_cast<Uint32>(m_descriptorSetLayoutBindings.size()),
             .descriptorType = ConvertDescriptorType(descriptor.type),
             .descriptorCount = descriptor.count,
             .stageFlags = VulkanShader::ConvertStage(descriptor.stage),
             .pImmutableSamplers = nullptr,
         };
-        descriptorSetLayoutBindings.push_back(pipelineLayoutBinding);
+        m_descriptorSetLayoutBindings.push_back(pipelineLayoutBinding);
     }
 
-    if (!descriptorSetLayoutBindings.empty()) {
+    if (!m_descriptorSetLayoutBindings.empty()) {
         VkDescriptorSetLayoutCreateInfo layoutInfo{
             .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-            .bindingCount = static_cast<Uint32>(descriptorSetLayoutBindings.size()),
-            .pBindings = descriptorSetLayoutBindings.data(),
+            .bindingCount = static_cast<Uint32>(m_descriptorSetLayoutBindings.size()),
+            .pBindings = m_descriptorSetLayoutBindings.data(),
         };
         if (auto err = HUH::vkCreateDescriptorSetLayout(*m_device, &layoutInfo, nullptr, &m_descriptorSetLayout);
             err != VK_SUCCESS) {
@@ -340,12 +355,29 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
         HUH_ELOG(LogVulkanRHI, "Error creating graphics pipeline: {}", err);
         return false;
     }
+    VkDescriptorPoolSize uniformPoolSize{
+        .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        .descriptorCount = 2 * HUH::RHI::DefaultMaxSets,
+    };
+    VkDescriptorPoolCreateInfo poolInfo{
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .maxSets = HUH::RHI::DefaultMaxSets,
+        .poolSizeCount = 1,
+        .pPoolSizes = &uniformPoolSize,
+    };
+    if (auto err = vkCreateDescriptorPool(*m_device, &poolInfo, nullptr, &m_descriptorPool); err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Error creating descriptor pool: {}", err);
+        return false;
+    }
+
     HUH_ILOG(LogVulkanRHI, "Pipeline Creation Successful")
 
     return true;
 }
 
 void VulkanPipeline::Destroy() {
+    Pipeline::Destroy();
+    HUH::vkDestroyDescriptorPool(*m_device, m_descriptorPool, nullptr);
     HUH::vkDestroyPipeline(m_device->m_device, m_pipeline, nullptr);
     HUH::vkDestroyPipelineLayout(m_device->m_device, m_layout, nullptr);
     HUH::vkDestroyDescriptorSetLayout(m_device->m_device, m_descriptorSetLayout, nullptr);
@@ -354,6 +386,61 @@ void VulkanPipeline::Destroy() {
 void VulkanPipeline::AddShader(class Shader* shader) {
     auto vk_shader = dynamic_cast<VulkanShader*>(shader);
     m_shaderStages.push_back(vk_shader->m_shaderStageInfo);
+}
+
+Buffer* VulkanPipeline::CreateBuffer(Buffer::Type type, Uint64 Size) {
+    VkBuffer buffer;
+    VkBufferCreateInfo bufferCreateInfo{.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+                                        .pNext = nullptr,
+                                        .size = Size,
+                                        .usage = VulkanBuffer::ConvertBufferType(type),
+                                        .sharingMode = VK_SHARING_MODE_EXCLUSIVE};
+    if (auto err = HUH::vkCreateBuffer(*m_device, &bufferCreateInfo, nullptr, &buffer); err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Vulkan buffer creation failed: {}", HUH::ToString(err))
+    }
+    m_createdBuffers.push_back(new VulkanBuffer(Size, buffer, m_device));
+    return m_createdBuffers.back();
+}
+
+Buffer* VulkanPipeline::CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Binding) {
+    if (Binding >= m_createdBuffers.size()) {
+        HUH_ELOG(LogVulkanRHI, "Requesting a buffer for binding greater than the specified Bindings")
+        return nullptr;
+    }
+    // TODO error on non uniform type
+
+    VkBuffer buffer;
+    VkBufferCreateInfo bufferCreateInfo{.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+                                        .pNext = nullptr,
+                                        .size = Size,
+                                        .usage = VulkanBuffer::ConvertBufferType(type),
+                                        .sharingMode = VK_SHARING_MODE_EXCLUSIVE};
+    if (auto err = HUH::vkCreateBuffer(*m_device, &bufferCreateInfo, nullptr, &buffer); err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Vulkan buffer creation failed: {}", HUH::ToString(err))
+    }
+    auto vk_buffer = new VulkanBuffer(Size, buffer, m_device);
+    m_createdBuffers.push_back(vk_buffer);
+    vk_buffer->m_uniformBuffer = true;
+    vk_buffer->m_binding = Binding;
+
+    if (m_descriptorSets.empty()) {
+        CreateDescriptorSet();
+    }
+    bool found = false;
+    for (auto& [set, bound] : m_descriptorSets) {
+        if (!bound[Binding]) {
+            vk_buffer->m_descriptorSet = set;
+            bound[Binding] = true;
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        CreateDescriptorSet();
+    }
+    m_descriptorSets.back().bound[Binding] = true;
+    vk_buffer->m_descriptorSet = m_descriptorSets.back().set;
+    return m_createdBuffers.back();
 }
 
 VulkanPipeline::~VulkanPipeline() {

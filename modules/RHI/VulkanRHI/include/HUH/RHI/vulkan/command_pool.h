@@ -21,6 +21,8 @@ public:
         void Reset() override;
         void BindVertexBuffer(Buffer* buffer) override;
         void BindIndexBuffer(Buffer* buffer) override;
+        // TODO rethink this with dx12
+        void BindUniformBuffers(Buffer* buffer) override;
         void Draw(Uint32 vertexCount, Uint32 instanceCount) override;
         void DrawIndexed(Uint32 indexCount, Uint32 instanceCount) override;
         void BindPipeline(class Pipeline* pipeline) override;
@@ -28,6 +30,7 @@ public:
 
     protected:
         VulkanCommandPool* m_parent;
+        VulkanPipeline* m_pipeline = nullptr;
         VkCommandBuffer m_commandBuffer;
 
         VulkanCommandBuffer(VulkanCommandPool* parent, VkCommandBuffer commandBuffer)

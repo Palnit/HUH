@@ -1,5 +1,6 @@
 #pragma once
 
+#include <HUH/RHI/Types/buffer.h>
 #include <HUH/RHI/fwd.h>
 #include <HUH/RHI/shader.h>
 #include <HUH/enum_define.h>
@@ -49,12 +50,15 @@ public:
     friend class CommandPool;
     friend class Device;
     virtual bool Init(Initializer&& initializer) = 0;
-    virtual void Destroy() = 0;
+    virtual void Destroy();
     virtual void AddShader(class Shader* shader) = 0;
+    virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size) = 0;
+    virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Binding) = 0;
 
 protected:
     Pipeline() = default;
     virtual ~Pipeline() = default;
+    std::vector<Buffer*> m_createdBuffers;
 };
 }// namespace RHI
 std::string HUH_RHI_API ToString(RHI::Pipeline::Stages stage);

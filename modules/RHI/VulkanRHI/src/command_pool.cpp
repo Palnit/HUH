@@ -121,6 +121,17 @@ void VulkanCommandPool::VulkanCommandBuffer::BindIndexBuffer(Buffer* buffer) {
     vkCmdBindIndexBuffer(m_commandBuffer, *vk_buffer, 0, VK_INDEX_TYPE_UINT32);
 }
 
+void VulkanCommandPool::VulkanCommandBuffer::BindUniformBuffers(Buffer* buffer) {
+    if (!m_pipeline) {
+        HUH_ELOG(LogVulkanRHI, "You should bind a pipeline before binding buffers")
+        return;
+    }
+    auto vk_buffer = dynamic_cast<VulkanBuffer*>(buffer);
+    // TODO RETHINK THIS A LOT
+    vkCmdBindDescriptorSets(m_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->m_layout, 0, 1,
+                            &vk_buffer->m_descriptorSet, 0, nullptr);
+}
+
 void VulkanCommandPool::VulkanCommandBuffer::Draw(Uint32 vertexCount, Uint32 instanceCount) {
     vkCmdDraw(m_commandBuffer, vertexCount, instanceCount, 0, 0);
 }
@@ -130,8 +141,8 @@ void VulkanCommandPool::VulkanCommandBuffer::DrawIndexed(Uint32 indexCount, Uint
 }
 
 void VulkanCommandPool::VulkanCommandBuffer::BindPipeline(class Pipeline* pipeline) {
-    auto vk_pipeline = dynamic_cast<VulkanPipeline*>(pipeline);
-    HUH::vkCmdBindPipeline(m_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *vk_pipeline);
+    m_pipeline = dynamic_cast<VulkanPipeline*>(pipeline);
+    HUH::vkCmdBindPipeline(m_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *m_pipeline);
 }
 
 void VulkanCommandPool::VulkanCommandBuffer::CopyBuffer(Buffer* srcBuffer, Buffer* dstBuffer) {

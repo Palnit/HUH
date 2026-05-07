@@ -19,6 +19,7 @@ public:
         void SetClearColor(const Vector4f& clearColor) { m_clearColor = clearColor; };
         virtual void BindVertexBuffer(class Buffer* buffer) = 0;
         virtual void BindIndexBuffer(Buffer* buffer) = 0;
+        virtual void BindUniformBuffers(Buffer* buffer) = 0;
         virtual void Draw(Uint32 vertexCount, Uint32 instanceCount) = 0;
         virtual void DrawIndexed(Uint32 indexCount, Uint32 instanceCount) = 0;
         virtual void Reset() = 0;

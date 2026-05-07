@@ -278,20 +278,6 @@ MemoryAllocator* VulkanDevice::CreateMemoryAllocator() {
     return m_createdMemoryAllocators.back();
 }
 
-Buffer* VulkanDevice::CreateBuffer(Buffer::Type type, Uint64 Size) {
-    VkBuffer buffer;
-    VkBufferCreateInfo bufferCreateInfo{.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-                                        .pNext = nullptr,
-                                        .size = Size,
-                                        .usage = VulkanBuffer::ConvertBufferType(type),
-                                        .sharingMode = VK_SHARING_MODE_EXCLUSIVE};
-    if (auto err = HUH::vkCreateBuffer(m_device, &bufferCreateInfo, nullptr, &buffer); err != VK_SUCCESS) {
-        HUH_ELOG(LogVulkanRHI, "Vulkan buffer creation failed: {}", HUH::ToString(err))
-    }
-    m_createdBuffers.push_back(new VulkanBuffer(Size, buffer, this));
-    return m_createdBuffers.back();
-}
-
 RenderPass* VulkanDevice::CreateRenderPass() {
     m_createdRenderPasses.push_back(new VulkanRenderPass(this));
     return m_createdRenderPasses.back();

@@ -73,7 +73,6 @@ public:
     std::vector<Fence*> CreateFence(Uint32 num) override;
 
     MemoryAllocator* CreateMemoryAllocator() override;
-    Buffer* CreateBuffer(Buffer::Type type, Uint64 Size) override;
     RenderPass* CreateRenderPass() override;
 
 protected:

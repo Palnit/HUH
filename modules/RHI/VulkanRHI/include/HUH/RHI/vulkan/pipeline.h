@@ -14,6 +14,8 @@ public:
     bool Init(Initializer&& initializer) override;
     void Destroy() override;
     void AddShader(class Shader* shader) override;
+    virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size);
+    virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Binding);
 
     // ReSharper disable once CppMemberFunctionMayBeConst CppNonExplicitConversionOperator
     operator VkPipeline() { return m_pipeline; }
@@ -26,10 +28,20 @@ protected:
     VulkanPipeline(VulkanDevice* device) : m_device(device) {}
     ~VulkanPipeline() override;
 
+    struct DescriptorSet {
+        VkDescriptorSet set = nullptr;
+        std::vector<bool> bound;
+    };
+
+    void CreateDescriptorSet();
+
     VulkanDevice* m_device;
+    std::vector<VkDescriptorSetLayoutBinding> m_descriptorSetLayoutBindings;
     VkDescriptorSetLayout m_descriptorSetLayout = nullptr;
     VkPipelineLayout m_layout = nullptr;
     VkPipeline m_pipeline = nullptr;
+    VkDescriptorPool m_descriptorPool = nullptr;
+    std::vector<DescriptorSet> m_descriptorSets;
     std::vector<VkPipelineShaderStageCreateInfo> m_shaderStages;
 };
 }// namespace HUH::RHI

@@ -41,7 +41,6 @@ public:
     virtual CommandPool* CreateCommandPool() = 0;
     virtual Swapchain* CreateSwapchain(Window& window) = 0;
     virtual MemoryAllocator* CreateMemoryAllocator() = 0;
-    virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size) = 0;
     virtual Fence* CreateFence() = 0;
     virtual std::vector<Fence*> CreateFence(Uint32 num) = 0;
     virtual RenderPass* CreateRenderPass() = 0;
@@ -58,7 +57,6 @@ protected:
     std::vector<CommandPool*> m_createdCommandBuffers;
     std::vector<Swapchain*> m_createdSwapchains;
     std::vector<Fence*> m_createdFences;
-    std::vector<Buffer*> m_createdBuffers;
     std::vector<MemoryAllocator*> m_createdMemoryAllocators;
     std::vector<RenderPass*> m_createdRenderPasses;
 };
