@@ -9,7 +9,7 @@
 
 namespace HUH {
 namespace RHI {
-class Pipeline {
+class HUH_RHI_API Pipeline {
 public:
     enum class DescriptorTypes {
         Uniform,
