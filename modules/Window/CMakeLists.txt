@@ -9,6 +9,7 @@ set(HEADER_FILES
         ${WINDOW_INC_PATH}/definitions.h
 )
 set(SOURCE_FILES
+        src/window_proto.cpp
 )
 
 set_property(TARGET HUH APPEND PROPERTY HUH_REQUIRED_INSTANCE_EXTENSIONS VK_KHR_surface VK_KHR_get_surface_capabilities2)

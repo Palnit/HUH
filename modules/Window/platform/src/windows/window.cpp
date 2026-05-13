@@ -4,6 +4,24 @@
 #include <HUH/Window/Windows/window.h>
 
 namespace HUH {
+
+KeyBindings TransformToHUHKey(WPARAM wParam) {
+    switch (wParam) {
+        case VK_LBUTTON:
+            return KeyBindings::Mouse_1;
+            case VK_RBUTTON:
+            return KeyBindings::Mouse_2;
+            case VK_MBUTTON:
+            return KeyBindings::Mouse_3;
+            case VK_XBUTTON1:
+            return KeyBindings::Mouse_4;
+            case VK_XBUTTON2:
+            return KeyBindings::Mouse_5;
+        default:
+            return KeyBindings::Unknown;
+    }
+}
+
 Window::Window(const std::string& name, const Int32 width, const Int32 height) : WindowProto(name, width, height) {
     constexpr char className[] = "HUH_WINDOWS_WINDOW";
     WNDCLASS wc = {};
@@ -54,6 +72,17 @@ LRESULT Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
         case WM_SIZE: {
             OnSizeChange.ExecuteAll(this, LOWORD(lParam), HIWORD(lParam));
             return 0;
+        }
+        case WM_SYSKEYDOWN:
+        case WM_KEYDOWN: {
+            HUH_TLOG("Keydown?");
+            KeyBindings key = TransformToHUHKey(wParam);
+            HUH_TLOG("Key: {}",key);
+            return 0;
+        }
+        case WM_MOUSEACTIVATE: {
+            HUH_TLOG("Mouse activate");
+            return MA_ACTIVATE;
         }
         default:
             return DefWindowProc(hwnd, uMsg, wParam, lParam);

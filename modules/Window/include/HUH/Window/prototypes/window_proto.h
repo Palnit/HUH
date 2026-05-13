@@ -2,6 +2,7 @@
 
 #include <HUH/event.h>
 #include <HUH/definitions.h>
+#include <HUH/enum_define.h>
 #include <string>
 
 typedef struct HWND__* HWND;
@@ -10,6 +11,10 @@ struct wl_surface;
 
 namespace HUH {
 class Window;
+
+enum class KeyBindings {
+    Unknown, A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,Mouse_1,Mouse_2,Mouse_3,Mouse_4,Mouse_5, LeftArrow, RightArrow, UpperArrow, DownArrow,
+};
 
 class HUH_WINDOW_API WindowProto {
 public:
@@ -41,4 +46,8 @@ protected:
     PlatformVariables m_platform{};
 };
 
+HUH_WINDOW_API std::string ToString(KeyBindings key);
+
 }// namespace HUH
+
+HUH_ENUM_FORMATER(HUH::KeyBindings)
