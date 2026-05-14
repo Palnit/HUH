@@ -1,10 +1,14 @@
-#include <HUH/RHI/types.h>
+#include <HUH/RHI/vulkan/dynamic_rhi.h>
+
 #include <HUH/RHI/vulkan/command_pool.h>
 #include <HUH/RHI/vulkan/device.h>
-#include <HUH/RHI/vulkan/dynamic_rhi.h>
 #include <HUH/RHI/vulkan/vulkan_defines.h>
 
+#include <HUH/RHI/types.h>
+
+#include <HUH/enum_helper.h>
 #include <HUH/string_operations.h>
+
 #include <vector>
 
 namespace HUH::RHI {

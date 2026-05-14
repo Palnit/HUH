@@ -9,7 +9,9 @@ option(BUILD_ARRAY "Build numpy like array module" OFF)
 option(BUILD_THREADING "Build threading library" OFF)
 option(BUILD_PYTHON_BINDING "Build the python binding module" OFF)
 option(BUILD_HUH_PYTHON_BINDING "Build the python binding for all building HUH module" OFF)
+option(BUILD_WAYLAND_CONNECTOR "Build the wayland connector abstraction layer to simplify wayland connections on linux" OFF)
 option(USE_SIMD "Activates auto detection of cpu intrinsics and uses simd instructions where library supports it" ON)
+
 
 option(BUILD_TESTS "Build google tests for the modules" OFF)
 option(BUILD_BENCHMARKS "Build google benchmarks for the modules" OFF)
@@ -113,6 +115,10 @@ endif ()
 
 if (BUILD_PYTHON_BINDING)
     huh_add_module_build(HUH INTERFACE Python)
+endif ()
+
+if (BUILD_WAYLAND_CONNECTOR)
+    huh_add_module_build(HUH INTERFACE WaylandConnector)
 endif ()
 
 

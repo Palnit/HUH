@@ -1,8 +1,8 @@
 #pragma once
 
-#include <HUH/event.h>
 #include <HUH/definitions.h>
 #include <HUH/enum_define.h>
+#include <HUH/event.h>
 #include <string>
 
 typedef struct HWND__* HWND;
@@ -13,7 +13,70 @@ namespace HUH {
 class Window;
 
 enum class KeyBindings {
-    Unknown, A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,Mouse_1,Mouse_2,Mouse_3,Mouse_4,Mouse_5, LeftArrow, RightArrow, UpperArrow, DownArrow,
+    Unknown,
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G,
+    H,
+    I,
+    J,
+    K,
+    L,
+    M,
+    N,
+    O,
+    P,
+    Q,
+    R,
+    S,
+    T,
+    U,
+    V,
+    W,
+    X,
+    Y,
+    Z,
+    a,
+    b,
+    c,
+    d,
+    e,
+    f,
+    g,
+    h,
+    i,
+    j,
+    k,
+    l,
+    m,
+    n,
+    o,
+    p,
+    q,
+    r,
+    s,
+    t,
+    u,
+    v,
+    w,
+    x,
+    y,
+    z,
+    Mouse_1,
+    Mouse_2,
+    Mouse_3,
+    Mouse_4,
+    Mouse_5,
+    LeftArrow,
+    RightArrow,
+    UpperArrow,
+    DownArrow,
+    Shift,
+    Control,
 };
 
 class HUH_WINDOW_API WindowProto {
@@ -36,6 +99,15 @@ public:
 
     MultiEvent<void(Window*)> OnClose;
     MultiEvent<void(Window*, Int32 Width, Int32 Height)> OnSizeChange;
+
+    MultiEvent<void(Window*, double x, double y)> OnMouseEnter;
+    MultiEvent<void(Window*)> OnMouseLeave;
+    MultiEvent<void(Window*, double x, double y)> OnMouseMove;
+    MultiEvent<void(Window*, KeyBindings)> OnMousePress;
+    MultiEvent<void(Window*, KeyBindings)> OnMouseRelease;
+
+    MultiEvent<void(Window*, KeyBindings)> OnKeyPress;
+    MultiEvent<void(Window*, KeyBindings)> OnKeyRelease;
 
     HUH_NODISCARD virtual const PlatformVariables& GetPlatformVariables() const { return m_platform; }
 

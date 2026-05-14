@@ -1,7 +1,9 @@
-#include <HUH/RHI/vulkan/Types/buffer.h>
 #include <HUH/RHI/vulkan/memory_allocator.h>
 
-#include "HUH/RHI/vulkan/device.h"
+#include <HUH/RHI/vulkan/Types/buffer.h>
+#include <HUH/RHI/vulkan/device.h>
+
+#include <HUH/enum_helper.h>
 
 namespace HUH::RHI {
 

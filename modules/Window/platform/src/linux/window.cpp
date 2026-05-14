@@ -29,6 +29,12 @@ Window::Window(const std::string& name, const Int32 width, const Int32 height) :
         this->m_width = inWidth;
         this->OnSizeChange.ExecuteAll(this, inWidth, inHeight);
     });
+
+    m_impl->OnMouseEnter.Add([&](Window*, double x, double y) { this->OnMouseEnter(this, x, y); });
+    m_impl->OnMouseLeave.Add([&](Window*) { this->OnMouseLeave(this); });
+    m_impl->OnMouseMove.Add([&](Window*, double x, double y) { this->OnMouseMove(this, x, y); });
+    m_impl->OnMousePress.Add([&](Window*, KeyBindings bindings) { this->OnMousePress(this, bindings); });
+    m_impl->OnMouseRelease.Add([&](Window*, KeyBindings bindings) { this->OnMouseRelease(this, bindings); });
 }
 Window::~Window() {
     delete m_impl;

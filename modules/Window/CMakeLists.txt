@@ -43,9 +43,7 @@ target_include_directories(HUH-Window PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/includ
 
 
 if (HUH_LINUX)
-    find_package(Wayland)
-    find_package(WaylandProtocols)
-    if (Wayland_FOUND AND WaylandProtocols_FOUND)
+    if (TARGET HUH::WaylandConnector)
         set_property(TARGET HUH APPEND PROPERTY HUH_REQUIRED_INSTANCE_EXTENSIONS VK_KHR_wayland_surface)
         set(WAYLAND_HEADER_FILES
                 ${WAYLAND_WINDOW_INC_PATH}/window.h
@@ -56,20 +54,16 @@ if (HUH_LINUX)
         )
         add_library(HUH-WaylandWindow SHARED ${WAYLAND_SOURCE_FILES} ${WAYLAND_HEADER_FILES})
         add_library(HUH::WaylandWindow ALIAS HUH-WaylandWindow)
-        huh_wayland_create_protocol(HUH-WaylandWindow PUBLIC CLIENT PRIVATE_CODE PROTOCOLS_DIR ${WAYLAND_PROTOCOLS_DIR} PROTOCOL "stable/xdg-shell/xdg-shell.xml" FILENAME "xdg-shell")
-        huh_wayland_create_protocol(HUH-WaylandWindow PUBLIC CLIENT PRIVATE_CODE PROTOCOLS_DIR ${WAYLAND_PROTOCOLS_DIR} PROTOCOL "unstable/xdg-decoration/xdg-decoration-unstable-v1.xml" FILENAME "xdg-decoration")
-        find_package(PlasmaWaylandProtocols)
-        if (PlasmaWaylandProtocols_FOUND)
-            target_compile_definitions(HUH-WaylandWindow PRIVATE HUH_PLASMA_PROTOCOLS)
-        endif ()
         huh_target_create_definition(HUH-WaylandWindow)
         target_link_libraries(HUH-WaylandWindow PUBLIC
                 HUH
                 HUH::Core
-                HUH-Window
-                Wayland::client
+                HUH::Window
+                HUH::WaylandConnector
         )
-        target_include_directories(HUH-WaylandWindow PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/platform/include" "${CMAKE_CURRENT_BINARY_DIR}/generated/include")
+        target_include_directories(HUH-WaylandWindow PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/platform/include")
+    else ()
+        message(WARNING "Wayland Connector target not build HUH::WaylandConnector")
     endif ()
 endif ()
 

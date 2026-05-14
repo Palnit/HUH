@@ -1,8 +1,13 @@
 #pragma once
 
-#include <HUH/RHI/memory_allocator.h>
 #include <HUH/RHI/vulkan/fwd.h>
 #include <HUH/RHI/vulkan/vulkan_defines.h>
+
+#include <HUH/RHI/memory_allocator.h>
+
+#include <HUH/types.h>
+
+#include <vector>
 
 namespace HUH::RHI {
 class VulkanMemoryAllocator : public MemoryAllocator {

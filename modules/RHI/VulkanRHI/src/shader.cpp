@@ -1,5 +1,8 @@
-#include <HUH/RHI/vulkan/device.h>
 #include <HUH/RHI/vulkan/shader.h>
+
+#include <HUH/RHI/vulkan/device.h>
+
+#include <HUH/enum_helper.h>
 
 namespace HUH::RHI {
 
