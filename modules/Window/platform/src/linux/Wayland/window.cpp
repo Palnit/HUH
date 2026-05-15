@@ -50,8 +50,238 @@ const wl_keyboard_listener WaylandWindow::s_wlKeyboardListener = {.keymap = Wayl
                                                                   .repeat_info = WaylandWindow::wlKeyboardRepeatInfo};
 // const wl_touch_listener WaylandWindow::s_wlTouchListener = {};
 
-extern "C" WindowProto* CreateWindowImpl(const std::string& name, Int32 width, Int32 height) {
-    return new WaylandWindow(name, width, height);
+extern "C" WindowProto* CreateWindowImpl(const std::string& name, const HUH::Vector2u32& size) {
+    return new WaylandWindow(name, size);
+}
+
+KeyBindings XkbToKeyBindings(xkb_keysym_t keysym) {
+    switch (keysym) {
+        case XKB_KEY_A:
+            return KeyBindings::A;
+        case XKB_KEY_B:
+            return KeyBindings::B;
+        case XKB_KEY_C:
+            return KeyBindings::C;
+        case XKB_KEY_D:
+            return KeyBindings::D;
+        case XKB_KEY_E:
+            return KeyBindings::E;
+        case XKB_KEY_F:
+            return KeyBindings::F;
+        case XKB_KEY_G:
+            return KeyBindings::G;
+        case XKB_KEY_H:
+            return KeyBindings::H;
+        case XKB_KEY_I:
+            return KeyBindings::I;
+        case XKB_KEY_J:
+            return KeyBindings::J;
+        case XKB_KEY_K:
+            return KeyBindings::K;
+        case XKB_KEY_L:
+            return KeyBindings::L;
+        case XKB_KEY_M:
+            return KeyBindings::M;
+        case XKB_KEY_N:
+            return KeyBindings::N;
+        case XKB_KEY_O:
+            return KeyBindings::O;
+        case XKB_KEY_P:
+            return KeyBindings::P;
+        case XKB_KEY_Q:
+            return KeyBindings::Q;
+        case XKB_KEY_R:
+            return KeyBindings::R;
+        case XKB_KEY_S:
+            return KeyBindings::S;
+        case XKB_KEY_T:
+            return KeyBindings::T;
+        case XKB_KEY_U:
+            return KeyBindings::U;
+        case XKB_KEY_V:
+            return KeyBindings::V;
+        case XKB_KEY_W:
+            return KeyBindings::W;
+        case XKB_KEY_X:
+            return KeyBindings::X;
+        case XKB_KEY_Y:
+            return KeyBindings::Y;
+        case XKB_KEY_Z:
+            return KeyBindings::Z;
+        case XKB_KEY_a:
+            return KeyBindings::a;
+        case XKB_KEY_b:
+            return KeyBindings::b;
+        case XKB_KEY_c:
+            return KeyBindings::c;
+        case XKB_KEY_d:
+            return KeyBindings::d;
+        case XKB_KEY_e:
+            return KeyBindings::e;
+        case XKB_KEY_f:
+            return KeyBindings::f;
+        case XKB_KEY_g:
+            return KeyBindings::g;
+        case XKB_KEY_h:
+            return KeyBindings::h;
+        case XKB_KEY_i:
+            return KeyBindings::i;
+        case XKB_KEY_j:
+            return KeyBindings::j;
+        case XKB_KEY_k:
+            return KeyBindings::k;
+        case XKB_KEY_l:
+            return KeyBindings::l;
+        case XKB_KEY_m:
+            return KeyBindings::m;
+        case XKB_KEY_n:
+            return KeyBindings::n;
+        case XKB_KEY_o:
+            return KeyBindings::o;
+        case XKB_KEY_p:
+            return KeyBindings::p;
+        case XKB_KEY_q:
+            return KeyBindings::q;
+        case XKB_KEY_r:
+            return KeyBindings::r;
+        case XKB_KEY_s:
+            return KeyBindings::s;
+        case XKB_KEY_t:
+            return KeyBindings::t;
+        case XKB_KEY_u:
+            return KeyBindings::u;
+        case XKB_KEY_v:
+            return KeyBindings::v;
+        case XKB_KEY_w:
+            return KeyBindings::w;
+        case XKB_KEY_x:
+            return KeyBindings::x;
+        case XKB_KEY_y:
+            return KeyBindings::y;
+        case XKB_KEY_z:
+            return KeyBindings::z;
+        case XKB_KEY_0:
+            return KeyBindings::N0;
+        case XKB_KEY_1:
+            return KeyBindings::N1;
+        case XKB_KEY_2:
+            return KeyBindings::N2;
+        case XKB_KEY_3:
+            return KeyBindings::N3;
+        case XKB_KEY_4:
+            return KeyBindings::N4;
+        case XKB_KEY_5:
+            return KeyBindings::N5;
+        case XKB_KEY_6:
+            return KeyBindings::N6;
+        case XKB_KEY_7:
+            return KeyBindings::N7;
+        case XKB_KEY_8:
+            return KeyBindings::N8;
+        case XKB_KEY_9:
+            return KeyBindings::N9;
+        case XKB_KEY_KP_0:
+            return KeyBindings::KP0;
+        case XKB_KEY_KP_1:
+            return KeyBindings::KP1;
+        case XKB_KEY_KP_2:
+            return KeyBindings::KP2;
+        case XKB_KEY_KP_3:
+            return KeyBindings::KP3;
+        case XKB_KEY_KP_4:
+            return KeyBindings::KP4;
+        case XKB_KEY_KP_5:
+            return KeyBindings::KP5;
+        case XKB_KEY_KP_6:
+            return KeyBindings::KP6;
+        case XKB_KEY_KP_7:
+            return KeyBindings::KP7;
+        case XKB_KEY_KP_8:
+            return KeyBindings::KP8;
+        case XKB_KEY_KP_9:
+            return KeyBindings::KP9;
+        case XKB_KEY_F1:
+            return KeyBindings::F1;
+        case XKB_KEY_F2:
+            return KeyBindings::F2;
+        case XKB_KEY_F3:
+            return KeyBindings::F3;
+        case XKB_KEY_F4:
+            return KeyBindings::F4;
+        case XKB_KEY_F5:
+            return KeyBindings::F5;
+        case XKB_KEY_F6:
+            return KeyBindings::F6;
+        case XKB_KEY_F7:
+            return KeyBindings::F7;
+        case XKB_KEY_F8:
+            return KeyBindings::F8;
+        case XKB_KEY_F9:
+            return KeyBindings::F9;
+        case XKB_KEY_F10:
+            return KeyBindings::F10;
+        case XKB_KEY_F11:
+            return KeyBindings::F11;
+        case XKB_KEY_F12:
+            return KeyBindings::F12;
+        case XKB_KEY_F13:
+            return KeyBindings::F13;
+        case XKB_KEY_F14:
+            return KeyBindings::F14;
+        case XKB_KEY_F15:
+            return KeyBindings::F15;
+        case XKB_KEY_F16:
+            return KeyBindings::F16;
+        case XKB_KEY_F17:
+            return KeyBindings::F17;
+        case XKB_KEY_F18:
+            return KeyBindings::F18;
+        case XKB_KEY_F19:
+            return KeyBindings::F19;
+        case XKB_KEY_F20:
+            return KeyBindings::F20;
+        case XKB_KEY_F21:
+            return KeyBindings::F21;
+        case XKB_KEY_F22:
+            return KeyBindings::F22;
+        case XKB_KEY_F23:
+            return KeyBindings::F23;
+        case XKB_KEY_F24:
+            return KeyBindings::F24;
+        case XKB_KEY_Up:
+            return KeyBindings::ArrowUp;
+        case XKB_KEY_Down:
+            return KeyBindings::ArrowDown;
+        case XKB_KEY_Left:
+            return KeyBindings::ArrowLeft;
+        case XKB_KEY_Right:
+            return KeyBindings::ArrowRight;
+        case XKB_KEY_Escape:
+            return KeyBindings::Escape;
+        case XKB_KEY_Control_L:
+            return KeyBindings::LeftControl;
+        case XKB_KEY_Control_R:
+            return KeyBindings::RightControl;
+        case XKB_KEY_Shift_L:
+            return KeyBindings::LeftShift;
+        case XKB_KEY_Shift_R:
+            return KeyBindings::RightShift;
+        case XKB_KEY_Alt_L:
+            return KeyBindings::LeftAlt;
+        case XKB_KEY_Alt_R:
+            return KeyBindings::RightAlt;
+        case XKB_KEY_BackSpace:
+            return KeyBindings::BackSpace;
+        case XKB_KEY_Tab:
+            return KeyBindings::Tab;
+        case XKB_KEY_KP_Enter:
+        case XKB_KEY_ISO_Enter:
+        case XKB_KEY_Return:
+            return KeyBindings::Enter;
+
+        default:
+            return KeyBindings::Other;
+    }
 }
 
 void WaylandWindow::xdgWmBasePing(void* data, xdg_wm_base* xdg_wm_base, const Uint32 serial) {
@@ -73,9 +303,8 @@ void WaylandWindow::xdgToplevelConfigure(void* data,
     if (width == 0 || height == 0) {
         return;
     }
-    window->m_width = width;
-    window->m_height = height;
-    window->OnSizeChange.ExecuteAll(nullptr, window->m_width, window->m_height);
+    window->m_size = {static_cast<Uint32>(width), static_cast<Uint32>(height)};
+    window->OnSizeChange.ExecuteAll(nullptr, window->m_size);
 }
 
 void WaylandWindow::xdgToplevelClose(void* data, xdg_toplevel* toplevel) {
@@ -184,8 +413,8 @@ void WaylandWindow::wlPointerFrame(void* data, wl_pointer* wl_pointer) {
     const auto window = static_cast<WaylandWindow*>(data);
     auto& event = window->m_pointerEvent;
     if (HUH::CheckFlag(event.eventType, PointerEventType::Enter)) {
-        window->OnMouseEnter.ExecuteAll(nullptr, wl_fixed_to_double(event.surfaceX),
-                                        wl_fixed_to_double(event.surfaceY));
+        window->OnMouseEnter.ExecuteAll(nullptr,
+                                        {wl_fixed_to_double(event.surfaceX), wl_fixed_to_double(event.surfaceY)});
     }
     if (HUH::CheckAllFlag(event.eventType, PointerEventType::Leave)) {
         window->OnMouseLeave.ExecuteAll(nullptr);
@@ -214,7 +443,8 @@ void WaylandWindow::wlPointerFrame(void* data, wl_pointer* wl_pointer) {
         }
     }
     if (HUH::CheckFlag(event.eventType, PointerEventType::Motion)) {
-        window->OnMouseMove.ExecuteAll(nullptr, wl_fixed_to_double(event.surfaceX), wl_fixed_to_double(event.surfaceY));
+        window->OnMouseMove.ExecuteAll(nullptr,
+                                       {wl_fixed_to_double(event.surfaceX), wl_fixed_to_double(event.surfaceY)});
     }
     // TODO AXIS
 
@@ -261,7 +491,7 @@ void WaylandWindow::wlKeyboardKeymap(void* data, wl_keyboard* wl_keyboard, Uint3
         return;
     }
 
-    char* map_shm = static_cast<char*>(mmap(nullptr, size, PROT_READ, MAP_SHARED, fd, 0));
+    const auto map_shm = static_cast<char*>(mmap(nullptr, size, PROT_READ, MAP_SHARED, fd, 0));
 
     xkb_keymap* xkb_keymap = xkb_keymap_new_from_string(window->m_xkbContext, map_shm, XKB_KEYMAP_FORMAT_TEXT_V1,
                                                         XKB_KEYMAP_COMPILE_NO_FLAGS);
@@ -281,16 +511,19 @@ void WaylandWindow::wlKeyboardEnter(void* data,
                                     wl_array* keys) {
     const auto window = static_cast<WaylandWindow*>(data);
 
-    HUH_TLOG("keyboard enter; keys pressed are:");
     for (Uint32* key = static_cast<Uint32*>(keys->data);
          keys->size != 0 && reinterpret_cast<const char*>(key) < static_cast<const char*>(keys->data) + keys->size;
          key++) {
-        char buf[128];
         xkb_keysym_t sym = xkb_state_key_get_one_sym(window->m_xkbState, *key + 8);
-        xkb_keysym_get_name(sym, buf, sizeof(buf));
-        fprintf(stderr, "sym: %-12s (%d), ", buf, sym);
-        xkb_state_key_get_utf8(window->m_xkbState, *key + 8, buf, sizeof(buf));
-        fprintf(stderr, "utf8: '%s'\n", buf);
+        auto keybinding = XkbToKeyBindings(sym);
+        // char buf[128];
+        // xkb_keysym_get_name(sym, buf, sizeof(buf));
+        // HUH_TLOG("HUH?: {}", buf)
+        auto size = xkb_state_key_get_utf8(window->m_xkbState, *key + 8, nullptr, 0);
+        std::string utf8;
+        utf8.resize(size);
+        xkb_state_key_get_utf8(window->m_xkbState, *key + 8, utf8.data(), size + 1);
+        window->OnKeyPress(nullptr, keybinding, utf8);
     }
 }
 void WaylandWindow::wlKeyboardLeave(void* data, wl_keyboard* wl_keyboard, Uint32 serial, wl_surface* surface) {
@@ -300,20 +533,24 @@ void WaylandWindow::wlKeyboardKey(void* data,
                                   wl_keyboard* wl_keyboard,
                                   Uint32 serial,
                                   Uint32 time,
-                                  Uint32 key,
-                                  Uint32 state) {
+                                  const Uint32 key,
+                                  const Uint32 state) {
     const auto window = static_cast<WaylandWindow*>(data);
-    char buf[128];
     Uint32 keycode = key + 8;
     xkb_keysym_t sym = xkb_state_key_get_one_sym(window->m_xkbState, keycode);
-    if (sym == XKB_KEY_a) {
-        HUH_TLOG("A PRESSED")
+    auto keybinding = XkbToKeyBindings(sym);
+    if (state == WL_KEYBOARD_KEY_STATE_PRESSED) {
+        auto size = xkb_state_key_get_utf8(window->m_xkbState, keycode, nullptr, 0);
+        // char buf[128];
+        // xkb_keysym_get_name(sym, buf, sizeof(buf));
+        // HUH_TLOG("HUH?: {}", buf)
+        std::string utf8;
+        utf8.resize(size);
+        xkb_state_key_get_utf8(window->m_xkbState, keycode, utf8.data(), size + 1);
+        window->OnKeyPress(nullptr, keybinding, utf8);
+        return;
     }
-    xkb_keysym_get_name(sym, buf, sizeof(buf));
-    const char* action = state == WL_KEYBOARD_KEY_STATE_PRESSED ? "press" : "release";
-    fprintf(stderr, "key %s: sym: %-12s (%d), ", action, buf, sym);
-    xkb_state_key_get_utf8(window->m_xkbState, keycode, buf, sizeof(buf));
-    fprintf(stderr, "utf8: '%s'\n", buf);
+    window->OnKeyRelease(nullptr, keybinding);
 }
 void WaylandWindow::wlKeyboardModifiers(void* data,
                                         wl_keyboard* wl_keyboard,
@@ -328,8 +565,7 @@ void WaylandWindow::wlKeyboardModifiers(void* data,
 void WaylandWindow::wlKeyboardRepeatInfo(void* data, wl_keyboard* wl_keyboard, Int32 rate, Int32 delay) {
 }
 
-WaylandWindow::WaylandWindow(const std::string& name, const Int32 width, const Int32 height)
-    : WindowProto(name, width, height) {
+WaylandWindow::WaylandWindow(const std::string& name, HUH::Vector2u32 size) : WindowProto(name, size) {
 
     m_xkbContext = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
     m_fd = wl_display_get_fd(HUH::g_waylandConnector);
@@ -354,7 +590,7 @@ WaylandWindow::WaylandWindow(const std::string& name, const Int32 width, const I
     m_zxdgToplevelDecoration =
         zxdg_decoration_manager_v1_get_toplevel_decoration(m_zxdgDecorationManager, m_xdgToplevel);
     zxdg_toplevel_decoration_v1_set_mode(m_zxdgToplevelDecoration, ZXDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
-    xdg_toplevel_set_min_size(m_xdgToplevel, m_width, m_height);
+    xdg_toplevel_set_min_size(m_xdgToplevel, size.X(), size.Y());
     // xdg_toplevel_set_max_size(m_xdgToplevel, m_width, m_height);
     xdg_toplevel_set_title(m_xdgToplevel, m_name.c_str());
     wl_surface_commit(m_surface);

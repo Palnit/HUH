@@ -1,17 +1,17 @@
 #pragma once
 
-#include <HUH/types.h>
-#include <HUH/dynamic_library.h>
 #include <HUH/Window/prototypes/window_proto.h>
+#include <HUH/dynamic_library.h>
+#include <HUH/types.h>
 #include <string>
 
 namespace HUH {
 class HUH_WINDOW_API Window : public WindowProto {
 public:
-    Window(const std::string& name, const Int32 width, const Int32 height);
+    Window(const std::string& name, HUH::Vector2u32 size);
     ~Window() override;
 
-    using CreateWindowImpl = WindowProto*(const std::string&, const Int32, const Int32);
+    using CreateWindowImpl = WindowProto*(const std::string&, const HUH::Vector2u32&);
     inline static CreateWindowImpl* s_createImpl = nullptr;
     HUH_NODISCARD const PlatformVariables& GetPlatformVariables() const override;
     void Show() override;

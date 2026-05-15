@@ -8,6 +8,7 @@
 #include <HUH/definitions.h>
 #include <cstring>
 #include <ostream>
+#include <sstream>
 #include <type_traits>
 
 namespace HUH {
@@ -57,7 +58,9 @@ public:
     template<typename T2>
     HUH_CONSTEXPR_FORCE bool operator==(const Vector<T2, N>& rhs) {
         for (std::size_t i = 0; i < N; i++) {
-            if (data[i] != rhs[i]) { return false; }
+            if (data[i] != rhs[i]) {
+                return false;
+            }
         }
         return true;
     }
@@ -261,6 +264,18 @@ struct std::tuple_element<I, HUH::Vector<T, N>> {
     using type = T;
 };
 
+template<typename T, std::size_t size>
+struct std::formatter<HUH::Vector<T, size>> : std::formatter<std::string> {
+    auto format(const HUH::Vector<T, size>& vec, format_context& ctx) const {
+        std::stringstream ss;
+        ss << "[ " << vec[0];
+        for (std::size_t i = 1; i < size; i++) {
+            ss << ", " << vec[i];
+        }
+        ss << "]";
+        return formatter<string>::format(ss.str(), ctx);
+    }
+};
 
 #include <HUH/Math/vector/vector2.inl.h>
 #include <HUH/Math/vector/vector3.inl.h>

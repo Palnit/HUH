@@ -25,11 +25,11 @@ struct xkb_keymap;
 
 namespace HUH {
 
-extern "C" WindowProto* CreateWindowImpl(const std::string& name, Int32 width, Int32 height);
+extern "C" WindowProto* CreateWindowImpl(const std::string& name, const HUH::Vector2u32& size);
 
 class HUH_WAYLANDWINDOW_API WaylandWindow : public WindowProto {
 public:
-    WaylandWindow(const std::string& name, const Int32 width, const Int32 height);
+    WaylandWindow(const std::string& name, HUH::Vector2u32 size);
     ~WaylandWindow() override;
 
     friend WindowProto* CreateWindowImpl(const std::string& name);

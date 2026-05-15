@@ -38,6 +38,7 @@ huh_target_create_definition(HUH-Window)
 target_link_libraries(HUH-Window PUBLIC
         HUH
         HUH::Core
+        HUH::Math
 )
 target_include_directories(HUH-Window PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/platform/include")
 

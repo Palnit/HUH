@@ -76,7 +76,7 @@ bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minIma
         }
     }
 
-    m_sizeChangeEventHandler = m_windowParent->OnSizeChange.Add([&](auto, auto, auto) { RecreateSwapchain(); });
+    m_sizeChangeEventHandler = m_windowParent->OnSizeChange.Add([&](auto, auto) { RecreateSwapchain(); });
     m_closeEventHandler =
         m_windowParent->OnClose.Add([&](auto) { m_windowParent->OnSizeChange.Remove(m_sizeChangeEventHandler); });
 
@@ -149,8 +149,8 @@ void VulkanSwapchain::Present(Queue* queue, Fence* fence) {
 bool VulkanSwapchain::CreateSwapchain() {
     HUH::vkGetPhysicalDeviceSurfaceCapabilities2KHR(m_device->m_physicalDevice, &m_surface, &Details.capabilities);
     if (Details.capabilities.surfaceCapabilities.currentExtent.width == 0xFFFFFFFF) {
-        m_extent.height = m_windowParent->GetHeight();
-        m_extent.width = m_windowParent->GetWidth();
+        m_extent.width = m_windowParent->GetSize().Width();
+        m_extent.height = m_windowParent->GetSize().Height();
     } else {
         m_extent = Details.capabilities.surfaceCapabilities.currentExtent;
     }

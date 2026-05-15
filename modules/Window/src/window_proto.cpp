@@ -110,6 +110,94 @@ std::string ToString(KeyBindings key) {
             return "y";
         case KeyBindings::z:
             return "z";
+        case KeyBindings::N0:
+            return "N0";
+        case KeyBindings::N1:
+            return "N1";
+        case KeyBindings::N2:
+            return "N2";
+        case KeyBindings::N3:
+            return "N3";
+        case KeyBindings::N4:
+            return "N4";
+        case KeyBindings::N5:
+            return "N5";
+        case KeyBindings::N6:
+            return "N6";
+        case KeyBindings::N7:
+            return "N7";
+        case KeyBindings::N8:
+            return "N8";
+        case KeyBindings::N9:
+            return "N9";
+        case KeyBindings::KP0:
+            return "KP0";
+        case KeyBindings::KP1:
+            return "KP1";
+        case KeyBindings::KP2:
+            return "KP2";
+        case KeyBindings::KP3:
+            return "KP3";
+        case KeyBindings::KP4:
+            return "KP4";
+        case KeyBindings::KP5:
+            return "KP5";
+        case KeyBindings::KP6:
+            return "KP6";
+        case KeyBindings::KP7:
+            return "KP7";
+        case KeyBindings::KP8:
+            return "KP8";
+        case KeyBindings::KP9:
+            return "KP9";
+        case KeyBindings::F1:
+            return "F1";
+        case KeyBindings::F2:
+            return "F2";
+        case KeyBindings::F3:
+            return "F3";
+        case KeyBindings::F4:
+            return "F4";
+        case KeyBindings::F5:
+            return "F5";
+        case KeyBindings::F6:
+            return "F6";
+        case KeyBindings::F7:
+            return "F7";
+        case KeyBindings::F8:
+            return "F8";
+        case KeyBindings::F9:
+            return "F9";
+        case KeyBindings::F10:
+            return "F10";
+        case KeyBindings::F11:
+            return "F11";
+        case KeyBindings::F12:
+            return "F12";
+        case KeyBindings::F13:
+            return "F13";
+        case KeyBindings::F14:
+            return "F14";
+        case KeyBindings::F15:
+            return "F15";
+        case KeyBindings::F16:
+            return "F16";
+        case KeyBindings::F17:
+            return "F17";
+        case KeyBindings::F18:
+            return "F18";
+        case KeyBindings::F19:
+            return "F19";
+        case KeyBindings::F20:
+            return "F20";
+        case KeyBindings::F21:
+            return "F21";
+        case KeyBindings::F22:
+            return "F22";
+        case KeyBindings::F23:
+            return "F23";
+        case KeyBindings::F24:
+            return "F24";
         case KeyBindings::Mouse_1:
             return "Mouse_1";
         case KeyBindings::Mouse_2:
@@ -120,18 +208,34 @@ std::string ToString(KeyBindings key) {
             return "Mouse_4";
         case KeyBindings::Mouse_5:
             return "Mouse_5";
-        case KeyBindings::LeftArrow:
-            return "LeftArrow";
-        case KeyBindings::RightArrow:
-            return "RightArrow";
-        case KeyBindings::UpperArrow:
-            return "UpperArrow";
-        case KeyBindings::DownArrow:
-            return "DownArrow";
-        case KeyBindings::Shift:
-            return "Shift";
-        case KeyBindings::Control:
-            return "Control";
+        case KeyBindings::ArrowLeft:
+            return "ArrowLeft";
+        case KeyBindings::ArrowRight:
+            return "ArrowRight";
+        case KeyBindings::ArrowUp:
+            return "ArrowUp";
+        case KeyBindings::ArrowDown:
+            return "ArrowDown";
+        case KeyBindings::Escape:
+            return "Escape";
+        case KeyBindings::LeftControl:
+            return "LeftControl";
+        case KeyBindings::RightControl:
+            return "RightControl";
+        case KeyBindings::LeftShift:
+            return "LeftShift";
+        case KeyBindings::RightShift:
+            return "RightShift";
+        case KeyBindings::LeftAlt:
+            return "LeftAlt";
+        case KeyBindings::RightAlt:
+            return "RightAlt";
+        case KeyBindings::BackSpace:
+            return "BackSpace";
+        case KeyBindings::Enter:
+            return "Enter";
+        case KeyBindings::Tab:
+            return "Tab";
         case KeyBindings::Other:
             return "Other";
         default:

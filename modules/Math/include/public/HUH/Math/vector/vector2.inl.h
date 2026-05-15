@@ -35,6 +35,12 @@ public:
     HUH_NODISCARD HUH_CONSTEXPR_FORCE const T& U() const noexcept { return data[0]; }
     HUH_NODISCARD HUH_CONSTEXPR_FORCE const T& V() const noexcept { return data[1]; }
 
+    HUH_NODISCARD HUH_CONSTEXPR_FORCE T& Width() noexcept { return data[0]; }
+    HUH_NODISCARD HUH_CONSTEXPR_FORCE T& Height() noexcept { return data[1]; }
+
+    HUH_NODISCARD HUH_CONSTEXPR_FORCE const T& Width() const noexcept { return data[0]; }
+    HUH_NODISCARD HUH_CONSTEXPR_FORCE const T& Height() const noexcept { return data[1]; }
+
     HUH_NODISCARD HUH_CONSTEXPR_FORCE T* XY() noexcept { return data; }
     HUH_NODISCARD HUH_CONSTEXPR_FORCE const T* XY() const noexcept { return data; }
 

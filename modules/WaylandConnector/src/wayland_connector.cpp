@@ -19,10 +19,10 @@ WaylandConnector::WaylandConnector() {
     if (!m_display) {
         HUH_ELOG(LogWaylandConnector, "Couldn't connect to Wayland display");
     }
+    HUH_ILOG(LogWaylandConnector, "Wayland Connector Initialized");
     m_registry = wl_display_get_registry(m_display);
     wl_registry_add_listener(m_registry, &s_registryListener, this);
     wl_display_roundtrip(m_display);
-    HUH_ILOG(LogWaylandConnector, "Wayland Connector Initialized");
 }
 
 WaylandConnector::~WaylandConnector() {
