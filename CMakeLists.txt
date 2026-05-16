@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
 
-option(BUILD_GRAPHICS "Build Graphics module" OFF)
 option(BUILD_RHI "Build Render Hardware Interface module" OFF)
 option(BUILD_WINDOW "Build Window management module" OFF)
 option(BUILD_VULKAN_LOADER "Build Vulkan Loader" OFF)
@@ -11,6 +10,10 @@ option(BUILD_PYTHON_BINDING "Build the python binding module" OFF)
 option(BUILD_HUH_PYTHON_BINDING "Build the python binding for all building HUH module" OFF)
 option(BUILD_WAYLAND_CONNECTOR "Build the wayland connector abstraction layer to simplify wayland connections on linux" OFF)
 option(USE_SIMD "Activates auto detection of cpu intrinsics and uses simd instructions where library supports it" ON)
+
+#Graphics
+option(BUILD_GRAPHICS_ALL "Builds all graphics modules" OFF)
+option(BUILD_GRAPHICS_CAMERA "Builds a camera module" OFF)
 
 
 option(BUILD_TESTS "Build google tests for the modules" OFF)
@@ -81,17 +84,15 @@ if (USE_SIMD AND SSE_SUPPORT AND SSE2_SUPPORT)
     target_compile_definitions(HUH INTERFACE HUH_USE_SIMD)
 endif ()
 
+huh_set_modules_dependency(HUH)
+
 add_subdirectory(modules/Core)
 
-huh_set_modules_dependency(HUH)
 
 if (BUILD_MATH)
     huh_add_module_build(HUH INTERFACE Math)
 endif ()
 
-if (BUILD_GRAPHICS)
-    huh_add_module_build(HUH INTERFACE Graphics)
-endif ()
 
 if (BUILD_ARRAY)
     huh_add_module_build(HUH INTERFACE Array)
@@ -120,6 +121,8 @@ endif ()
 if (BUILD_WAYLAND_CONNECTOR)
     huh_add_module_build(HUH INTERFACE WaylandConnector)
 endif ()
+
+add_subdirectory(modules/Graphics)
 
 
 get_property(BUILD_MODULES TARGET HUH PROPERTY BUILD_MODULES)

@@ -22,6 +22,7 @@ public:
     using RowType = Vector<T, 4>;
     using ColumnType = Vector<T, 4>;
     RowType data[4];
+    inline static const Matrix Identity{{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
 
     HUH_CONSTEXPR_FORCE Matrix() noexcept : data{0} {}
     HUH_CONSTEXPR_FORCE Matrix(const Matrix& other) noexcept = default;
@@ -46,6 +47,9 @@ public:
 
     template<std::size_t size, std::enable_if_t<size == 4, bool> = true>
     HUH_CONSTEXPR_FORCE Matrix(const RowType (&Rows)[size]) noexcept : data{Rows[0], Rows[1], Rows[2], Rows[3]} {}
+
+    HUH_CONSTEXPR_FORCE Matrix(const RowType& r1, const RowType& r2, const RowType& r3, const RowType& r4) noexcept
+        : data{r1, r2, r3, r4} {}
 
     HUH_CONSTEXPR_FORCE Matrix(T v) noexcept : data{v, v, v, v} {}
 

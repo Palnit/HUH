@@ -204,4 +204,17 @@ struct std::tuple_element<I, HUH::Matrix<T, C, R>> {
     using type = typename HUH::Matrix<T, C, R>::RowType;
 };
 
+template<typename T, std::size_t C, std::size_t R>
+struct std::formatter<HUH::Matrix<T, C, R>> : std::formatter<std::string> {
+    auto format(const HUH::Matrix<T, C, R>& mat, format_context& ctx) const {
+        std::stringstream ss;
+        ss << "[ " << mat[0];
+        for (std::size_t i = 1; i < C; i++) {
+            ss << ", " << mat[i];
+        }
+        ss << "]";
+        return formatter<string>::format(ss.str(), ctx);
+    }
+};
+
 #include <HUH/Math/matrix/matrix_4x4.inl.h>

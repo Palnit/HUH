@@ -102,4 +102,10 @@ using Matrix4x4ui = Matrix4x4<unsigned int>;
 // template<typename T, std::size_t N>
 // struct IsVector<HUH::Vector<T, N>> : public std::true_type {};
 
+template<typename T>
+class Quaternion;
+
+using Quaternionf = Quaternion<float>;
+using Quaterniond = Quaternion<double>;
+
 }// namespace HUH

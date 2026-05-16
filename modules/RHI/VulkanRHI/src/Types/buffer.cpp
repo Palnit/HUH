@@ -78,6 +78,7 @@ void VulkanBuffer::UploadData(void* data) {
         // TODO whole set update
         vkUpdateDescriptorSets(*m_device, 1, &descriptorWrite, 0, nullptr);
     }
+    UnMapData();
 }
 
 VkMemoryRequirements VulkanBuffer::GetMemoryRequirements() const {
