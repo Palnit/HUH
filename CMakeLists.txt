@@ -37,6 +37,7 @@ endif ()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Tools/Cmake")
 include(HUHDependency)
 include(HUHDefine)
+include(CompilerHelper)
 include(Tools/CpuCheck/CpuChecker.cmake)
 check_cpu()
 

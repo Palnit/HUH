@@ -1,5 +1,6 @@
 #pragma once
 
+#include <HUH/definitions.h>
 #include <HUH/Math/quaternion_functions.h>
 
 namespace HUH {

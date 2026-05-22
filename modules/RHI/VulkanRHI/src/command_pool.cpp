@@ -35,9 +35,9 @@ void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPa
     auto size = vk_image->GetSize();
 
     VkViewport viewport{.x = 0.0f,
-                        .y = 0.0f,
+                        .y = static_cast<float>(size.Y()),
                         .width = static_cast<float>(size.X()),
-                        .height = static_cast<float>(size.Y()),
+                        .height = -static_cast<float>(size.Y()),
                         .minDepth = 0.0f,
                         .maxDepth = 1.0f};
     vkCmdSetViewport(m_commandBuffer, 0, 1, &viewport);

@@ -156,10 +156,10 @@ HUH_CONSTEXPR_FORCE void MatrixMultiply(const Matrix4x4<T>& lhs,
     typename Matrix4x4<T2>::RowType rhsRow2 = rhs[2];
     typename Matrix4x4<T2>::RowType rhsRow3 = rhs[3];
 
-    result[0] = lhsRow0 * rhsRow0[0] + lhsRow1 * rhsRow0[1] + lhsRow2 * rhsRow0[2] + lhsRow3 * rhsRow0[3];
-    result[1] = lhsRow0 * rhsRow1[0] + lhsRow1 * rhsRow1[1] + lhsRow2 * rhsRow1[2] + lhsRow3 * rhsRow1[3];
-    result[2] = lhsRow0 * rhsRow2[0] + lhsRow1 * rhsRow2[1] + lhsRow2 * rhsRow2[2] + lhsRow3 * rhsRow2[3];
-    result[3] = lhsRow0 * rhsRow3[0] + lhsRow1 * rhsRow3[1] + lhsRow2 * rhsRow3[2] + lhsRow3 * rhsRow3[3];
+    result[0] = rhsRow0 * lhsRow0[0] + rhsRow1 * lhsRow0[1] + rhsRow2 * lhsRow0[2] + rhsRow3 * lhsRow0[3];
+    result[1] = rhsRow0 * lhsRow1[0] + rhsRow1 * lhsRow1[1] + rhsRow2 * lhsRow1[2] + rhsRow3 * lhsRow1[3];
+    result[2] = rhsRow0 * lhsRow2[0] + rhsRow1 * lhsRow2[1] + rhsRow2 * lhsRow2[2] + rhsRow3 * lhsRow2[3];
+    result[3] = rhsRow0 * lhsRow3[0] + rhsRow1 * lhsRow3[1] + rhsRow2 * lhsRow3[2] + rhsRow3 * lhsRow3[3];
 }
 
 #ifdef HUH_USE_SIMD
