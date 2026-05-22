@@ -3,7 +3,7 @@
 #include <HUH/Window/window.h>
 
 namespace HUH::Graphics {
-class Camera {
+class HUH_GRAPHICS_CAMERA_API Camera {
 public:
     Camera(Window* window);
 

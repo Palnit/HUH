@@ -8,7 +8,7 @@ namespace HUH {
 LRESULT CALLBACK WindowProcPassToClass(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 class HUH_WINDOW_API Window : public WindowProto {
 public:
-    Window(const std::string& name, const Int32 width, const Int32 height);
+    Window(const std::string& name, HUH::Vector2u32 size);
     ~Window() override;
     void Show() override;
     bool Loop() override;

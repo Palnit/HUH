@@ -22,7 +22,7 @@ KeyBindings TransformToHUHKey(WPARAM wParam) {
     }
 }
 
-Window::Window(const std::string& name, const Int32 width, const Int32 height) : WindowProto(name, width, height) {
+Window::Window(const std::string& name, const HUH::Vector2u32 size) : WindowProto(name, size) {
     constexpr char className[] = "HUH_WINDOWS_WINDOW";
     WNDCLASS wc = {};
     wc.lpfnWndProc = HUH::WindowProcPassToClass;
@@ -32,7 +32,7 @@ Window::Window(const std::string& name, const Int32 width, const Int32 height) :
     RegisterClass(&wc);
 
     m_windowHandle = CreateWindowEx(0, className, m_name.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
-                                    m_width, m_height, nullptr, nullptr, HUH::g_AppInstance, nullptr);
+                                    m_size.Width(), m_size.Height(), nullptr, nullptr, HUH::g_AppInstance, nullptr);
     if (!m_windowHandle) {
         HUH_ILOG(LogWindow, "Window creation failed");
         return;
@@ -70,7 +70,7 @@ LRESULT Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
             return 0;
         }
         case WM_SIZE: {
-            OnSizeChange.ExecuteAll(this, LOWORD(lParam), HIWORD(lParam));
+            OnSizeChange.ExecuteAll(this, {LOWORD(lParam), HIWORD(lParam)});
             return 0;
         }
         case WM_SYSKEYDOWN:

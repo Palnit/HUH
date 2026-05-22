@@ -5,6 +5,8 @@
 #endif
 #include <HUH/enum_define.h>
 
+#include <iostream>
+
 namespace HUH {
 class HUH_CORE_API ConsoleColor {
 public:

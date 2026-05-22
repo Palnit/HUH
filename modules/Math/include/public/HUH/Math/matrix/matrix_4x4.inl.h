@@ -22,7 +22,7 @@ public:
     using RowType = Vector<T, 4>;
     using ColumnType = Vector<T, 4>;
     RowType data[4];
-    inline static const Matrix Identity{{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+    // inline static const Matrix Identity{{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
 
     HUH_CONSTEXPR_FORCE Matrix() noexcept : data{0} {}
     HUH_CONSTEXPR_FORCE Matrix(const Matrix& other) noexcept = default;
