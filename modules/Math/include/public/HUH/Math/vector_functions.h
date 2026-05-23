@@ -58,4 +58,14 @@ HUH_FORCE_INLINE void Normalize(HUH::Vector<float, 3>& vec) noexcept;
 // HUH_FORCE_INLINE void Normalize(HUH::Vector<float, 2>& vec) noexcept;
 #endif
 
+template<typename T, typename T2>
+HUH_FORCE_INLINE void Cross(const Vector<T, 3>& lhs,
+                            const Vector<T2, 3>& rhs,
+                            HUH::Vector<std::common_type_t<T, T2>, 3>& result) noexcept {
+    result[0] = lhs[1] * rhs[2] - lhs[2] * rhs[1];
+    result[1] = lhs[2] * rhs[0] - lhs[0] * rhs[2];
+    result[2] = lhs[0] * rhs[1] - lhs[1] * rhs[0];
+    // TODO simd version ?
+}
+
 }// namespace HUH

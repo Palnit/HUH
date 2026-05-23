@@ -1,6 +1,8 @@
 #pragma once
 
+#include <HUH/concepts.h>
 #include <HUH/types.h>
+
 #include <type_traits>
 
 namespace HUH {
@@ -102,7 +104,7 @@ using Matrix4x4ui = Matrix4x4<unsigned int>;
 // template<typename T, std::size_t N>
 // struct IsVector<HUH::Vector<T, N>> : public std::true_type {};
 
-template<typename T>
+template<FloatingPoint T>
 class Quaternion;
 
 using Quaternionf = Quaternion<float>;

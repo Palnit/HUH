@@ -1,10 +1,11 @@
 #pragma once
 
-#include <HUH/definitions.h>
 #include <HUH/Math/quaternion_functions.h>
+#include <HUH/concepts.h>
+#include <HUH/definitions.h>
 
 namespace HUH {
-template<typename T>
+template<FloatingPoint T>
 class Quaternion {
 public:
     using ValueType = T;
@@ -22,6 +23,16 @@ public:
 
     template<std::size_t size, std::enable_if_t<size == 4, bool> = true>
     HUH_CONSTEXPR_FORCE Quaternion(const T (&t)[size]) noexcept : data{t[0], t[1], t[2], t[3]} {}
+
+    template<FloatingPoint T2>
+    HUH_CONSTEXPR_FORCE Quaternion(const T2& angle, const HUH::Vector3<T>& axis) {
+        auto half = angle / static_cast<T2>(2);
+        T sin = std::sin(half);
+        data[0] = std::cos(half);
+        data[1] = axis[0] * sin;
+        data[2] = axis[1] * sin;
+        data[3] = axis[2] * sin;
+    }
 
     HUH_NODISCARD HUH_CONSTEXPR_FORCE T& W() noexcept { return data[0]; }
     HUH_NODISCARD HUH_CONSTEXPR_FORCE T& X() noexcept { return data[1]; }
@@ -153,20 +164,32 @@ public:
         return result;
     }
 
-    template<typename T2>
-    HUH_CONSTEXPR_FORCE Quaternion& operator/=(const Quaternion<T2>& rhs) noexcept {
-        data[0] /= rhs.data[0];
-        data[1] /= rhs.data[1];
-        data[2] /= rhs.data[2];
-        data[3] /= rhs.data[3];
-        return *this;
+    // template<typename T2>
+    // HUH_CONSTEXPR_FORCE Quaternion& operator/=(const Quaternion<T2>& rhs) noexcept {
+    //     data[0] /= rhs.data[0];
+    //     data[1] /= rhs.data[1];
+    //     data[2] /= rhs.data[2];
+    //     data[3] /= rhs.data[3];
+    //     return *this;
+    // }
+    //
+    // template<typename T2>
+    // HUH_CONSTEXPR_FORCE auto operator/(const Quaternion<T2>& rhs) const noexcept {
+    //     Quaternion<std::common_type_t<T, T2>> result{data[0] / rhs.data[0], data[1] / rhs.data[1],
+    //                                                  data[2] / rhs.data[2], data[3] / rhs.data[3]};
+    //     return result;
+    // }
+
+    HUH_CONSTEXPR_FORCE HUH::Vector<T, 3> RotateVector(const HUH::Vector<T, 3>& vec) {
+        HUH::Vector<T, 3> result;
+        HUH::RotateVector(*this, vec, result);
+        return result;
     }
 
-    template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator/(const Quaternion<T2>& rhs) const noexcept {
-        Quaternion<std::common_type_t<T, T2>> result{data[0] / rhs.data[0], data[1] / rhs.data[1],
-                                                     data[2] / rhs.data[2], data[3] / rhs.data[3]};
-        return result;
+    template<FloatingPoint T2>
+    HUH_CONSTEXPR_FORCE void Rotate(T2 angle, const HUH::Vector<T, 3>& axis) {
+        Quaternion rot(angle, axis);
+        *this *= rot;
     }
 };
 

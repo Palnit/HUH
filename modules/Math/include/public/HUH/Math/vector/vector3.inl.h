@@ -92,6 +92,13 @@ public:
         return result;
     }
 
+    HUH_CONSTEXPR_FORCE Vector& operator-() noexcept {
+        data[0] = -data[0];
+        data[1] = -data[1];
+        data[2] = -data[2];
+        return *this;
+    }
+
     template<typename T2>
     HUH_CONSTEXPR_FORCE Vector& operator-=(const T2& rhs) noexcept {
         data[0] -= rhs;
@@ -184,6 +191,13 @@ public:
     HUH_CONSTEXPR_FORCE Vector& Normalize() noexcept {
         HUH::Normalize(*this);
         return *this;
+    }
+
+    template<typename T2>
+    HUH_CONSTEXPR_FORCE Vector<std::common_type_t<T, T2>, 3> Cross(const Vector<T2, 3>& rhs) noexcept {
+        Vector<std::common_type_t<T, T2>, 3> res;
+        HUH::Cross(*this, rhs, res);
+        return res;
     }
 
 };// namespace HUH
