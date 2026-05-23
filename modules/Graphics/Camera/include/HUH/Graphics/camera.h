@@ -1,12 +1,15 @@
 #pragma once
 
-#include <HUH/Window/window.h>
+#include "HUH/Graphics/transform.h"
+
+#include <HUH/definitions.h>
 
 namespace HUH::Graphics {
 class HUH_GRAPHICS_CAMERA_API Camera {
 public:
-    Camera(Window* window);
+    Transform Transform;
 
-private:
+    float NearClipPlane;
+    float FarClipPlane;
 };
 }// namespace HUH::Graphics

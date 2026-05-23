@@ -35,4 +35,24 @@ HUH_CONSTEXPR_FORCE void RotateVector(const Quaternion<T>& quat, const Vector3<T
         u * 2.0f * u.Dot(vec) + vec * (quat.data[0] * quat.data[0] - u.Dot(u)) + u.Cross(vec) * 2.0f * quat.data[0];
 }
 
+template<typename T>
+HUH_CONSTEXPR_FORCE void Normalize(HUH::Quaternion<T>& quat) noexcept {
+    T tmp = quat.data[0] * quat.data[0] + quat.data[1] * quat.data[1] + quat.data[2] * quat.data[2]
+        + quat.data[3] * quat.data[3];
+    tmp = std::sqrt(tmp);
+    quat /= tmp;
+}
+
+template<typename T>
+HUH_CONSTEXPR_FORCE Matrix4x4<T> ToMatrix(HUH::Quaternion<T> quat) noexcept {
+    quat.Normalize();
+    return {{1 - 2 * (quat[2] * quat[2] + quat[3] * quat[3]), 2 * (quat[1] * quat[2] - quat[3] * quat[0]),
+             2 * (quat[1] * quat[3] + quat[2] * quat[0]), 0},
+            {2 * (quat[1] * quat[2] + quat[3] * quat[0]), 1 - 2 * (quat[1] * quat[1] + quat[0] * quat[0]),
+             2 * (quat[2] * quat[3] - quat[1] * quat[0]), 0},
+            {2 * (quat[1] * quat[3] - quat[2] * quat[0]), 2 * (quat[2] * quat[3] + quat[1] * quat[0]),
+             1 - 2 * (quat[1] * quat[1] + quat[2] * quat[2]), 0},
+            {0, 0, 0, 1}};
+}
+
 }// namespace HUH

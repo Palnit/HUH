@@ -11,7 +11,7 @@ public:
     using ValueType = T;
     T data[4];
 
-    HUH_CONSTEXPR_FORCE Quaternion() noexcept : data{} {}
+    HUH_CONSTEXPR_FORCE Quaternion() noexcept : data{0, 0, 0, 1} {}
     HUH_CONSTEXPR_FORCE Quaternion(const Quaternion& other) noexcept = default;
     HUH_CONSTEXPR_FORCE Quaternion(Quaternion&& other) noexcept = default;
     HUH_CONSTEXPR_FORCE Quaternion& operator=(const Quaternion& other) noexcept = default;
@@ -191,6 +191,13 @@ public:
         Quaternion rot(angle, axis);
         *this *= rot;
     }
+
+    HUH_CONSTEXPR_FORCE Quaternion& Normalize() {
+        HUH::Normalize(*this);
+        return *this;
+    }
+
+    HUH_CONSTEXPR_FORCE Matrix4x4<T> ToMatrix() const noexcept { return HUH::ToMatrix(*this); }
 };
 
 template<typename T>

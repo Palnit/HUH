@@ -139,6 +139,13 @@ public:
         *this = tmp;
         return *this;
     }
+
+    Matrix& Transpose() {
+        *this = Transpose(*this);
+        return *this;
+    }
+
+    Matrix& GetTransposed() const { return Transpose(*this); }
 };
 
 template<typename T, typename T2>
