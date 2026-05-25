@@ -4,6 +4,7 @@
 #include <HUH/Math/quaternion.h>
 #include <HUH/Math/vector.h>
 
+namespace HUH::Graphics {
 class Transform {
 public:
     HUH::Vector3f Position;
@@ -30,3 +31,4 @@ public:
         return result;
     }
 };
+}// namespace HUH::Graphics

@@ -22,7 +22,9 @@ public:
     using RowType = Vector<T, 4>;
     using ColumnType = Vector<T, 4>;
     RowType data[4];
-    // inline static const Matrix Identity{{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+    HUH_CONSTEXPR_FORCE static Matrix Identity() noexcept {
+        return {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+    }
 
     HUH_CONSTEXPR_FORCE Matrix() noexcept : data{0} {}
     HUH_CONSTEXPR_FORCE Matrix(const Matrix& other) noexcept = default;
@@ -141,11 +143,17 @@ public:
     }
 
     Matrix& Transpose() {
-        *this = Transpose(*this);
+        *this = HUH::Transpose(*this);
         return *this;
     }
 
     Matrix& GetTransposed() const { return Transpose(*this); }
+
+    HUH_CONSTEXPR_FORCE static Matrix GetPerspective(T FOV, T AspectRation, T NearClipZ, T FarClipZ)
+        requires(FloatingPoint<T>)
+    {
+        return HUH::GetPerspectiveMatrix(FOV, AspectRation, NearClipZ, FarClipZ);
+    }
 };
 
 template<typename T, typename T2>
