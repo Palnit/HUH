@@ -48,7 +48,7 @@ HUH_CONSTEXPR_FORCE Matrix4x4<T> ToMatrix(HUH::Quaternion<T> quat) noexcept {
     quat.Normalize();
     return {{1 - 2 * (quat[2] * quat[2] + quat[3] * quat[3]), 2 * (quat[1] * quat[2] - quat[3] * quat[0]),
              2 * (quat[1] * quat[3] + quat[2] * quat[0]), 0},
-            {2 * (quat[1] * quat[2] + quat[3] * quat[0]), 1 - 2 * (quat[1] * quat[1] + quat[0] * quat[0]),
+            {2 * (quat[1] * quat[2] + quat[3] * quat[0]), 1 - 2 * (quat[1] * quat[1] + quat[3] * quat[3]),
              2 * (quat[2] * quat[3] - quat[1] * quat[0]), 0},
             {2 * (quat[1] * quat[3] - quat[2] * quat[0]), 2 * (quat[2] * quat[3] + quat[1] * quat[0]),
              1 - 2 * (quat[1] * quat[1] + quat[2] * quat[2]), 0},
