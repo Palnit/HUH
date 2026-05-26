@@ -66,7 +66,7 @@ inline void WinConsoleRedirect() {
         if (freopen_s(&fp, "CONOUT$", "w", stdout) != 0) {
             HUH::WinError();
         } else {
-            setvbuf(stdout, NULL, _IONBF, 0);
+            setvbuf(stdout, nullptr, _IONBF, 0);
         }
     }
 
@@ -76,7 +76,7 @@ inline void WinConsoleRedirect() {
         if (freopen_s(&fp, "CONOUT$", "w", stderr) != 0) {
             HUH::WinError();
         } else {
-            setvbuf(stderr, NULL, _IONBF, 0);
+            setvbuf(stderr, nullptr, _IONBF, 0);
         }
     }
 

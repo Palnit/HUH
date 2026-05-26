@@ -120,6 +120,16 @@ VkFormat VulkanPipeline::ConvertToFormat(const VertexFactory::Descriptor& descri
             return VK_FORMAT_UNDEFINED;
     }
 }
+VkVertexInputRate VulkanPipeline::ConvertToVertexInputRate(const VertexFactory::InputRate& rate){
+    switch (rate) {
+        case VertexFactory::InputRate::Vertex:
+            return VK_VERTEX_INPUT_RATE_VERTEX;
+            case VertexFactory::InputRate::Instance:
+            return VK_VERTEX_INPUT_RATE_INSTANCE;
+            default:
+            return VK_VERTEX_INPUT_RATE_VERTEX;
+    }
+}
 VkPipelineStageFlags VulkanPipeline::ConvertToPipelineStage(const Pipeline::Stages& stages) {
     VkPipelineStageFlags result = 0;
     if (HUH::CheckFlag(stages, HUH::RHI::Pipeline::Stages::TopOfPipe)) {
@@ -217,7 +227,7 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
     for (auto stream : initializer.vertexFactory.m_streams) {
         bindingDescription.emplace_back();
         bindingDescription.back().binding = binding;
-        bindingDescription.back().inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+        bindingDescription.back().inputRate = ConvertToVertexInputRate(stream.Rate);
         bindingDescription.back().stride = stream.Stride;
         Uint32 attribute = 0;
         for (auto descriptor : stream.descriptors) {

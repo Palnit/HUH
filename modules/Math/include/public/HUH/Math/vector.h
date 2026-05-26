@@ -264,12 +264,12 @@ struct std::tuple_element<I, HUH::Vector<T, N>> {
     using type = T;
 };
 
-template<typename T, std::size_t size>
-struct std::formatter<HUH::Vector<T, size>> : std::formatter<std::string> {
-    auto format(const HUH::Vector<T, size>& vec, format_context& ctx) const {
+template<typename T, std::size_t N>
+struct std::formatter<HUH::Vector<T, N>> : std::formatter<std::string> {
+    auto format(const HUH::Vector<T, N>& vec, format_context& ctx) const {
         std::stringstream ss;
         ss << "[ " << vec[0];
-        for (std::size_t i = 1; i < size; i++) {
+        for (std::size_t i = 1; i < N; i++) {
             ss << ", " << vec[i];
         }
         ss << "]";

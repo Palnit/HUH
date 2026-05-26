@@ -11,6 +11,7 @@ class VertexFactory {
 public:
     enum class Format { U8, U16, U32, U64, I8, I16, I32, I64, F32, F64 };
     enum class VectorFormat { X, XY, XYZ, XYZW };
+    enum class InputRate {Vertex, Instance};
     VertexFactory() = default;
 
     friend class Pipeline;
@@ -18,14 +19,14 @@ public:
 
     template<auto... T>
         requires(IsMemberPtr<T> && ...)
-    HUH_FORCE_INLINE constexpr void AddVertexStream() {
+    HUH_FORCE_INLINE constexpr void AddVertexStream(const InputRate rate = InputRate::Vertex) {
         size_t Stride = 0;
         (
             [&] {
                 Stride = sizeof(typename HUH::ClassMemberTypeHelper<T>::StructType);
             }(),
             ...);
-        m_streams.emplace_back(static_cast<HUH::Uint32>(Stride));
+        m_streams.emplace_back(static_cast<HUH::Uint32>(Stride), rate);
         (
             [&] {
                 AddVertexStreamInternal<typename HUH::ClassMemberTypeHelper<T>::Type>(
@@ -35,8 +36,8 @@ public:
     }
 
     template<typename... T>
-    HUH_FORCE_INLINE constexpr void AddVertexStream() {
-        m_streams.emplace_back((sizeof(T) + ...));
+    HUH_FORCE_INLINE constexpr void AddVertexStream(const InputRate rate = InputRate::Vertex) {
+        m_streams.emplace_back((sizeof(T) + ...), rate);
         size_t Offset = 0;
         (
             [&] {
@@ -139,6 +140,7 @@ private:
     };
     struct Stream {
         Uint32 Stride;
+        InputRate Rate;
         std::vector<Descriptor> descriptors;
     };
     std::vector<Stream> m_streams;

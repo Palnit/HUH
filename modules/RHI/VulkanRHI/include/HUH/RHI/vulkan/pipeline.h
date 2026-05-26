@@ -21,6 +21,7 @@ public:
     operator VkPipeline() { return m_pipeline; }
     // TODO move to dynamic rhi
     static VkFormat ConvertToFormat(const VertexFactory::Descriptor& descriptor);
+    static VkVertexInputRate ConvertToVertexInputRate(const VertexFactory::InputRate& rate);
     static VkPipelineStageFlags ConvertToPipelineStage(const Pipeline::Stages& stages);
     static VkDescriptorType ConvertDescriptorType(const Pipeline::DescriptorTypes& descriptor);
 
