@@ -20,7 +20,7 @@ bool VulkanShader::Init(Stage stage, const std::string& entryFunctionName) {
 
     m_shaderStageInfo.stage = ConvertStageBits(m_stage);
     m_shaderStageInfo.module = m_shaderModule;
-    m_shaderStageInfo.pName = entryFunctionName.c_str();
+    m_shaderStageInfo.pName = "main";
 
     return true;
 }

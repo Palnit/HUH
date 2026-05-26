@@ -4,8 +4,10 @@
 #include <HUH/Math/quaternion.h>
 #include <HUH/Math/vector.h>
 
+#include <HUH/definitions.h>
+
 namespace HUH::Graphics {
-class Transform {
+class HUH_GRAPHICS_CORE_API Transform {
 public:
     HUH::Vector3f Position;
     HUH::Quaternionf Rotation;

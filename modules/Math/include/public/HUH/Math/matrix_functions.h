@@ -51,8 +51,8 @@ HUH_CONSTEXPR_FORCE Matrix4x4<T> GetPerspectiveMatrix(T FOV, T AspectRation, T N
     auto HalfFov = static_cast<T>(FOV / 2.0);
     auto PerTan = static_cast<T>(1.0 / std::tan(HalfFov));
     auto ClipRange = FarClipZ / (FarClipZ - NearClipZ);
-    return Matrix4x4<T>({PerTan / AspectRation, 0, 0, 0}, {0, PerTan, 0, 0}, {0, 0, ClipRange, 1},
-                        {0, 0, -ClipRange * NearClipZ, 0});
+    return Matrix4x4<T>({PerTan/ AspectRation  , 0, 0, 0}, {0, PerTan , 0, 0}, {0, 0, ClipRange, 1},
+                        {0, 0, ClipRange * -NearClipZ, 0});
 }
 
 }// namespace HUH
