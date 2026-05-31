@@ -52,12 +52,12 @@ public:
     HUH_NODISCARD HUH_CONSTEXPR_FORCE static std::size_t Size() { return 2; }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE bool operator==(const Vector<T2, 4>& rhs) {
+    HUH_CONSTEXPR_FORCE bool operator==(const Vector<T2, 2>& rhs) {
         return data[0] == rhs.data[0] && data[1] == rhs.data[1];
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE bool operator!=(const Vector<T2, 4>& rhs) {
+    HUH_CONSTEXPR_FORCE bool operator!=(const Vector<T2, 2>& rhs) {
         return !(*this == rhs);
     }
 

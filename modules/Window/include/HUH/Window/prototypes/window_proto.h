@@ -130,6 +130,7 @@ enum class KeyBindings {
     LeftAlt,
     RightAlt,
     BackSpace,
+    Space,
     Enter,
     Tab,
     Other,

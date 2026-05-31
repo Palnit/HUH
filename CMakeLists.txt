@@ -15,6 +15,10 @@ option(USE_SIMD "Activates auto detection of cpu intrinsics and uses simd instru
 option(BUILD_GRAPHICS_ALL "Builds all graphics modules" OFF)
 option(BUILD_GRAPHICS_CAMERA "Builds a camera module" OFF)
 
+#FileHandling
+option(BUILD_FILE_HANDLING_ALL "Builds all file handling module" OFF)
+option(BUILD_FILE_HANDLING_IMAGE "Builds a image handling module" OFF)
+
 
 option(BUILD_TESTS "Build google tests for the modules" OFF)
 option(BUILD_BENCHMARKS "Build google benchmarks for the modules" OFF)
@@ -124,6 +128,7 @@ if (BUILD_WAYLAND_CONNECTOR)
 endif ()
 
 add_subdirectory(modules/Graphics)
+add_subdirectory(modules/FileHandling)
 
 
 get_property(BUILD_MODULES TARGET HUH PROPERTY BUILD_MODULES)

@@ -274,6 +274,8 @@ KeyBindings XkbToKeyBindings(xkb_keysym_t keysym) {
             return KeyBindings::BackSpace;
         case XKB_KEY_Tab:
             return KeyBindings::Tab;
+        case XKB_KEY_space:
+            return KeyBindings::Space;
         case XKB_KEY_KP_Enter:
         case XKB_KEY_ISO_Enter:
         case XKB_KEY_Return:
@@ -539,7 +541,7 @@ void WaylandWindow::wlKeyboardKey(void* data,
     Uint32 keycode = key + 8;
     xkb_keysym_t sym = xkb_state_key_get_one_sym(window->m_xkbState, keycode);
     auto keybinding = XkbToKeyBindings(sym);
-    if (state == WL_KEYBOARD_KEY_STATE_PRESSED) {
+    if (state == WL_KEYBOARD_KEY_STATE_PRESSED || state == WL_KEYBOARD_KEY_STATE_REPEATED) {
         auto size = xkb_state_key_get_utf8(window->m_xkbState, keycode, nullptr, 0);
         // char buf[128];
         // xkb_keysym_get_name(sym, buf, sizeof(buf));

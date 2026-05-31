@@ -120,13 +120,13 @@ VkFormat VulkanPipeline::ConvertToFormat(const VertexFactory::Descriptor& descri
             return VK_FORMAT_UNDEFINED;
     }
 }
-VkVertexInputRate VulkanPipeline::ConvertToVertexInputRate(const VertexFactory::InputRate& rate){
+VkVertexInputRate VulkanPipeline::ConvertToVertexInputRate(const VertexFactory::InputRate& rate) {
     switch (rate) {
         case VertexFactory::InputRate::Vertex:
             return VK_VERTEX_INPUT_RATE_VERTEX;
-            case VertexFactory::InputRate::Instance:
+        case VertexFactory::InputRate::Instance:
             return VK_VERTEX_INPUT_RATE_INSTANCE;
-            default:
+        default:
             return VK_VERTEX_INPUT_RATE_VERTEX;
     }
 }
@@ -224,12 +224,12 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
     std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
 
     Uint32 binding = 0;
+    Uint32 attribute = 0;
     for (auto stream : initializer.vertexFactory.m_streams) {
         bindingDescription.emplace_back();
         bindingDescription.back().binding = binding;
         bindingDescription.back().inputRate = ConvertToVertexInputRate(stream.Rate);
         bindingDescription.back().stride = stream.Stride;
-        Uint32 attribute = 0;
         for (auto descriptor : stream.descriptors) {
             attributeDescriptions.emplace_back();
             attributeDescriptions.back().binding = binding;
@@ -367,15 +367,19 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
         HUH_ELOG(LogVulkanRHI, "Error creating graphics pipeline: {}", err);
         return false;
     }
-    VkDescriptorPoolSize uniformPoolSize{
-        .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-        .descriptorCount = 2 * HUH::RHI::DefaultMaxSets,
-    };
+    VkDescriptorPoolSize uniformPoolSize[2]{{
+                                                .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                                                .descriptorCount = 2 * HUH::RHI::DefaultMaxSets,
+                                            },
+                                            {
+                                                .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                                .descriptorCount = 2 * HUH::RHI::DefaultMaxSets,
+                                            }};
     VkDescriptorPoolCreateInfo poolInfo{
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
         .maxSets = HUH::RHI::DefaultMaxSets,
-        .poolSizeCount = 1,
-        .pPoolSizes = &uniformPoolSize,
+        .poolSizeCount = 2,
+        .pPoolSizes = &uniformPoolSize[0],
     };
     if (auto err = vkCreateDescriptorPool(*m_device, &poolInfo, nullptr, &m_descriptorPool); err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "Error creating descriptor pool: {}", err);

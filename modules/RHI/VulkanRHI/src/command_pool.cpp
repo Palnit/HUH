@@ -108,12 +108,12 @@ void VulkanCommandPool::VulkanCommandBuffer::Reset() {
     HUH::vkResetCommandBuffer(m_commandBuffer, 0);
 }
 
-void VulkanCommandPool::VulkanCommandBuffer::BindVertexBuffer(Buffer* buffer) {
+void VulkanCommandPool::VulkanCommandBuffer::BindVertexBuffer(Buffer* buffer, Uint32 binding) {
     // TODO offsets
     auto vk_buffer = dynamic_cast<VulkanBuffer*>(buffer);
     VkBuffer buffers[] = {*vk_buffer};
     VkDeviceSize offsets[] = {0};
-    vkCmdBindVertexBuffers(m_commandBuffer, 0, 1, buffers, offsets);
+    vkCmdBindVertexBuffers(m_commandBuffer, binding, 1, buffers, offsets);
 }
 
 void VulkanCommandPool::VulkanCommandBuffer::BindIndexBuffer(Buffer* buffer) {

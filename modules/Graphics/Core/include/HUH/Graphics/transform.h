@@ -15,9 +15,9 @@ public:
 
     HUH::Matrix4x4f ToMatrix() const {
         HUH::Matrix4x4f result = Rotation.ToMatrix();
-        result[0][4] = Position[0];
-        result[1][4] = Position[1];
-        result[2][4] = Position[2];
+        result[3][0] = Position[0];
+        result[3][1] = Position[1];
+        result[3][2] = Position[2];
 
         result[0][0] *= Scale[0];
         result[1][1] *= Scale[1];
@@ -32,5 +32,8 @@ public:
         result[2][4] = Position[2];
         return result;
     }
+
+    HUH::Vector3f GetForward() const { return Rotation.RotateVector({1.f, 0.f, 0.f}); }
+    HUH::Vector3f GetRight() const { return Rotation.RotateVector({0.f, 1.f, 0.f}); }
 };
 }// namespace HUH::Graphics

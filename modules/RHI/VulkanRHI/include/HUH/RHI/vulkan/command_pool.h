@@ -19,7 +19,7 @@ public:
         void BeginRendering(RenderPass* renderPass, Image* renderTarget) override;
         void EndRendering() override;
         void Reset() override;
-        void BindVertexBuffer(Buffer* buffer) override;
+        void BindVertexBuffer(Buffer* buffer, Uint32 binding) override;
         void BindIndexBuffer(Buffer* buffer) override;
         // TODO rethink this with dx12
         void BindUniformBuffers(Buffer* buffer) override;

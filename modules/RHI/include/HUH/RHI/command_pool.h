@@ -17,7 +17,7 @@ public:
         void SetViewPort(const Vector2u32& viewPort) { m_viewPort = viewPort; };
         void SetScissor(const Vector2u32& Scissor) { m_scissor = Scissor; };
         void SetClearColor(const Vector4f& clearColor) { m_clearColor = clearColor; };
-        virtual void BindVertexBuffer(class Buffer* buffer) = 0;
+        virtual void BindVertexBuffer(class Buffer* buffer, Uint32 binding) = 0;
         virtual void BindIndexBuffer(Buffer* buffer) = 0;
         virtual void BindUniformBuffers(Buffer* buffer) = 0;
         virtual void Draw(Uint32 vertexCount, Uint32 instanceCount) = 0;

@@ -11,13 +11,13 @@ public:
     using ValueType = T;
     T data[4];
 
-    HUH_CONSTEXPR_FORCE Quaternion() noexcept : data{0, 0, 0, 1} {}
+    HUH_CONSTEXPR_FORCE Quaternion() noexcept : data{1, 0, 0, 0} {}
     HUH_CONSTEXPR_FORCE Quaternion(const Quaternion& other) noexcept = default;
     HUH_CONSTEXPR_FORCE Quaternion(Quaternion&& other) noexcept = default;
     HUH_CONSTEXPR_FORCE Quaternion& operator=(const Quaternion& other) noexcept = default;
     HUH_CONSTEXPR_FORCE Quaternion& operator=(Quaternion&& other) noexcept = default;
 
-    HUH_CONSTEXPR_FORCE Quaternion(const T& x, const T& y, const T& z, const T& w) noexcept : data{x, y, z, w} {}
+    HUH_CONSTEXPR_FORCE Quaternion(const T& w, const T& x, const T& y, const T& z) noexcept : data{w, x, y, z} {}
 
     HUH_CONSTEXPR_FORCE Quaternion(const T& v) noexcept : data{v, v, v, v} {}
 
@@ -119,6 +119,10 @@ public:
         return result;
     }
 
+    HUH_CONSTEXPR_FORCE Quaternion operator-() const noexcept {
+        return Quaternion(data[0], -data[1], -data[2], -data[3]);
+    }
+
     template<typename T2>
     HUH_CONSTEXPR_FORCE Quaternion& operator*=(const T2& rhs) noexcept {
         data[0] *= rhs;
@@ -180,7 +184,7 @@ public:
     //     return result;
     // }
 
-    HUH_CONSTEXPR_FORCE HUH::Vector<T, 3> RotateVector(const HUH::Vector<T, 3>& vec) {
+    HUH_CONSTEXPR_FORCE HUH::Vector<T, 3> RotateVector(const HUH::Vector<T, 3>& vec) const {
         HUH::Vector<T, 3> result;
         HUH::RotateVector(*this, vec, result);
         return result;
@@ -194,6 +198,12 @@ public:
 
     HUH_CONSTEXPR_FORCE Quaternion& Normalize() {
         HUH::Normalize(*this);
+        return *this;
+    }
+
+    HUH_CONSTEXPR_FORCE Quaternion GetNormalized() const {
+        auto tmp = *this;
+        HUH::Normalize(tmp);
         return *this;
     }
 
