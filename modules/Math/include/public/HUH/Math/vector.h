@@ -277,6 +277,19 @@ struct std::formatter<HUH::Vector<T, N>> : std::formatter<std::string> {
     }
 };
 
+template<std::size_t N>
+struct std::formatter<HUH::Vector<HUH::Uint8, N>> : std::formatter<std::string> {
+    auto format(const HUH::Vector<HUH::Uint8, N>& vec, format_context& ctx) const {
+        std::stringstream ss;
+        ss << "[ " << static_cast<int>(vec[0]);
+        for (std::size_t i = 1; i < N; i++) {
+            ss << ", " << static_cast<int>(vec[i]);
+        }
+        ss << "]";
+        return formatter<string>::format(ss.str(), ctx);
+    }
+};
+
 #include <HUH/Math/vector/vector2.inl.h>
 #include <HUH/Math/vector/vector3.inl.h>
 #include <HUH/Math/vector/vector4.inl.h>

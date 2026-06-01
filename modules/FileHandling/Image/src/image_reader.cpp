@@ -26,6 +26,10 @@ Image ReadImageFromFile(const std::string& path) {
 Image ReadImageFromData(const std::vector<Uint8>& bytes) {
 #ifdef HUH_IMAGE_READER_AVAILABLE_PNG
     HUH_TLOG("IS PNG: {}", PngReader::IsPng(bytes))
+    if (PngReader::IsPng(bytes)) {
+        PngReader reader(bytes);
+        reader.ReadPng();
+    }
 #endif
 
     return {};

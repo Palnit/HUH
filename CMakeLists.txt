@@ -73,6 +73,15 @@ elseif (UNIX AND NOT APPLE)
     target_compile_definitions(HUH PUBLIC HUH_LINUX)
 endif ()
 
+if (CMAKE_CXX_BYTE_ORDER STREQUAL "BIG_ENDIAN")
+    target_compile_definitions(HUH PUBLIC HUH_BIG_ENDIAN)
+elseif (CMAKE_CXX_BYTE_ORDER STREQUAL "LITTLE_ENDIAN")
+    target_compile_definitions(HUH PUBLIC HUH_LITTLE_ENDIAN)
+else ()
+    target_compile_definitions(HUH PUBLIC HUH_LITTLE_ENDIAN)
+    message(WARNING "Endianness could not be determined.")
+endif ()
+
 target_compile_definitions(HUH PUBLIC HUH_DEBUG $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:DEBUG> HUH_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
 
 target_include_directories(HUH PUBLIC

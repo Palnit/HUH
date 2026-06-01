@@ -2,6 +2,7 @@ set(INC_PATH "include/HUH/FileHandling/Image")
 
 
 set(HEADER_FILES
+        ${INC_PATH}/definitions.h
         ${INC_PATH}/image.h
         ${INC_PATH}/image_reader.h
 )
