@@ -1,6 +1,9 @@
 #include <HUH/RHI/vulkan/pipeline.h>
 
+#include "HUH/RHI/vulkan/dynamic_rhi.h"
+
 #include <HUH/RHI/vulkan/Types/buffer.h>
+#include <HUH/RHI/vulkan/Types/image.h>
 #include <HUH/RHI/vulkan/device.h>
 #include <HUH/RHI/vulkan/render_pass.h>
 #include <HUH/RHI/vulkan/shader.h>
@@ -197,6 +200,8 @@ void VulkanPipeline::CreateDescriptorSet() {
     VkDescriptorSetAllocateInfo allocInfo{
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
         .descriptorPool = m_descriptorPool,
+        // This should match the number of command buffers but for now it can stay
+        // This should be created based on which command buffer i am bound too and each should have its own sets.
         .descriptorSetCount = 1,
         .pSetLayouts = &m_descriptorSetLayout,
     };
@@ -433,6 +438,7 @@ Buffer* VulkanPipeline::CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Bind
                                         .sharingMode = VK_SHARING_MODE_EXCLUSIVE};
     if (auto err = HUH::vkCreateBuffer(*m_device, &bufferCreateInfo, nullptr, &buffer); err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "Vulkan buffer creation failed: {}", HUH::ToString(err))
+        return nullptr;
     }
     auto vk_buffer = new VulkanBuffer(Size, buffer, m_device);
     m_createdBuffers.push_back(vk_buffer);
@@ -457,6 +463,51 @@ Buffer* VulkanPipeline::CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Bind
     m_descriptorSets.back().bound[Binding] = true;
     vk_buffer->m_descriptorSet = m_descriptorSets.back().set;
     return m_createdBuffers.back();
+}
+
+HUH::RHI::Image* VulkanPipeline::CreateImage(Buffer::Type type, const HUH::Image& image, Uint64 Binding) {
+
+    VkImage vk_tempImage;
+    VkImageCreateInfo imageCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+        .imageType = VK_IMAGE_TYPE_2D,
+        .format = VulkanDynamicRHI::ConvertFormat(Format::R8G8B8A8_SRGB),
+        .extent = {.width = image.Size.Width(), .height = image.Size.Height(), .depth = 1},
+        .mipLevels = 1,
+        .arrayLayers = 1,
+        .samples = VK_SAMPLE_COUNT_1_BIT,
+        .tiling = VK_IMAGE_TILING_OPTIMAL,
+        .usage = VulkanBuffer::ConvertBufferType(type),
+        .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+        .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED};
+
+    if (auto err = HUH::vkCreateImage(*m_device, &imageCreateInfo, nullptr, &vk_tempImage); err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Vulkan buffer creation failed: {}", HUH::ToString(err))
+        return nullptr;
+    }
+    auto vk_image = new VulkanImage(vk_tempImage, true);
+    m_createdImages.push_back(vk_image);
+    vk_image->m_binding = Binding;
+    vk_image->Init({m_device, Format::R8G8B8A8_SRGB, 1, image.Size});
+
+    if (m_descriptorSets.empty()) {
+        CreateDescriptorSet();
+    }
+    bool found = false;
+    for (auto& [set, bound] : m_descriptorSets) {
+        if (!bound[Binding]) {
+            vk_image->m_descriptorSet = set;
+            bound[Binding] = true;
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        CreateDescriptorSet();
+    }
+    m_descriptorSets.back().bound[Binding] = true;
+    vk_image->m_descriptorSet = m_descriptorSets.back().set;
+    return m_createdImages.back();
 }
 
 VulkanPipeline::~VulkanPipeline() {

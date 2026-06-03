@@ -2,6 +2,7 @@
 #include <HUH/RHI/vulkan/command_pool.h>
 #include <HUH/RHI/vulkan/device.h>
 
+#include "HUH/RHI/vulkan/Types/barrier.h"
 #include "HUH/RHI/vulkan/Types/buffer.h"
 #include "HUH/RHI/vulkan/render_pass.h"
 
@@ -260,6 +261,11 @@ Swapchain* VulkanDevice::CreateSwapchain(Window& window) {
 Fence* VulkanDevice::CreateFence() {
     m_createdFences.push_back(new VulkanFence(this));
     return m_createdFences.back();
+}
+
+Barrier* VulkanDevice::CreateBarrier() {
+    m_createdBarriers.push_back(new VulkanBarrier(this));
+    return m_createdBarriers.back();
 }
 
 std::vector<Fence*> VulkanDevice::CreateFence(Uint32 num) {

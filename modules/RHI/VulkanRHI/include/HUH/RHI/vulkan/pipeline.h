@@ -13,9 +13,10 @@ public:
     friend class VulkanImage;
     bool Init(Initializer&& initializer) override;
     void Destroy() override;
-    void AddShader(class Shader* shader) override;
-    virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size);
-    virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Binding);
+    void AddShader(Shader* shader) override;
+    Buffer* CreateBuffer(Buffer::Type type, Uint64 Size) override;
+    Buffer* CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Binding) override;
+    HUH::RHI::Image* CreateImage(Buffer::Type type, const HUH::Image& image, Uint64 Binding) override;
 
     // ReSharper disable once CppMemberFunctionMayBeConst CppNonExplicitConversionOperator
     operator VkPipeline() { return m_pipeline; }

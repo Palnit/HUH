@@ -128,15 +128,17 @@ void VulkanCommandPool::VulkanCommandBuffer::BindUniformBuffers(Buffer* buffer) 
     }
     auto vk_buffer = dynamic_cast<VulkanBuffer*>(buffer);
     // TODO RETHINK THIS A LOT
-    vkCmdBindDescriptorSets(m_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->m_layout, 0, 1,
-                            &vk_buffer->m_descriptorSet, 0, nullptr);
+    m_descriptorSets.push_back(vk_buffer->m_descriptorSet);
+    m_descriptorWrites.push_back(vk_buffer->m_descriptorWriter);
 }
 
 void VulkanCommandPool::VulkanCommandBuffer::Draw(Uint32 vertexCount, Uint32 instanceCount) {
+    BindDescriptorSetWriters();
     vkCmdDraw(m_commandBuffer, vertexCount, instanceCount, 0, 0);
 }
 
 void VulkanCommandPool::VulkanCommandBuffer::DrawIndexed(Uint32 indexCount, Uint32 instanceCount) {
+    BindDescriptorSetWriters();
     vkCmdDrawIndexed(m_commandBuffer, indexCount, instanceCount, 0, 0, 0);
 }
 
@@ -154,6 +156,14 @@ void VulkanCommandPool::VulkanCommandBuffer::CopyBuffer(Buffer* srcBuffer, Buffe
     }
     VkBufferCopy copyRegion = {.srcOffset = 0, .dstOffset = 0, .size = vk_srcBuffer->GetSize()};
     vkCmdCopyBuffer(m_commandBuffer, *vk_srcBuffer, *vk_dstBuffer, 1, &copyRegion);
+}
+
+void VulkanCommandPool::VulkanCommandBuffer::BindDescriptorSetWriters() const {
+    vkUpdateDescriptorSets(*m_parent->m_device, m_descriptorWrites.size(), m_descriptorWrites.data(), 0, nullptr);
+    for (auto it : m_descriptorSets) {
+        vkCmdBindDescriptorSets(m_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->m_layout, 0, 1, &it, 0,
+                                nullptr);
+    }
 }
 
 VulkanCommandPool::VulkanCommandPool(VulkanDevice* device) : m_device(device) {

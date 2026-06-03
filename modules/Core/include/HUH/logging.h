@@ -1,10 +1,10 @@
 #pragma once
 
+#include <HUH/console_color.h>
 #include <HUH/definitions.h>
 #include <filesystem>
 #include <format>
 #include <iostream>
-#include <HUH/console_color.h>
 
 namespace HUH {
 
@@ -76,7 +76,7 @@ public:
                        std::filesystem::path&& file_info,
                        const std::string& file_line,
                        Args&&... args) {
-        std::cout << ConsoleColor::Green << std::left << std::setw(12) << "[Temp]"
+        std::cout << ConsoleColor::Green << std::left << std::setw(16) << "[Temp]"
                   << std::setw(LogCategory::GetCategoryWidth()) << " " << ConsoleColor::Reset
                   << std::vformat(format, std::make_format_args(args...)) << "\t["
                   << file_info.lexically_relative(s_huh_path).string() << ":" << file_line << "]" << std::endl;

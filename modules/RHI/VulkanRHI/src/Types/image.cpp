@@ -11,8 +11,9 @@ void VulkanImage::Destroy() {
         return;
     }
     if (m_created) {
+        HUH::vkDestroyImage(*m_device, m_image, nullptr);
     }
-    HUH::vkDestroyImageView(m_device->m_device, m_imageView, nullptr);
+    HUH::vkDestroyImageView(*m_device, m_imageView, nullptr);
     HUH::vkDestroyFramebuffer(*m_device, m_frameBuffer, nullptr);
 }
 
@@ -37,33 +38,41 @@ VkFramebuffer VulkanImage::GetFrameBuffer(const VulkanRenderPass* renderPass) {
     return m_frameBuffer;
 }
 
+VkMemoryRequirements VulkanImage::GetMemoryRequirements() const {
+    return m_memoryRequirements;
+}
+
 bool VulkanImage::Init(Initializer&& init) {
-    // TODO proper vulkan image creation from real image or swapchain image
     m_device = dynamic_cast<VulkanDevice*>(init.Device);
     m_size = init.Size;
-    VkComponentMapping componentMapping = {
-        .r = VK_COMPONENT_SWIZZLE_IDENTITY,
-        .g = VK_COMPONENT_SWIZZLE_IDENTITY,
-        .b = VK_COMPONENT_SWIZZLE_IDENTITY,
-        .a = VK_COMPONENT_SWIZZLE_IDENTITY,
-    };
-    VkImageSubresourceRange imageSubresourceRange = {
+    if (m_created) {
+        vkGetImageMemoryRequirements(*m_device, m_image, &m_memoryRequirements);
+    }
+    // TODO proper vulkan image creation from real image or swapchain image
 
-        // TODO proper aspect mask
-        .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-        .baseMipLevel = 0,
-        .levelCount = init.MipLevels,
-        .baseArrayLayer = 0,
-        .layerCount = 1,
-    };
     VkImageViewCreateInfo imageCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
         .image = m_image,
         // TODO proper image view type of 2d or 3d
         .viewType = VK_IMAGE_VIEW_TYPE_2D,
         .format = VulkanDynamicRHI::ConvertFormat(init.Format),
-        .components = componentMapping,
-        .subresourceRange = imageSubresourceRange,
+        .components =
+            {
+                .r = VK_COMPONENT_SWIZZLE_IDENTITY,
+                .g = VK_COMPONENT_SWIZZLE_IDENTITY,
+                .b = VK_COMPONENT_SWIZZLE_IDENTITY,
+                .a = VK_COMPONENT_SWIZZLE_IDENTITY,
+            },
+        .subresourceRange =
+            {
+
+                // TODO proper aspect mask
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .baseMipLevel = 0,
+                .levelCount = init.MipLevels,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
+            },
     };
 
     if (auto err = HUH::vkCreateImageView(m_device->m_device, &imageCreateInfo, nullptr, &m_imageView);

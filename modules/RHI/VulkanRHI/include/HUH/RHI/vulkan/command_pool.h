@@ -29,9 +29,12 @@ public:
         void CopyBuffer(Buffer* srcBuffer, Buffer* dstBuffer) override;
 
     protected:
+        void BindDescriptorSetWriters() const;
         VulkanCommandPool* m_parent;
         VulkanPipeline* m_pipeline = nullptr;
         VkCommandBuffer m_commandBuffer;
+        std::vector<VkWriteDescriptorSet> m_descriptorWrites;
+        std::vector<VkDescriptorSet> m_descriptorSets;
 
         VulkanCommandBuffer(VulkanCommandPool* parent, VkCommandBuffer commandBuffer)
             : CommandBuffer(),

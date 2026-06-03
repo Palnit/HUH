@@ -12,12 +12,13 @@ public:
 
     operator VkRenderPass() const { return m_renderPass; }
 
-protected:
-    VulkanRenderPass(VulkanDevice* device);
-    ~VulkanRenderPass() override;
     static VkImageLayout ConvertImageLayout(Layout layout);
     static VkAttachmentLoadOp ConvertLoadOp(LoadOp loadOp);
     static VkAttachmentStoreOp ConvertStoreOp(StoreOp storeOp);
+
+protected:
+    VulkanRenderPass(VulkanDevice* device);
+    ~VulkanRenderPass() override;
 
     VulkanDevice* m_device = nullptr;
     VkRenderPass m_renderPass = nullptr;

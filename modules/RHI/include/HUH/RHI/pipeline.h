@@ -5,6 +5,9 @@
 #include <HUH/RHI/shader.h>
 #include <HUH/enum_define.h>
 #include <HUH/types.h>
+
+#include <HUH/FileHandling/Image/image.h>
+
 #include <vector>
 
 namespace HUH {
@@ -54,11 +57,13 @@ public:
     virtual void AddShader(class Shader* shader) = 0;
     virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size) = 0;
     virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Binding) = 0;
+    virtual HUH::RHI::Image* CreateImage(Buffer::Type type, const HUH::Image& image, Uint64 Binding) = 0;
 
 protected:
     Pipeline() = default;
     virtual ~Pipeline() = default;
     std::vector<Buffer*> m_createdBuffers;
+    std::vector<Image*> m_createdImages;
 };
 }// namespace RHI
 std::string HUH_RHI_API ToString(RHI::Pipeline::Stages stage);

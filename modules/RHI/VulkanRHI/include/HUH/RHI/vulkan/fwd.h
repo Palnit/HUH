@@ -11,6 +11,7 @@ class VulkanCommandPool;
 class VulkanMemoryAllocator;
 class VulkanImage;
 class VulkanFence;
+class VulkanBarrier;
 class VulkanBuffer;
 class VulkanRenderPass;
 

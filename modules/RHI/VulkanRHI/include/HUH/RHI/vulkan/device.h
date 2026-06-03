@@ -70,6 +70,7 @@ public:
     operator VkDevice() const { return m_device; }
 
     Fence* CreateFence() override;
+    Barrier* CreateBarrier() override;
     std::vector<Fence*> CreateFence(Uint32 num) override;
 
     MemoryAllocator* CreateMemoryAllocator() override;

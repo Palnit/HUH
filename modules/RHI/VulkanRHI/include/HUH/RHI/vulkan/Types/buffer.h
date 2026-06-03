@@ -33,6 +33,8 @@ protected:
     VkMemoryRequirements m_memoryRequirements{};
     VulkanDevice* m_device = nullptr;
     VkDescriptorSet m_descriptorSet = nullptr;
+    VkWriteDescriptorSet m_descriptorWriter = {};
+    VkDescriptorBufferInfo m_bufferInfo = {};
     VulkanMemoryAllocator::MemoryBlock m_allocatedBlock{};
     VulkanMemoryAllocator::Allocation* m_allocation = nullptr;
 };

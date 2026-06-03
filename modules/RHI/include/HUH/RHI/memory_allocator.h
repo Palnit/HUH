@@ -18,7 +18,9 @@ public:
         TransferDst = 1 << 3,
     };
     virtual bool Allocate(Buffer* buffer, Type type) = 0;
+    virtual bool Allocate(Image* buffer, Type type) = 0;
     virtual bool Free(Buffer* buffer) = 0;
+    virtual bool Free(Image* buffer) = 0;
     virtual void Destroy() = 0;
 
 protected:

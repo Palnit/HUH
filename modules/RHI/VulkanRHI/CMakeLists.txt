@@ -14,6 +14,7 @@ set(VULKAN_RHI_HEADER_FILES
         ${VULKAN_RHI_INC_PATH}/Types/image.h
         ${VULKAN_RHI_INC_PATH}/Types/fence.h
         ${VULKAN_RHI_INC_PATH}/Types/buffer.h
+        ${VULKAN_RHI_INC_PATH}/Types/barrier.h
         ${VULKAN_RHI_INC_PATH}/render_pass.h
 )
 set(VULKAN_RHI_SOURCE_FILES
@@ -28,6 +29,7 @@ set(VULKAN_RHI_SOURCE_FILES
         src/Types/image.cpp
         src/Types/fence.cpp
         src/Types/buffer.cpp
+        src/Types/barrier.cpp
         src/render_pass.cpp
 )
 

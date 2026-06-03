@@ -4,8 +4,10 @@
 namespace HUH {
 class Image {
 public:
-    HUH::Vector2u32 Size;
+    Image() : Size(0, 0), Pixels() {}
 
-private:
+    HUH::Vector2u32 Size;
+    // TODO will do for now but should be replaced with my own with views instead of set u8 pixels
+    std::vector<HUH::Vector4u8> Pixels;
 };
 }// namespace HUH

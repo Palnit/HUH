@@ -1,5 +1,6 @@
 #include <HUH/RHI/device.h>
 
+#include "HUH/RHI/Types/barrier.h"
 #include "HUH/RHI/memory_allocator.h"
 #include "HUH/RHI/render_pass.h"
 
@@ -19,6 +20,10 @@ void Device::Destroy() {
     }
     for (auto fence : m_createdFences) {
         delete fence;
+    }
+    for (auto barrier : m_createdBarriers) {
+        barrier->Destroy();
+        delete barrier;
     }
     for (CommandPool* cmd : m_createdCommandBuffers) {
         cmd->Destroy();

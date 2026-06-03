@@ -1,5 +1,7 @@
 #include <HUH/RHI/vulkan/memory_allocator.h>
 
+#include "HUH/RHI/vulkan/Types/image.h"
+
 #include <HUH/RHI/vulkan/Types/buffer.h>
 #include <HUH/RHI/vulkan/device.h>
 
@@ -46,6 +48,51 @@ bool VulkanMemoryAllocator::Allocate(Buffer* buffer, Type type) {
         HUH_ELOG(LogVulkanRHI, "Failed to bind memory Error: {}", err)
         return false;
     }
+    return true;
+}
+
+bool VulkanMemoryAllocator::Allocate(Image* buffer, Type type) {
+    const auto vk_image = dynamic_cast<VulkanImage*>(buffer);
+    const auto requirements = vk_image->GetMemoryRequirements();
+    const auto typeIndex = FindMemoryType(requirements, ConvertMemoryType(type));
+    // TODO customizable base size
+    const Uint32 size = requirements.size > 64000000 ? requirements.size : 64000000;
+    auto it = m_deviceMemoryTypeMap.find(typeIndex);
+    if (it == m_deviceMemoryTypeMap.end()) {
+        vk_image->m_allocation = AddAllocation(typeIndex, size);
+    } else {
+        for (auto tmp : it->second) {
+            if (!tmp->FreeBlocks.empty()) {
+                vk_image->m_allocation = tmp;
+                break;
+            }
+        }
+        if (vk_image->m_allocation == nullptr) {
+            vk_image->m_allocation = AddAllocation(typeIndex, size);
+        }
+    }
+    auto block = vk_image->m_allocation->Allocate(requirements.size, requirements.alignment);
+    if (block.Size == 0) {
+        vk_image->m_allocation = AddAllocation(typeIndex, size);
+    }
+    block = vk_image->m_allocation->Allocate(requirements.size, requirements.alignment);
+    if (block.Size == 0) {
+        HUH_ELOG(LogVulkanRHI, "Error Could Not Allocate Memory!")
+        return false;
+    }
+    vk_image->m_allocator = this;
+    vk_image->m_allocatedBlock = block;
+    if (auto err = HUH::vkBindImageMemory(*m_device, *vk_image, vk_image->m_allocation->Memory, block.Offset);
+        err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Failed to bind memory Error: {}", err)
+        return false;
+    }
+    return true;
+}
+
+bool VulkanMemoryAllocator::Free(Image* buffer) {
+    const auto vk_buffer = dynamic_cast<VulkanImage*>(buffer);
+    vk_buffer->m_allocation->Free(vk_buffer->m_allocatedBlock);
     return true;
 }
 

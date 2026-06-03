@@ -15,7 +15,9 @@ public:
     friend class VulkanDevice;
     void Destroy() override;
     bool Allocate(Buffer* buffer, Type type) override;
+    bool Allocate(Image* buffer, Type type) override;
     bool Free(Buffer* buffer) override;
+    bool Free(Image* buffer) override;
 
     struct MemoryBlock {
         Uint32 Offset = 0;

@@ -12,6 +12,7 @@ class VertexFactory;
 class MemoryAllocator;
 class Image;
 class Fence;
+class Barrier;
 class Buffer;
 class RenderPass;
 

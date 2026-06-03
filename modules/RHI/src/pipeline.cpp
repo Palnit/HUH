@@ -1,4 +1,6 @@
+#include <HUH/RHI/Types/image.h>
 #include <HUH/RHI/pipeline.h>
+
 #include <HUH/enum_helper.h>
 
 namespace HUH {
@@ -6,6 +8,10 @@ namespace RHI {}
 
 void RHI::Pipeline::Destroy() {
     for (Buffer* buffer : m_createdBuffers) {
+        buffer->Destroy();
+        delete buffer;
+    }
+    for (Image* buffer : m_createdImages) {
         buffer->Destroy();
         delete buffer;
     }

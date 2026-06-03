@@ -47,6 +47,8 @@ target_link_libraries(HUH-RHI PUBLIC
         HUH
         HUH::Core
         HUH::Math
+        # TODO this should be optional
+        HUH::FileHandling::Image
 )
 
 

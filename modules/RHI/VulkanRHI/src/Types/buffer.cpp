@@ -26,6 +26,7 @@ VkBufferUsageFlags VulkanBuffer::ConvertBufferType(Buffer::Type type) {
 }
 
 void VulkanBuffer::Destroy() {
+    // UnMapData();
     if (m_buffer) {
         HUH::vkDestroyBuffer(*m_device, m_buffer, nullptr);
     }
@@ -42,8 +43,10 @@ void VulkanBuffer::MapData() {
 }
 void VulkanBuffer::UnMapData() {
     // TODO flush
-    HUH::vkUnmapMemory(*m_device, m_allocation->Memory);
-    m_mappedData = nullptr;
+    if (m_mappedData) {
+        HUH::vkUnmapMemory(*m_device, m_allocation->Memory);
+        m_mappedData = nullptr;
+    }
 }
 
 void VulkanBuffer::CopyData(void* data) {
@@ -58,12 +61,12 @@ void VulkanBuffer::UploadData(void* data) {
     if (m_uniformBuffer) {
 
         // TODO other than than uniform buffer;
-        VkDescriptorBufferInfo bufferInfo{
+        m_bufferInfo = {
             .buffer = m_buffer,
             .offset = 0,
             .range = m_size,
         };
-        VkWriteDescriptorSet descriptorWrite{
+        m_descriptorWriter = {
             .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
             .dstSet = m_descriptorSet,
             .dstBinding = m_binding,
@@ -71,12 +74,11 @@ void VulkanBuffer::UploadData(void* data) {
             .descriptorCount = 1,
             .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
             .pImageInfo = nullptr,// Optional
-            .pBufferInfo = &bufferInfo,
+            .pBufferInfo = &m_bufferInfo,
             .pTexelBufferView = nullptr,// Optional
         };
 
         // TODO whole set update
-        vkUpdateDescriptorSets(*m_device, 1, &descriptorWrite, 0, nullptr);
     }
     UnMapData();
 }
@@ -84,6 +86,7 @@ void VulkanBuffer::UploadData(void* data) {
 VkMemoryRequirements VulkanBuffer::GetMemoryRequirements() const {
     return m_memoryRequirements;
 }
+
 VulkanBuffer::VulkanBuffer(Uint64 size, VkBuffer buffer, VulkanDevice* device)
     : Buffer(size),
       m_buffer(buffer),
