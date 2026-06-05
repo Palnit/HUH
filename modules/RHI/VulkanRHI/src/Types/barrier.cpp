@@ -3,6 +3,7 @@
 #include "HUH/RHI/vulkan/Types/buffer.h"
 #include "HUH/RHI/vulkan/Types/image.h"
 #include "HUH/RHI/vulkan/dynamic_rhi.h"
+#include "HUH/RHI/vulkan/pipeline.h"
 #include "HUH/RHI/vulkan/render_pass.h"
 
 namespace HUH::RHI {
@@ -22,6 +23,8 @@ void VulkanBarrier::Destroy() {
 }
 
 void VulkanBarrier::InitImage(Initializer&& initializer) {
+    m_imageMemoryBarrier.srcStageMask = VulkanPipeline::ConvertToPipelineStage(initializer.Transitions.Image.srcStage);
+    m_imageMemoryBarrier.dstStageMask = VulkanPipeline::ConvertToPipelineStage(initializer.Transitions.Image.dstStage);
     m_imageMemoryBarrier.srcAccessMask =
         HUH::RHI::VulkanDynamicRHI::ConvertAccess(initializer.Transitions.Image.srcAccess);
     m_imageMemoryBarrier.dstAccessMask =

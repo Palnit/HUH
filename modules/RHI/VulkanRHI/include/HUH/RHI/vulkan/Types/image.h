@@ -23,24 +23,27 @@ public:
 
     operator VkImageView() const { return m_imageView; }
     // TODO change location
-    VkFramebuffer GetFrameBuffer(const VulkanRenderPass* renderPass);
+    VkSampler GetSampler();
+    VkWriteDescriptorSet GetDescriptorWriter();
 
     operator VkImage() const { return m_image; }
 
     VkMemoryRequirements GetMemoryRequirements() const;
 
+    static VkImageUsageFlags ConvertImageUsage(Image::Type type);
+
 protected:
-    explicit VulkanImage(VkImage image, bool created = false) : Image(created), m_image(image) {}
+    explicit VulkanImage(VulkanDevice* device, VkImage image, bool created = false);
     ~VulkanImage() override;
 
     Uint32 m_binding = 0;
     VkImage m_image = nullptr;
     VkImageView m_imageView = nullptr;
-    VkFramebuffer m_frameBuffer = nullptr;
+    VkSampler m_sampler = nullptr;
     VulkanDevice* m_device = nullptr;
     VkDescriptorSet m_descriptorSet = nullptr;
     VkWriteDescriptorSet m_descriptorWriter = {};
-    VkDescriptorBufferInfo m_bufferInfo = {};
+    VkDescriptorImageInfo m_imageInfo = {};
     VkMemoryRequirements m_memoryRequirements{};
     VulkanMemoryAllocator::MemoryBlock m_allocatedBlock{};
     VulkanMemoryAllocator::Allocation* m_allocation = nullptr;

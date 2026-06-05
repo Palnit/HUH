@@ -10,6 +10,10 @@ enum class Format {
     R8G8B8A8_SRGB,
     B8G8R8A8_UNORM,
     B8G8R8A8_SRGB,
+    // TODO: better names ?
+    D32_FLOAT,
+    D32_FLOAT_S8_UINT,
+    D24_UNORM_S8_UINT,
 };
 
 // TODO what to do with this ??? dx12 no equivalent ??

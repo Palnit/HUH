@@ -186,9 +186,8 @@ bool VulkanSwapchain::CreateSwapchain() {
     images.resize(imageCount);
     HUH::vkGetSwapchainImagesKHR(m_device->m_device, m_swapchain, &imageCount, images.data());
     for (auto image : images) {
-        m_images.push_back(new VulkanImage(image));
-        m_images.back()->Init(
-            {m_device, VulkanDynamicRHI::ConvertFormat(m_vkFormat), 1, {m_extent.width, m_extent.height}});
+        m_images.push_back(new VulkanImage(m_device, image));
+        m_images.back()->Init({VulkanDynamicRHI::ConvertFormat(m_vkFormat), 1, {m_extent.width, m_extent.height}});
     }
 
     HUH_ILOG(LogVulkanRHI, "Swapchain Creation Successful")

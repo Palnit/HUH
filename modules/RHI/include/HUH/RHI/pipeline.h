@@ -1,6 +1,7 @@
 #pragma once
 
 #include <HUH/RHI/Types/buffer.h>
+#include <HUH/RHI/Types/image.h>
 #include <HUH/RHI/fwd.h>
 #include <HUH/RHI/shader.h>
 #include <HUH/enum_define.h>
@@ -17,6 +18,7 @@ public:
     enum class DescriptorTypes {
         Uniform,
         Sampler,
+        ImageSampler,
     };
 
     enum class Stages {
@@ -49,6 +51,7 @@ public:
         RenderPass* renderPass;
         VertexFactory& vertexFactory;
         std::vector<Descriptor> descriptorTypes;
+        bool depthTest = false;
     };
     friend class CommandPool;
     friend class Device;
@@ -57,7 +60,8 @@ public:
     virtual void AddShader(class Shader* shader) = 0;
     virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size) = 0;
     virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Binding) = 0;
-    virtual HUH::RHI::Image* CreateImage(Buffer::Type type, const HUH::Image& image, Uint64 Binding) = 0;
+    virtual HUH::RHI::Image* CreateImage(Image::Type type, const HUH::Vector2u32& size) = 0;
+    virtual HUH::RHI::Image* CreateImage(Image::Type type, const HUH::Vector2u32& size, Uint64 Binding) = 0;
 
 protected:
     Pipeline() = default;

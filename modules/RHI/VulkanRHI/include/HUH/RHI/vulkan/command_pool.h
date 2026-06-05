@@ -4,6 +4,7 @@
 #include <HUH/RHI/vulkan/fwd.h>
 #include <HUH/RHI/vulkan/vulkan_defines.h>
 #include <HUH/Types/tuple.h>
+#include <map>
 
 namespace HUH::RHI {
 class HUH_VULKANRHI_API VulkanCommandPool : public CommandPool {
@@ -17,29 +18,38 @@ public:
         bool Begin() override;
         void End() override;
         void BeginRendering(RenderPass* renderPass, Image* renderTarget) override;
+        void BeginRendering(RenderPass* renderPass, Image* renderTarget, Image* depthTarget) override;
         void EndRendering() override;
         void Reset() override;
         void BindVertexBuffer(Buffer* buffer, Uint32 binding) override;
         void BindIndexBuffer(Buffer* buffer) override;
         // TODO rethink this with dx12
         void BindUniformBuffers(Buffer* buffer) override;
+        void BindSampledImage(Image* image) override;
         void Draw(Uint32 vertexCount, Uint32 instanceCount) override;
         void DrawIndexed(Uint32 indexCount, Uint32 instanceCount) override;
         void BindPipeline(class Pipeline* pipeline) override;
         void CopyBuffer(Buffer* srcBuffer, Buffer* dstBuffer) override;
+        void CopyBuffer(Buffer* srcBuffer, Image* dstImage) override;
+        void BindBarrier(Barrier* barrier) override;
 
     protected:
-        void BindDescriptorSetWriters() const;
+        void BindDescriptorSetWriters();
         VulkanCommandPool* m_parent;
         VulkanPipeline* m_pipeline = nullptr;
         VkCommandBuffer m_commandBuffer;
         std::vector<VkWriteDescriptorSet> m_descriptorWrites;
         std::vector<VkDescriptorSet> m_descriptorSets;
+        // TODO this is bad design
+        std::vector<VkImageView> m_attachments;
+        VkFramebuffer m_frameBuffer = nullptr;
 
         VulkanCommandBuffer(VulkanCommandPool* parent, VkCommandBuffer commandBuffer)
             : CommandBuffer(),
               m_parent(parent),
-              m_commandBuffer(commandBuffer) {}
+              m_commandBuffer(commandBuffer) {
+            m_attachments.resize(2);
+        }
         ~VulkanCommandBuffer() override;
     };
 

@@ -192,6 +192,8 @@ VkDescriptorType VulkanPipeline::ConvertDescriptorType(const Pipeline::Descripto
             return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         case DescriptorTypes::Sampler:
             return VK_DESCRIPTOR_TYPE_SAMPLER;
+        case DescriptorTypes::ImageSampler:
+            return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         default:
             return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     }
@@ -346,6 +348,20 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
         return false;
     }
 
+    VkPipelineDepthStencilStateCreateInfo depthStencil{};
+    if (initializer.depthTest) {
+        depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+        depthStencil.depthTestEnable = VK_TRUE;
+        depthStencil.depthWriteEnable = VK_TRUE;
+        depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
+        depthStencil.depthBoundsTestEnable = VK_FALSE;
+        depthStencil.minDepthBounds = 0.0f;// Optional
+        depthStencil.maxDepthBounds = 1.0f;// Optional
+        depthStencil.stencilTestEnable = VK_FALSE;
+        depthStencil.front = {};// Optional
+        depthStencil.back = {}; // Optional
+    }
+
     auto vk_renderPass = dynamic_cast<VulkanRenderPass*>(initializer.renderPass);
     VkGraphicsPipelineCreateInfo pipelineInfo{
         .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
@@ -356,7 +372,7 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
         .pViewportState = &viewportStateCreateInfo,
         .pRasterizationState = &rasterizationStateCreateInfo,
         .pMultisampleState = &multisampleStateCreateInfo,
-        .pDepthStencilState = nullptr,// Optional
+        .pDepthStencilState = initializer.depthTest ? &depthStencil : nullptr,
         .pColorBlendState = &colorBlending,
         .pDynamicState = &dynamicStateCreateInfo,
         .layout = m_layout,
@@ -465,19 +481,20 @@ Buffer* VulkanPipeline::CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Bind
     return m_createdBuffers.back();
 }
 
-HUH::RHI::Image* VulkanPipeline::CreateImage(Buffer::Type type, const HUH::Image& image, Uint64 Binding) {
-
+HUH::RHI::Image* VulkanPipeline::CreateImage(Image::Type type, const HUH::Vector2u32& size) {
     VkImage vk_tempImage;
     VkImageCreateInfo imageCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
         .imageType = VK_IMAGE_TYPE_2D,
-        .format = VulkanDynamicRHI::ConvertFormat(Format::R8G8B8A8_SRGB),
-        .extent = {.width = image.Size.Width(), .height = image.Size.Height(), .depth = 1},
+        // TODO FIX THIS
+        .format = VulkanDynamicRHI::ConvertFormat(type == Image::Type::DeptStencil ? Format::D32_FLOAT_S8_UINT
+                                                                                   : Format::R8G8B8A8_SRGB),
+        .extent = {.width = size.Width(), .height = size.Height(), .depth = 1},
         .mipLevels = 1,
         .arrayLayers = 1,
         .samples = VK_SAMPLE_COUNT_1_BIT,
         .tiling = VK_IMAGE_TILING_OPTIMAL,
-        .usage = VulkanBuffer::ConvertBufferType(type),
+        .usage = VulkanImage::ConvertImageUsage(type),
         .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
         .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED};
 
@@ -485,10 +502,33 @@ HUH::RHI::Image* VulkanPipeline::CreateImage(Buffer::Type type, const HUH::Image
         HUH_ELOG(LogVulkanRHI, "Vulkan buffer creation failed: {}", HUH::ToString(err))
         return nullptr;
     }
-    auto vk_image = new VulkanImage(vk_tempImage, true);
+    auto vk_image = new VulkanImage(m_device, vk_tempImage, true);
+    m_createdImages.push_back(vk_image);
+    return m_createdImages.back();
+}
+
+HUH::RHI::Image* VulkanPipeline::CreateImage(Image::Type type, const HUH::Vector2u32& size, Uint64 Binding) {
+
+    VkImage vk_tempImage;
+    VkImageCreateInfo imageCreateInfo = {.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+                                         .imageType = VK_IMAGE_TYPE_2D,
+                                         .format = VulkanDynamicRHI::ConvertFormat(Format::R8G8B8A8_SRGB),
+                                         .extent = {.width = size.Width(), .height = size.Height(), .depth = 1},
+                                         .mipLevels = 1,
+                                         .arrayLayers = 1,
+                                         .samples = VK_SAMPLE_COUNT_1_BIT,
+                                         .tiling = VK_IMAGE_TILING_OPTIMAL,
+                                         .usage = VulkanImage::ConvertImageUsage(type),
+                                         .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+                                         .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED};
+
+    if (auto err = HUH::vkCreateImage(*m_device, &imageCreateInfo, nullptr, &vk_tempImage); err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Vulkan buffer creation failed: {}", HUH::ToString(err))
+        return nullptr;
+    }
+    auto vk_image = new VulkanImage(m_device, vk_tempImage, true);
     m_createdImages.push_back(vk_image);
     vk_image->m_binding = Binding;
-    vk_image->Init({m_device, Format::R8G8B8A8_SRGB, 1, image.Size});
 
     if (m_descriptorSets.empty()) {
         CreateDescriptorSet();

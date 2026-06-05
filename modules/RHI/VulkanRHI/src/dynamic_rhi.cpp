@@ -134,6 +134,13 @@ VkFormat VulkanDynamicRHI::ConvertFormat(Format format) {
             return VK_FORMAT_B8G8R8A8_UNORM;
         case Format::B8G8R8A8_SRGB:
             return VK_FORMAT_B8G8R8A8_SRGB;
+        case Format::D32_FLOAT:
+            return VK_FORMAT_D32_SFLOAT;
+        case Format::D32_FLOAT_S8_UINT:
+            return VK_FORMAT_D32_SFLOAT_S8_UINT;
+        case Format::D24_UNORM_S8_UINT:
+            return VK_FORMAT_D24_UNORM_S8_UINT;
+
         case Format::Unknown:
             return VK_FORMAT_UNDEFINED;
         default:
@@ -151,6 +158,12 @@ Format VulkanDynamicRHI::ConvertFormat(VkFormat format) {
             return Format::B8G8R8A8_UNORM;
         case VK_FORMAT_B8G8R8A8_SRGB:
             return Format::B8G8R8A8_SRGB;
+        case VK_FORMAT_D32_SFLOAT:
+            return Format::D32_FLOAT;
+        case VK_FORMAT_D32_SFLOAT_S8_UINT:
+            return Format::D32_FLOAT_S8_UINT;
+        case VK_FORMAT_D24_UNORM_S8_UINT:
+            return Format::D24_UNORM_S8_UINT;
         case VK_FORMAT_UNDEFINED:
             return Format::Unknown;
         default:

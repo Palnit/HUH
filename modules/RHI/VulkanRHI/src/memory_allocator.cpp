@@ -163,8 +163,19 @@ VulkanMemoryAllocator::MemoryBlock VulkanMemoryAllocator::Allocation::Allocate(U
                 FreeBlocks.erase(it);
                 break;
             }
-            if (it->Size - it->Offset % alignment >= size) {
-                auto offset = it->Offset % alignment;
+            if (it->Offset < alignment && it->Size - (alignment - it->Offset) >= size) {
+                auto offset = alignment - it->Offset;
+                block.Offset = it->Offset + offset;
+                block.Size = size;
+                TmpBlocks.push_back({it->Offset, offset});
+                TmpBlocks.push_back({it->Offset + offset + size, it->Size - offset - size});
+                FreeBlocks.erase(it);
+                break;
+            }
+            if (it->Offset > alignment
+                && it->Size
+                    - (it->Offset - (alignment - (it->Offset - (it->Offset / alignment) * alignment)) >= size)) {
+                auto offset = alignment - (it->Offset - (it->Offset / alignment) * alignment);
                 block.Offset = it->Offset + offset;
                 block.Size = size;
                 TmpBlocks.push_back({it->Offset, offset});

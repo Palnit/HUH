@@ -12,7 +12,8 @@ public:
         friend class CommandPool;
         virtual bool Begin() = 0;
         virtual void End() = 0;
-        virtual void BeginRendering(RenderPass* renderPass, class Image* renderTarget) = 0;
+        virtual void BeginRendering(RenderPass* renderPass, Image* renderTarget) = 0;
+        virtual void BeginRendering(RenderPass* renderPass, Image* renderTarget, Image* depthTarget) = 0;
         virtual void EndRendering() = 0;
         void SetViewPort(const Vector2u32& viewPort) { m_viewPort = viewPort; };
         void SetScissor(const Vector2u32& Scissor) { m_scissor = Scissor; };
@@ -20,11 +21,14 @@ public:
         virtual void BindVertexBuffer(class Buffer* buffer, Uint32 binding) = 0;
         virtual void BindIndexBuffer(Buffer* buffer) = 0;
         virtual void BindUniformBuffers(Buffer* buffer) = 0;
+        virtual void BindSampledImage(Image* image) = 0;
         virtual void Draw(Uint32 vertexCount, Uint32 instanceCount) = 0;
         virtual void DrawIndexed(Uint32 indexCount, Uint32 instanceCount) = 0;
         virtual void Reset() = 0;
         virtual void BindPipeline(class Pipeline* pipeline) = 0;
         virtual void CopyBuffer(Buffer* srcBuffer, Buffer* dstBuffer) = 0;
+        virtual void CopyBuffer(Buffer* srcBuffer, Image* dstImage) = 0;
+        virtual void BindBarrier(Barrier* barrier) = 0;
 
         Vector2u32 m_viewPort{0, 0};
         Vector2u32 m_scissor{0, 0};

@@ -61,6 +61,7 @@ void CameraWindowConnector::KeyPress(Window*, KeyBindings key_bindings, const st
 
 void CameraWindowConnector::MouseMove(Window* window, Vector<double, 2> vector) {
     if (!m_mouseMove) {
+        m_previousMousePos = vector;
         return;
     }
     if (m_previousMousePos == Vector<double, 2>{-1, -1}) {

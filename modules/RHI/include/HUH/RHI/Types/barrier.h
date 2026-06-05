@@ -15,18 +15,22 @@ public:
         HUH::RHI::Buffer* Buffer;
         union {
             struct {
-                AccessType srcAccess;
-                AccessType dstAccess;
-                Int64 srcQueue;
-                Int64 dstQueue;
-                RenderPass::Layout srcLayout;
-                RenderPass::Layout dstLayout;
+                Pipeline::Stages srcStage = Pipeline::Stages::Unknown;
+                Pipeline::Stages dstStage = Pipeline::Stages::Unknown;
+                AccessType srcAccess = AccessType::Unknown;
+                AccessType dstAccess = AccessType::Unknown;
+                Int64 srcQueue = -1;
+                Int64 dstQueue = -1;
+                RenderPass::Layout srcLayout = RenderPass::Layout::Unknown;
+                RenderPass::Layout dstLayout = RenderPass::Layout::Unknown;
             } Image;
             struct {
-                AccessType srcAccess;
-                AccessType dstAccess;
-                Int64 srcQueue;
-                Int64 dstQueue;
+                Pipeline::Stages srcStage = Pipeline::Stages::Unknown;
+                Pipeline::Stages dstStage = Pipeline::Stages::Unknown;
+                AccessType srcAccess = AccessType::Unknown;
+                AccessType dstAccess = AccessType::Unknown;
+                Int64 srcQueue = -1;
+                Int64 dstQueue = -1;
             } Buffer;
         } Transitions;
     };

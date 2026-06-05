@@ -6,6 +6,7 @@
 
 namespace HUH {
 namespace RHI {
+// TODO rethink buffers to maybe be template resource data and go from there to be able to bind arrays ?
 class HUH_RHI_API Buffer {
 public:
     friend class Device;

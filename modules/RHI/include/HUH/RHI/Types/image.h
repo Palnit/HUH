@@ -2,6 +2,7 @@
 
 #include <HUH/RHI/dynamic_rhi.h>
 #include <HUH/RHI/fwd.h>
+#include <HUH/enum_define.h>
 
 #include <HUH/FileHandling/Image/image.h>
 
@@ -17,8 +18,18 @@ public:
     friend class Swapchain;
     friend class Pipeline;
 
+    enum Type {
+        Unknown = 0,
+        Color = 1 << 0,
+        DeptStencil = 1 << 1,
+        Transient = 1 << 2,
+        Sampled = 1 << 3,
+        Storage = 1 << 4,
+        SRC = 1 << 5,
+        DST = 1 << 6,
+    };
+
     struct Initializer {
-        HUH::RHI::Device* Device = nullptr;
         HUH::RHI::Format Format = Format::Unknown;
         Uint32 MipLevels = 0;
         HUH::Vector2u32 Size = {0, 0};
@@ -37,3 +48,5 @@ protected:
     MemoryAllocator* m_allocator = nullptr;
 };
 }// namespace HUH::RHI
+
+HUH_ENUM_BIT_OPERATORS(HUH::RHI::Image::Type)

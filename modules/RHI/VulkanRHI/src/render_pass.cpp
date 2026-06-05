@@ -60,6 +60,9 @@ bool VulkanRenderPass::Init() {
         auto [Format, ColorLoadOp, ColorStoreOp, StencilLoadOp, StencilStoreOp, InitialLayout, FinalLayout] =
             subpass.DepthAttachments;
         if (Format != Format::Unknown) {
+            depthAttachmentsRef.push_back({.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2,
+                                           .attachment = static_cast<Uint32>(Attachments.size()),
+                                           .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL});
             Attachments.push_back({
                 .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2_KHR,
                 .format = VulkanDynamicRHI::ConvertFormat(Format),
@@ -71,9 +74,6 @@ bool VulkanRenderPass::Init() {
                 .initialLayout = ConvertImageLayout(InitialLayout),
                 .finalLayout = ConvertImageLayout(FinalLayout),
             });
-            depthAttachmentsRef.push_back({.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2,
-                                           .attachment = static_cast<Uint32>(Attachments.size()),
-                                           .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL});
         }
 
         // TODO bind point other than graphics
