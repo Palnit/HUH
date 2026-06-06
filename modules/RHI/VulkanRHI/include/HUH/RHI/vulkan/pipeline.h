@@ -18,6 +18,8 @@ public:
     Buffer* CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Binding) override;
     HUH::RHI::Image* CreateImage(Image::Type type, const HUH::Vector2u32& size) override;
     HUH::RHI::Image* CreateImage(Image::Type type, const HUH::Vector2u32& size, Uint64 Binding) override;
+    bool DestroyImage(HUH::RHI::Image* image) override;
+    bool DestroyBuffer(HUH::RHI::Buffer* buffer) override;
 
     // ReSharper disable once CppMemberFunctionMayBeConst CppNonExplicitConversionOperator
     operator VkPipeline() { return m_pipeline; }

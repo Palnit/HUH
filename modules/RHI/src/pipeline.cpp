@@ -17,6 +17,18 @@ void RHI::Pipeline::Destroy() {
     }
 }
 
+bool RHI::Pipeline::DestroyBuffer(Buffer* buffer) {
+    buffer->Destroy();
+    delete buffer;
+    return true;
+}
+
+bool RHI::Pipeline::DestroyImage(Image* buffer) {
+    buffer->Destroy();
+    delete buffer;
+    return true;
+}
+
 std::string ToString(RHI::Pipeline::Stages type) {
     std::string result = "";
     if (HUH::CheckFlag(type, RHI::Pipeline::Stages::Unknown)) {

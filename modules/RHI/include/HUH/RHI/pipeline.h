@@ -63,6 +63,10 @@ public:
     virtual HUH::RHI::Image* CreateImage(Image::Type type, const HUH::Vector2u32& size) = 0;
     virtual HUH::RHI::Image* CreateImage(Image::Type type, const HUH::Vector2u32& size, Uint64 Binding) = 0;
 
+    // TODO re think this a lot
+    virtual bool DestroyBuffer(Buffer* buffer);
+    virtual bool DestroyImage(Image* buffer);
+
 protected:
     Pipeline() = default;
     virtual ~Pipeline() = default;

@@ -97,7 +97,6 @@ bool VulkanMemoryAllocator::Free(Image* buffer) {
 }
 
 bool VulkanMemoryAllocator::Free(Buffer* buffer) {
-    // TODO:: actual free from device and buffer deletion.
     const auto vk_buffer = dynamic_cast<VulkanBuffer*>(buffer);
     vk_buffer->m_allocation->Free(vk_buffer->m_allocatedBlock);
     return true;
@@ -191,6 +190,15 @@ VulkanMemoryAllocator::MemoryBlock VulkanMemoryAllocator::Allocation::Allocate(U
 
 bool VulkanMemoryAllocator::Allocation::Free(MemoryBlock block) {
     FreeBlocks.push_back(block);
+    std::vector<MemoryBlock> TmpBlocks;
+    for (auto it = FreeBlocks.begin(); it != FreeBlocks.end() - 1; ++it) {
+        if (it->Offset + it->Size == (it + 1)->Offset) {
+            TmpBlocks.push_back({it->Offset, it->Size + (it + 1)->Offset});
+            it = FreeBlocks.erase(it);
+            it = FreeBlocks.erase(it);
+        }
+    }
+    FreeBlocks.insert(FreeBlocks.end(), TmpBlocks.begin(), TmpBlocks.end());
     // TODO: merging strategy ?
     return true;
 }

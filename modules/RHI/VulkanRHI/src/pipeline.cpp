@@ -562,6 +562,23 @@ HUH::RHI::Image* VulkanPipeline::CreateImage(Image::Type type, const HUH::Vector
     vk_image->m_descriptorSet = m_descriptorSets.back().set;
     return m_createdImages.back();
 }
+bool VulkanPipeline::DestroyImage(HUH::RHI::Image* image) {
+    auto it = std::remove(m_createdImages.begin(), m_createdImages.end(), image);
+    if (it != m_createdImages.end()) {
+        Pipeline::DestroyImage(image);
+    }
+    m_createdImages.erase(it, m_createdImages.end());
+    return true;
+}
+
+bool VulkanPipeline::DestroyBuffer(HUH::RHI::Buffer* buffer) {
+    auto it = std::remove(m_createdBuffers.begin(), m_createdBuffers.end(), buffer);
+    if (it != m_createdBuffers.end()) {
+        Pipeline::DestroyBuffer(buffer);
+    }
+    m_createdBuffers.erase(it, m_createdBuffers.end());
+    return true;
+}
 
 VulkanPipeline::~VulkanPipeline() {
     HUH_ILOG(LogVulkanRHI, "VulkanPipeline Destroyed")
