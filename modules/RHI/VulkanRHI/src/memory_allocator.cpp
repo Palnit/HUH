@@ -151,14 +151,15 @@ VulkanMemoryAllocator::Allocation* VulkanMemoryAllocator::AddAllocation(Uint32 m
 }
 
 VulkanMemoryAllocator::MemoryBlock VulkanMemoryAllocator::Allocation::Allocate(Uint32 size, Uint32 alignment) {
-    std::vector<MemoryBlock> TmpBlocks;
     MemoryBlock block{};
     for (auto it = FreeBlocks.begin(); it != FreeBlocks.end(); ++it) {
         if (it->Size >= size) {
             if (it->Offset % alignment == 0) {
                 block.Offset = it->Offset;
                 block.Size = size;
-                TmpBlocks.push_back({it->Offset + size, it->Size - size});
+                if (it->Size - size != 0) {
+                    it = ++FreeBlocks.insert(it, {it->Offset + size, it->Size - size});
+                }
                 FreeBlocks.erase(it);
                 break;
             }
@@ -166,8 +167,10 @@ VulkanMemoryAllocator::MemoryBlock VulkanMemoryAllocator::Allocation::Allocate(U
                 auto offset = alignment - it->Offset;
                 block.Offset = it->Offset + offset;
                 block.Size = size;
-                TmpBlocks.push_back({it->Offset, offset});
-                TmpBlocks.push_back({it->Offset + offset + size, it->Size - offset - size});
+                it = ++FreeBlocks.insert(it, {it->Offset, offset});
+                if (it->Size - offset - size != 0) {
+                    it = ++FreeBlocks.insert(it, {it->Offset + offset + size, it->Size - offset - size});
+                }
                 FreeBlocks.erase(it);
                 break;
             }
@@ -177,29 +180,37 @@ VulkanMemoryAllocator::MemoryBlock VulkanMemoryAllocator::Allocation::Allocate(U
                 auto offset = alignment - (it->Offset - (it->Offset / alignment) * alignment);
                 block.Offset = it->Offset + offset;
                 block.Size = size;
-                TmpBlocks.push_back({it->Offset, offset});
-                TmpBlocks.push_back({it->Offset + offset + size, it->Size - offset - size});
+                it = ++FreeBlocks.insert(it, {it->Offset, offset});
+                if (it->Size - offset - size != 0) {
+                    it = ++FreeBlocks.insert(it, {it->Offset + offset + size, it->Size - offset - size});
+                }
                 FreeBlocks.erase(it);
                 break;
             }
         }
     }
-    FreeBlocks.insert(FreeBlocks.end(), TmpBlocks.begin(), TmpBlocks.end());
     return block;
 }
 
 bool VulkanMemoryAllocator::Allocation::Free(MemoryBlock block) {
+    // TODO: merging strategy ?
     FreeBlocks.push_back(block);
-    std::vector<MemoryBlock> TmpBlocks;
-    for (auto it = FreeBlocks.begin(); it != FreeBlocks.end() - 1; ++it) {
-        if (it->Offset + it->Size == (it + 1)->Offset) {
-            TmpBlocks.push_back({it->Offset, it->Size + (it + 1)->Offset});
-            it = FreeBlocks.erase(it);
+    std::sort(FreeBlocks.begin(), FreeBlocks.end(),
+              [](MemoryBlock lht, MemoryBlock rht) { return lht.Offset < rht.Offset; });
+    for (auto it = FreeBlocks.begin();;) {
+        if (it == FreeBlocks.end() - 1 || it == FreeBlocks.end()) {
+            break;
+        }
+        if ((it->Offset + it->Size) == (it + 1)->Offset) {
+            it = FreeBlocks.insert(it, {it->Offset, it->Size + (it + 1)->Size});
+            it = FreeBlocks.erase(++it);
             it = FreeBlocks.erase(it);
         }
+        if (it == FreeBlocks.end() - 1 || it == FreeBlocks.end()) {
+            break;
+        }
+        ++it;
     }
-    FreeBlocks.insert(FreeBlocks.end(), TmpBlocks.begin(), TmpBlocks.end());
-    // TODO: merging strategy ?
     return true;
 }
 

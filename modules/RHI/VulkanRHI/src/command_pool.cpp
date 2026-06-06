@@ -178,6 +178,7 @@ bool VulkanCommandPool::Init(Uint32 bufferCount, Queue* queue) {
 }
 
 void VulkanCommandPool::Destroy() {
+    CommandPool::Destroy();
     HUH::vkDestroyCommandPool(*m_device, m_commandPool, nullptr);
 }
 

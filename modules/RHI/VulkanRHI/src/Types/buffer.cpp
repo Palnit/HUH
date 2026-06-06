@@ -30,7 +30,6 @@ void VulkanBuffer::Destroy() {
     if (m_buffer) {
         HUH::vkDestroyBuffer(*m_device, m_buffer, nullptr);
     }
-    m_allocation->Free(m_allocatedBlock);
 }
 void VulkanBuffer::MapData() {
     if (m_mappedData) {

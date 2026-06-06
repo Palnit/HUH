@@ -565,6 +565,8 @@ HUH::RHI::Image* VulkanPipeline::CreateImage(Image::Type type, const HUH::Vector
 bool VulkanPipeline::DestroyImage(HUH::RHI::Image* image) {
     auto it = std::remove(m_createdImages.begin(), m_createdImages.end(), image);
     if (it != m_createdImages.end()) {
+        auto vk_image = dynamic_cast<VulkanImage*>(image);
+        vk_image->m_allocation->Free(vk_image->m_allocatedBlock);
         Pipeline::DestroyImage(image);
     }
     m_createdImages.erase(it, m_createdImages.end());
@@ -574,6 +576,8 @@ bool VulkanPipeline::DestroyImage(HUH::RHI::Image* image) {
 bool VulkanPipeline::DestroyBuffer(HUH::RHI::Buffer* buffer) {
     auto it = std::remove(m_createdBuffers.begin(), m_createdBuffers.end(), buffer);
     if (it != m_createdBuffers.end()) {
+        auto vk_buffer = dynamic_cast<VulkanBuffer*>(buffer);
+        vk_buffer->m_allocation->Free(vk_buffer->m_allocatedBlock);
         Pipeline::DestroyBuffer(buffer);
     }
     m_createdBuffers.erase(it, m_createdBuffers.end());
