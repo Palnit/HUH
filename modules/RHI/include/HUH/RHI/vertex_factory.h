@@ -11,7 +11,8 @@ class VertexFactory {
 public:
     enum class Format { U8, U16, U32, U64, I8, I16, I32, I64, F32, F64 };
     enum class VectorFormat { X, XY, XYZ, XYZW };
-    enum class InputRate {Vertex, Instance};
+    enum class InputRate { Vertex, Instance };
+    enum class PolygonMode { Point, Line, Fill };
     VertexFactory() = default;
 
     friend class Pipeline;
@@ -46,6 +47,8 @@ public:
             }(),
             ...);
     }
+
+    void SetTriangulation(PolygonMode tri) { m_polygonMode = tri; }
 
 private:
     template<typename T>
@@ -144,6 +147,7 @@ private:
         std::vector<Descriptor> descriptors;
     };
     std::vector<Stream> m_streams;
+    PolygonMode m_polygonMode = PolygonMode::Fill;
 };
 
 }// namespace HUH::RHI

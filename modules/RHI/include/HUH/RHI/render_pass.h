@@ -39,6 +39,7 @@ public:
         StoreOp StencilStoreOp = StoreOp::DontCare;
         Layout InitialLayout = Layout::Unknown;
         Layout FinalLayout = Layout::Unknown;
+        Int64 Index = -1;
     };
 
     struct SubPass {

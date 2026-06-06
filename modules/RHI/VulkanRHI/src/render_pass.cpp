@@ -18,62 +18,71 @@ bool VulkanRenderPass::Init() {
     for (const auto& subpass : m_subPasses) {
         inputAttachmentsRef.emplace_back();
         colorAttachmentsRef.emplace_back();
-        for (auto [Format, ColorLoadOp, ColorStoreOp, StencilLoadOp, StencilStoreOp, InitialLayout, FinalLayout] :
-             subpass.InputAttachments) {
-            VkAttachmentDescription2 attachment{
-                .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2,
-                .format = VulkanDynamicRHI::ConvertFormat(Format),
-                // TODO other samples
-                .samples = VK_SAMPLE_COUNT_1_BIT,
-                .loadOp = ConvertLoadOp(ColorLoadOp),
-                .storeOp = ConvertStoreOp(ColorStoreOp),
-                .stencilLoadOp = ConvertLoadOp(StencilLoadOp),
-                .stencilStoreOp = ConvertStoreOp(StencilStoreOp),
-                .initialLayout = ConvertImageLayout(InitialLayout),
-                .finalLayout = ConvertImageLayout(FinalLayout),
-            };
-            VkAttachmentReference2 attachmentRef{.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2,
-                                                 .attachment = static_cast<Uint32>(Attachments.size()),
-                                                 .layout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL};
-            Attachments.emplace_back(attachment);
+        for (auto [Format, ColorLoadOp, ColorStoreOp, StencilLoadOp, StencilStoreOp, InitialLayout, FinalLayout,
+                   Index] : subpass.InputAttachments) {
+
+            VkAttachmentReference2 attachmentRef{
+                .sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2,
+                .attachment = Index == -1 ? static_cast<Uint32>(Attachments.size()) : static_cast<Uint32>(Index),
+                .layout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL};
+
+            if (Index == -1) {
+                Attachments.push_back({
+                    .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2,
+                    .format = VulkanDynamicRHI::ConvertFormat(Format),
+                    // TODO other samples
+                    .samples = VK_SAMPLE_COUNT_1_BIT,
+                    .loadOp = ConvertLoadOp(ColorLoadOp),
+                    .storeOp = ConvertStoreOp(ColorStoreOp),
+                    .stencilLoadOp = ConvertLoadOp(StencilLoadOp),
+                    .stencilStoreOp = ConvertStoreOp(StencilStoreOp),
+                    .initialLayout = ConvertImageLayout(InitialLayout),
+                    .finalLayout = ConvertImageLayout(FinalLayout),
+                });
+            }
             inputAttachmentsRef.back().emplace_back(attachmentRef);
         }
-        for (auto [Format, ColorLoadOp, ColorStoreOp, StencilLoadOp, StencilStoreOp, InitialLayout, FinalLayout] :
-             subpass.ColorAttachments) {
-            VkAttachmentDescription2 attachment{
-                .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2_KHR,
-                .format = VulkanDynamicRHI::ConvertFormat(Format),
-                .samples = VK_SAMPLE_COUNT_1_BIT,
-                .loadOp = ConvertLoadOp(ColorLoadOp),
-                .storeOp = ConvertStoreOp(ColorStoreOp),
-                .stencilLoadOp = ConvertLoadOp(StencilLoadOp),
-                .stencilStoreOp = ConvertStoreOp(StencilStoreOp),
-                .initialLayout = ConvertImageLayout(InitialLayout),
-                .finalLayout = ConvertImageLayout(FinalLayout),
-            };
-            VkAttachmentReference2 attachmentRef{.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2,
-                                                 .attachment = static_cast<Uint32>(Attachments.size()),
-                                                 .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
-            Attachments.emplace_back(attachment);
+        for (auto [Format, ColorLoadOp, ColorStoreOp, StencilLoadOp, StencilStoreOp, InitialLayout, FinalLayout,
+                   Index] : subpass.ColorAttachments) {
+            VkAttachmentReference2 attachmentRef{
+                .sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2,
+                .attachment = Index == -1 ? static_cast<Uint32>(Attachments.size()) : static_cast<Uint32>(Index),
+                .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
+            if (Index == -1) {
+                Attachments.push_back({
+                    .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2_KHR,
+                    .format = VulkanDynamicRHI::ConvertFormat(Format),
+                    .samples = VK_SAMPLE_COUNT_1_BIT,
+                    .loadOp = ConvertLoadOp(ColorLoadOp),
+                    .storeOp = ConvertStoreOp(ColorStoreOp),
+                    .stencilLoadOp = ConvertLoadOp(StencilLoadOp),
+                    .stencilStoreOp = ConvertStoreOp(StencilStoreOp),
+                    .initialLayout = ConvertImageLayout(InitialLayout),
+                    .finalLayout = ConvertImageLayout(FinalLayout),
+                });
+            }
             colorAttachmentsRef.back().emplace_back(attachmentRef);
         }
-        auto [Format, ColorLoadOp, ColorStoreOp, StencilLoadOp, StencilStoreOp, InitialLayout, FinalLayout] =
+        auto [Format, ColorLoadOp, ColorStoreOp, StencilLoadOp, StencilStoreOp, InitialLayout, FinalLayout, Index] =
             subpass.DepthAttachments;
         if (Format != Format::Unknown) {
-            depthAttachmentsRef.push_back({.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2,
-                                           .attachment = static_cast<Uint32>(Attachments.size()),
-                                           .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL});
-            Attachments.push_back({
-                .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2_KHR,
-                .format = VulkanDynamicRHI::ConvertFormat(Format),
-                .samples = VK_SAMPLE_COUNT_1_BIT,
-                .loadOp = ConvertLoadOp(ColorLoadOp),
-                .storeOp = ConvertStoreOp(ColorStoreOp),
-                .stencilLoadOp = ConvertLoadOp(StencilLoadOp),
-                .stencilStoreOp = ConvertStoreOp(StencilStoreOp),
-                .initialLayout = ConvertImageLayout(InitialLayout),
-                .finalLayout = ConvertImageLayout(FinalLayout),
-            });
+            depthAttachmentsRef.push_back(
+                {.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2,
+                 .attachment = Index == -1 ? static_cast<Uint32>(Attachments.size()) : static_cast<Uint32>(Index),
+                 .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL});
+            if (Index == -1) {
+                Attachments.push_back({
+                    .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2_KHR,
+                    .format = VulkanDynamicRHI::ConvertFormat(Format),
+                    .samples = VK_SAMPLE_COUNT_1_BIT,
+                    .loadOp = ConvertLoadOp(ColorLoadOp),
+                    .storeOp = ConvertStoreOp(ColorStoreOp),
+                    .stencilLoadOp = ConvertLoadOp(StencilLoadOp),
+                    .stencilStoreOp = ConvertStoreOp(StencilStoreOp),
+                    .initialLayout = ConvertImageLayout(InitialLayout),
+                    .finalLayout = ConvertImageLayout(FinalLayout),
+                });
+            }
         }
 
         // TODO bind point other than graphics

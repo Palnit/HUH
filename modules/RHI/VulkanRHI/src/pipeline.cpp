@@ -123,6 +123,19 @@ VkFormat VulkanPipeline::ConvertToFormat(const VertexFactory::Descriptor& descri
             return VK_FORMAT_UNDEFINED;
     }
 }
+VkPolygonMode VulkanPipeline::ConvertToPolygonMode(const VertexFactory::PolygonMode& tri) {
+    switch (tri) {
+        case VertexFactory::PolygonMode::Point:
+            return VK_POLYGON_MODE_POINT;
+        case VertexFactory::PolygonMode::Line:
+            return VK_POLYGON_MODE_LINE;
+        case VertexFactory::PolygonMode::Fill:
+            return VK_POLYGON_MODE_FILL;
+        default:
+            return VK_POLYGON_MODE_FILL;
+    }
+}
+
 VkVertexInputRate VulkanPipeline::ConvertToVertexInputRate(const VertexFactory::InputRate& rate) {
     switch (rate) {
         case VertexFactory::InputRate::Vertex:
@@ -266,7 +279,7 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
         .depthClampEnable = VK_FALSE,
         .rasterizerDiscardEnable = VK_FALSE,
-        .polygonMode = VK_POLYGON_MODE_FILL,
+        .polygonMode = ConvertToPolygonMode(initializer.vertexFactory.m_polygonMode),
         .cullMode = VK_CULL_MODE_BACK_BIT,
         .frontFace = VK_FRONT_FACE_CLOCKWISE,
         .depthBiasEnable = VK_FALSE,
