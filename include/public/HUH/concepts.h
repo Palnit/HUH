@@ -15,6 +15,9 @@ concept Derived = std::is_base_of_v<U, T>;
 template<typename T, typename U>
 concept Convertable = std::is_convertible_v<T, U>;
 
+template<typename T, typename U>
+concept ConvertableFrom = std::is_convertible_v<U, T>;
+
 template<typename T>
 concept Integral = std::is_integral_v<T>;
 

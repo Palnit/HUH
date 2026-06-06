@@ -33,4 +33,20 @@ if (PNG_FOUND)
     target_link_libraries(HUH-FileHandling-Image PUBLIC PNG::PNG)
 endif ()
 
+find_package(libjpeg-turbo)
+if (libjpeg-turbo_FOUND)
+    message(STATUS "Found libpng building jpeg image readers")
+    set(HEADER_FILES_JPEG
+            ${INC_PATH}/jpeg/jpeg_reader.h
+    )
+    set(SOURCE_FILES_JPEG
+            src/jpeg/jpeg_reader.cpp
+    )
+    target_compile_definitions(HUH-FileHandling-Image PUBLIC HUH_IMAGE_READER_AVAILABLE_JPEG)
+    target_sources(HUH-FileHandling-Image PUBLIC ${HEADER_FILES_JPEG} ${SOURCE_FILES_JPEG})
+    target_link_libraries(HUH-FileHandling-Image PUBLIC
+            $<IF:$<TARGET_EXISTS:libjpeg-turbo::turbojpeg>,libjpeg-turbo::turbojpeg,libjpeg-turbo::turbojpeg-static>
+    )
+endif ()
+
 target_include_directories(HUH-FileHandling-Image PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")

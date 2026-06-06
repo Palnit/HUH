@@ -1,5 +1,6 @@
 #include <HUH/FileHandling/Image/image_reader.h>
 
+#include "HUH/FileHandling/Image/jpeg/jpeg_reader.h"
 #include "HUH/logging.h"
 
 #include <fstream>
@@ -30,6 +31,12 @@ Image ReadImageFromData(const std::vector<Uint8>& bytes) {
     if (PngReader::IsPng(bytes)) {
         PngReader reader(bytes);
         reader.ReadPng(image);
+    }
+#endif
+#ifdef HUH_IMAGE_READER_AVAILABLE_JPEG
+    JpegReader reader(bytes);
+    if (reader.IsJpeg()) {
+        reader.ReadJpeg(image);
     }
 #endif
 
