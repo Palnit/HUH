@@ -74,8 +74,8 @@ bool VulkanMemoryAllocator::Allocate(Image* buffer, Type type) {
     auto block = vk_image->m_allocation->Allocate(requirements.size, requirements.alignment);
     if (block.Size == 0) {
         vk_image->m_allocation = AddAllocation(typeIndex, size);
+        block = vk_image->m_allocation->Allocate(requirements.size, requirements.alignment);
     }
-    block = vk_image->m_allocation->Allocate(requirements.size, requirements.alignment);
     if (block.Size == 0) {
         HUH_ELOG(LogVulkanRHI, "Error Could Not Allocate Memory!")
         return false;
