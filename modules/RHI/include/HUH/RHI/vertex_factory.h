@@ -48,7 +48,7 @@ public:
             ...);
     }
 
-    void SetTriangulation(PolygonMode tri) { m_polygonMode = tri; }
+    void SetPolygonMode(PolygonMode tri) { m_polygonMode = tri; }
 
 private:
     template<typename T>

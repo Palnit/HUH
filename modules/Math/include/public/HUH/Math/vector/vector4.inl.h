@@ -23,6 +23,24 @@ public:
     HUH_CONSTEXPR_FORCE Vector& operator=(const Vector& other) noexcept = default;
     HUH_CONSTEXPR_FORCE Vector& operator=(Vector&& other) noexcept = default;
 
+    template<HUH::ConvertableFrom<T> T2>
+    HUH_CONSTEXPR_FORCE Vector& operator=(Vector<T2, 4>&& other) noexcept {
+        data[0] = static_cast<ValueType>(other[0]);
+        data[1] = static_cast<ValueType>(other[1]);
+        data[2] = static_cast<ValueType>(other[2]);
+        data[3] = static_cast<ValueType>(other[3]);
+        return *this;
+    }
+
+    template<HUH::ConvertableFrom<T> T2>
+    HUH_CONSTEXPR_FORCE Vector& operator=(const Vector<T2, 4>& other) noexcept {
+        data[0] = static_cast<ValueType>(other[0]);
+        data[1] = static_cast<ValueType>(other[1]);
+        data[2] = static_cast<ValueType>(other[2]);
+        data[3] = static_cast<ValueType>(other[3]);
+        return *this;
+    }
+
     HUH_CONSTEXPR_FORCE Vector(const T& x, const T& y, const T& z, const T& w) noexcept : data{x, y, z, w} {}
 
     HUH_CONSTEXPR_FORCE Vector(const T& v) noexcept : data{v, v, v, v} {}

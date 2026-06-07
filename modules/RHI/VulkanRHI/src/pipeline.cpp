@@ -453,7 +453,7 @@ Buffer* VulkanPipeline::CreateBuffer(Buffer::Type type, Uint64 Size) {
 }
 
 Buffer* VulkanPipeline::CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Binding) {
-    if (Binding >= m_createdBuffers.size()) {
+    if (Binding >= m_descriptorSetLayoutBindings.size()) {
         HUH_ELOG(LogVulkanRHI, "Requesting a buffer for binding greater than the specified Bindings")
         return nullptr;
     }
