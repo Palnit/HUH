@@ -34,7 +34,7 @@ bool JpegReader::IsJpeg() {
 
 void JpegReader::ReadJpeg(Image& im) {
     im.Size = m_size;
-    im.Pixels.reserve(m_size.Width() * m_size.Height());
+    im.Pixels.resize(m_size.Width() * m_size.Height());
     if (tjDecompress2(m_decompressor, m_bytes.data(), m_bytes.size(), reinterpret_cast<HUH::Uint8*>(im.Pixels.data()),
                       m_size.Width(), 0, m_size.Height(), TJPF_RGBA, TJFLAG_NOREALLOC | TJFLAG_FASTDCT)
         != 0) {

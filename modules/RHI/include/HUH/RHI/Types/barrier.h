@@ -36,7 +36,7 @@ public:
     };
 
     virtual void Init(Initializer&&) = 0;
-    virtual void Destroy() = 0;
+    virtual void Destroy() { delete this; };
 
 protected:
     Barrier() = default;

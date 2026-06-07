@@ -264,8 +264,7 @@ Fence* VulkanDevice::CreateFence() {
 }
 
 Barrier* VulkanDevice::CreateBarrier() {
-    m_createdBarriers.push_back(new VulkanBarrier(this));
-    return m_createdBarriers.back();
+    return new VulkanBarrier(this);
 }
 
 std::vector<Fence*> VulkanDevice::CreateFence(Uint32 num) {

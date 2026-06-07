@@ -175,10 +175,9 @@ VulkanMemoryAllocator::MemoryBlock VulkanMemoryAllocator::Allocation::Allocate(U
                 break;
             }
             if (it->Offset > alignment
-                && it->Size
-                    - (it->Offset - (alignment - (it->Offset - (it->Offset / alignment) * alignment)) >= size)) {
-                auto offset = alignment - (it->Offset - (it->Offset / alignment) * alignment);
-                block.Offset = it->Offset + offset;
+                && it->Size - (it->Offset - ((it->Offset - (it->Offset / alignment) * alignment)) >= size)) {
+                auto offset = (it->Offset - (it->Offset / alignment) * alignment);
+                block.Offset = it->Offset - offset;
                 block.Size = size;
                 it = ++FreeBlocks.insert(it, {it->Offset, offset});
                 if (it->Size - offset - size != 0) {

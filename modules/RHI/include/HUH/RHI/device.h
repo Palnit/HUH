@@ -58,7 +58,6 @@ protected:
     std::vector<CommandPool*> m_createdCommandBuffers;
     std::vector<Swapchain*> m_createdSwapchains;
     std::vector<Fence*> m_createdFences;
-    std::vector<Barrier*> m_createdBarriers;
     std::vector<MemoryAllocator*> m_createdMemoryAllocators;
     std::vector<RenderPass*> m_createdRenderPasses;
 };

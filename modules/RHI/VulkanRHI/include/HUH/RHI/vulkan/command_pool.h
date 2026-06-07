@@ -18,7 +18,16 @@ public:
         bool Begin() override;
         void End() override;
         void BeginRendering(RenderPass* renderPass, Image* renderTarget) override;
+        void BeginRendering(RenderPass* renderPass,
+                            Image* renderTarget,
+                            HUH::Vector2i32 offset,
+                            HUH::Vector2u32) override;
         void BeginRendering(RenderPass* renderPass, Image* renderTarget, Image* depthTarget) override;
+        void BeginRendering(RenderPass* renderPass,
+                            Image* renderTarget,
+                            Image* depthTarget,
+                            HUH::Vector2i32 offset,
+                            HUH::Vector2u32) override;
         void EndRendering() override;
         void Reset() override;
         void BindVertexBuffer(Buffer* buffer, Uint32 binding) override;

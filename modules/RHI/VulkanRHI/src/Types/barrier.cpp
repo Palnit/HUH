@@ -20,6 +20,7 @@ void VulkanBarrier::Init(Initializer&& initializer) {
 }
 
 void VulkanBarrier::Destroy() {
+    delete this;
 }
 
 void VulkanBarrier::InitImage(Initializer&& initializer) {

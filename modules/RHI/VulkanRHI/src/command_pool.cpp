@@ -31,6 +31,19 @@ void VulkanCommandPool::VulkanCommandBuffer::End() {
 }
 
 void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPass, Image* renderTarget) {
+    BeginRendering(renderPass, renderTarget, {0, 0}, m_viewPort);
+}
+
+void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPass,
+                                                            Image* renderTarget,
+                                                            Image* depthTarget) {
+    BeginRendering(renderPass, renderTarget, depthTarget, {0, 0}, m_viewPort);
+}
+
+void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPass,
+                                                            Image* renderTarget,
+                                                            HUH::Vector2i32 offset,
+                                                            HUH::Vector2u32 renderArea) {
     auto vk_image = dynamic_cast<VulkanImage*>(renderTarget);
     auto vk_renderPass = dynamic_cast<VulkanRenderPass*>(renderPass);
     auto size = vk_image->GetSize();
@@ -71,9 +84,8 @@ void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPa
                                             .framebuffer = m_frameBuffer,
                                             .renderArea =
                                                 {
-                                                    .offset = {0, 0},
-                                                    // This might need scisor i dont know yet what to do windows
-                                                    .extent = {size.X(), size.Y()},
+                                                    .offset = {offset.X(), offset.Y()},
+                                                    .extent = {renderArea.X(), renderArea.Y()},
                                                 },
                                             .clearValueCount = 1,
                                             .pClearValues = &clearColor};
@@ -82,7 +94,9 @@ void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPa
 
 void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPass,
                                                             Image* renderTarget,
-                                                            Image* depthTarget) {
+                                                            Image* depthTarget,
+                                                            HUH::Vector2i32 offset,
+                                                            HUH::Vector2u32 renderArea) {
     auto vk_image = dynamic_cast<VulkanImage*>(renderTarget);
     auto vk_depth = dynamic_cast<VulkanImage*>(depthTarget);
     auto vk_renderPass = dynamic_cast<VulkanRenderPass*>(renderPass);
@@ -127,9 +141,9 @@ void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPa
                                             .framebuffer = m_frameBuffer,
                                             .renderArea =
                                                 {
-                                                    .offset = {0, 0},
+                                                    .offset = {offset.X(), offset.Y()},
                                                     // This might need scisor i dont know yet what to do windows
-                                                    .extent = {size.X(), size.Y()},
+                                                    .extent = {renderArea.X(), renderArea.Y()},
                                                 },
                                             .clearValueCount = 2,
                                             .pClearValues = clearValues.data()};

@@ -13,7 +13,16 @@ public:
         virtual bool Begin() = 0;
         virtual void End() = 0;
         virtual void BeginRendering(RenderPass* renderPass, Image* renderTarget) = 0;
+        virtual void BeginRendering(RenderPass* renderPass,
+                                    Image* renderTarget,
+                                    HUH::Vector2i32 offset,
+                                    HUH::Vector2u32 renderArea) = 0;
         virtual void BeginRendering(RenderPass* renderPass, Image* renderTarget, Image* depthTarget) = 0;
+        virtual void BeginRendering(RenderPass* renderPass,
+                                    Image* renderTarget,
+                                    Image* depthTarget,
+                                    HUH::Vector2i32 offset,
+                                    HUH::Vector2u32 renderArea) = 0;
         virtual void EndRendering() = 0;
         void SetViewPort(const Vector2u32& viewPort) { m_viewPort = viewPort; };
         void SetScissor(const Vector2u32& Scissor) { m_scissor = Scissor; };
