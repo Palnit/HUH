@@ -445,6 +445,18 @@ Buffer* VulkanPipeline::CreateBuffer(Buffer::Type type, Uint64 Size) {
                                         .size = Size,
                                         .usage = VulkanBuffer::ConvertBufferType(type),
                                         .sharingMode = VK_SHARING_MODE_EXCLUSIVE};
+#ifdef HUH_USE_CUDA
+#ifdef HUH_LINUX
+    VkExternalMemoryBufferCreateInfo externalMemoryBufferCreateInfo{
+        .sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO,
+        .pNext = nullptr,
+        .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT};
+    bufferCreateInfo.pNext = &externalMemoryBufferCreateInfo;
+#elifdef HUH_WIN
+    // TODO WINDOWS
+#endif
+#endif
+
     if (auto err = HUH::vkCreateBuffer(*m_device, &bufferCreateInfo, nullptr, &buffer); err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "Vulkan buffer creation failed: {}", HUH::ToString(err))
     }
@@ -465,6 +477,17 @@ Buffer* VulkanPipeline::CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Bind
                                         .size = Size,
                                         .usage = VulkanBuffer::ConvertBufferType(type),
                                         .sharingMode = VK_SHARING_MODE_EXCLUSIVE};
+#ifdef HUH_USE_CUDA
+#ifdef HUH_LINUX
+    VkExternalMemoryBufferCreateInfo externalMemoryBufferCreateInfo{
+        .sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO,
+        .pNext = nullptr,
+        .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT};
+    bufferCreateInfo.pNext = &externalMemoryBufferCreateInfo;
+#elifdef HUH_WIN
+    // TODO WINDOWS
+#endif
+#endif
     if (auto err = HUH::vkCreateBuffer(*m_device, &bufferCreateInfo, nullptr, &buffer); err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "Vulkan buffer creation failed: {}", HUH::ToString(err))
         return nullptr;

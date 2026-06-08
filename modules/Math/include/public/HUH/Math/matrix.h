@@ -31,7 +31,7 @@ public:
     using ColumnType = Vector<T, R>;
     RowType data[R];
 
-    HUH_CONSTEXPR_FORCE Matrix() noexcept : data{0} {}
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix() noexcept : data{0} {}
     HUH_CONSTEXPR_FORCE Matrix(const Matrix& other) noexcept = default;
     HUH_CONSTEXPR_FORCE Matrix(Matrix&& other) noexcept = default;
     HUH_CONSTEXPR_FORCE Matrix& operator=(const Matrix& other) noexcept = default;
@@ -40,37 +40,39 @@ public:
     template<typename... U,
              std::enable_if_t<1 + sizeof...(U) == R * C, bool> = true,
              std::enable_if_t<(std::is_same_v<T, U> && ...), bool> = true>
-    HUH_CONSTEXPR_FORCE Matrix(T t, U... u) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix(T t, U... u) noexcept {
         const T data_tmp[R * C](t, u...);
         std::memcpy(data, data_tmp, sizeof(T) * R * C);
     }
 
     template<std::size_t size, std::enable_if_t<size == R * C, bool> = true>
-    HUH_CONSTEXPR_FORCE Matrix(const T (&t)[size]) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix(const T (&t)[size]) noexcept {
         std::memcpy(data, t, sizeof(T) * R * C);
     }
 
     template<std::size_t size, std::enable_if_t<size == R, bool> = true>
-    HUH_CONSTEXPR_FORCE Matrix(const RowType (&Rows)[size]) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix(const RowType (&Rows)[size]) noexcept {
         std::memcpy(data, Rows, sizeof(T) * R * C);
     }
 
-    HUH_CONSTEXPR_FORCE Matrix(T v) noexcept : data{0} {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix(T v) noexcept : data{0} {
         for (std::size_t i = 0; i < R; i++) {
             data[i] = v;
         }
     }
 
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE RowType& operator[](std::size_t index) noexcept { return data[index]; }
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE const RowType& operator[](std::size_t index) const noexcept {
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE RowType& operator[](std::size_t index) noexcept {
+        return data[index];
+    }
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE const RowType& operator[](std::size_t index) const noexcept {
         return data[index];
     }
 
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE static size_t RowSize() noexcept { return R; }
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE static size_t ColumnSize() noexcept { return C; }
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE static size_t RowSize() noexcept { return R; }
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE static size_t ColumnSize() noexcept { return C; }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE Matrix& operator+=(const Matrix<T2, R, C>& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix& operator+=(const Matrix<T2, R, C>& rhs) noexcept {
         for (std::size_t i = 0; i < R; i++) {
             data[i] += rhs.data[i];
         }
@@ -78,7 +80,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator+(const Matrix<T2, R, C>& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto operator+(const Matrix<T2, R, C>& rhs) noexcept {
         Matrix<std::common_type_t<T, T2>, R, C> result;
         for (std::size_t i = 0; i < R; i++) {
             result.data[i] = data[i] + rhs.data[i];
@@ -87,7 +89,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE Matrix& operator+=(const T2& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix& operator+=(const T2& rhs) noexcept {
         for (std::size_t i = 0; i < R; i++) {
             data[i] += rhs;
         }
@@ -95,7 +97,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator+(const T2& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto operator+(const T2& rhs) noexcept {
         Matrix<std::common_type_t<T, T2>, R, C> result;
         for (std::size_t i = 0; i < R; i++) {
             result.data[i] = data[i] + rhs;
@@ -104,7 +106,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE Matrix& operator-=(const Matrix<T2, R, C>& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix& operator-=(const Matrix<T2, R, C>& rhs) noexcept {
         for (std::size_t i = 0; i < R; i++) {
             data[i] -= rhs.data[i];
         }
@@ -112,7 +114,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator-(const Matrix<T2, R, C>& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto operator-(const Matrix<T2, R, C>& rhs) noexcept {
         Matrix<std::common_type_t<T, T2>, R, C> result;
         for (std::size_t i = 0; i < R; i++) {
             result.data[i] = data[i] - rhs.data[i];
@@ -121,7 +123,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE Matrix& operator-=(const T2& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix& operator-=(const T2& rhs) noexcept {
         for (std::size_t i = 0; i < R; i++) {
             data[i] -= rhs;
         }
@@ -129,7 +131,7 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator-(const T2& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto operator-(const T2& rhs) noexcept {
         Matrix<std::common_type_t<T, T2>, R, C> result;
         for (std::size_t i = 0; i < R; i++) {
             result.data[i] = data[i] - rhs;
@@ -138,7 +140,7 @@ public:
     }
 
     template<typename T2, std::size_t C2>
-    HUH_CONSTEXPR_FORCE auto operator*(const Matrix<T2, C, C2>& rhs) {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto operator*(const Matrix<T2, C, C2>& rhs) {
         Matrix<std::common_type_t<T, T2>, R, C2> result{};
         HUH::MatrixMultiply(*this, rhs, result);
         return result;

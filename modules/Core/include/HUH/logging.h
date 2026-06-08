@@ -42,7 +42,7 @@ public:
         }
     }
 
-    static ConsoleColor::Color ToConsoleColor(Logging::Level level) noexcept {
+    constexpr static ConsoleColor::Color ToConsoleColor(Logging::Level level) noexcept {
         switch (level) {
             case Level::Log:
                 return ConsoleColor::Blue;

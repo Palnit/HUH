@@ -9,6 +9,8 @@
 #include <HUH/types.h>
 #include <vector>
 
+typedef void* HANDLE;
+
 namespace HUH {
 class Window;
 namespace RHI {
@@ -28,7 +30,23 @@ public:
         std::string name = "Unknown";
         Vendor vendor = Vendor::Unknown;
         Type type = Type::Unknown;
+#ifdef HUH_USE_CUDA
+        Uint8* DeviceUUID = nullptr;
+        Uint32 DeviceUUIDSize = 0;
+#endif
     };
+
+// TODO make it so this can be used with the shared memory library when i make thet instead of only cuda
+#ifdef HUH_USE_CUDA
+    struct SharedMemoryInfo {
+        int Fd;
+        HANDLE Handle;
+        Uint32 Offset;
+        Uint32 Size;
+    };
+
+    virtual SharedMemoryInfo GetSharedMemory() = 0;
+#endif
 
     DeviceInformation Information;
 

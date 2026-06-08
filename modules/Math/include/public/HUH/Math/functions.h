@@ -5,12 +5,12 @@
 
 namespace HUH {
 template<typename T>
-HUH_CONSTEXPR_FORCE auto DegToRad(T Deg) {
+HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto DegToRad(T Deg) {
     return Deg * (HUH::PI / 180.0f);
 }
 
 template<typename T>
-HUH_CONSTEXPR_FORCE auto Clamp(T value, T min, T max) {
+HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto Clamp(T value, T min, T max) {
     return value < min ? min : (value > max ? max : value);
 }
 

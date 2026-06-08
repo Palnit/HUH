@@ -135,6 +135,18 @@ VulkanMemoryAllocator::Allocation* VulkanMemoryAllocator::AddAllocation(Uint32 m
         .allocationSize = size,
         .memoryTypeIndex = memoryTypeIndex,
     };
+
+#ifdef HUH_USE_CUDA
+    VkExportMemoryAllocateInfo exportInfo = {.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO};
+    allocInfo.pNext = &exportInfo;
+#ifdef HUH_LINUX
+    exportInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+#elifdef HUH_WIN
+    // TODO WINDOWS MEMORY EXPORT
+#endif
+
+#endif
+
     auto* allocation = new Allocation();
     allocation->FreeBlocks.emplace_back(0, size);
     if (auto err = HUH::vkAllocateMemory(*m_device, &allocInfo, nullptr, &allocation->Memory); err != VK_SUCCESS) {

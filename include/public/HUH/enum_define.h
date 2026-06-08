@@ -20,7 +20,7 @@
 #define HUH_ENUM_FORMATER(EnumName) \
     template<> \
     struct std::formatter<EnumName> : std::formatter<std::string> { \
-        auto format(EnumName p, format_context& ctx) const { \
+         auto format(EnumName p, format_context& ctx) const { \
             return formatter<string>::format(std::format("{}", HUH::ToString(p)), ctx); \
         } \
     };

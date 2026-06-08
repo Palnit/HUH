@@ -10,6 +10,7 @@ option(BUILD_PYTHON_BINDING "Build the python binding module" OFF)
 option(BUILD_HUH_PYTHON_BINDING "Build the python binding for all building HUH module" OFF)
 option(BUILD_WAYLAND_CONNECTOR "Build the wayland connector abstraction layer to simplify wayland connections on linux" OFF)
 option(USE_SIMD "Activates auto detection of cpu intrinsics and uses simd instructions where library supports it" ON)
+option(BUILD_CUDA "Builds cuda helper library" OFF)
 
 #Graphics
 option(BUILD_GRAPHICS_ALL "Builds all graphics modules" OFF)
@@ -95,7 +96,7 @@ if (USE_SIMD AND SSE_SUPPORT AND SSE2_SUPPORT)
 
     add_subdirectory(modules/Simd)
 
-    target_compile_definitions(HUH INTERFACE HUH_USE_SIMD)
+    target_compile_definitions(HUH INTERFACE $<IF:$<COMPILE_LANGUAGE:CUDA>,HUH_USE_SIMD=false,HUH_USE_SIMD=true>)
 endif ()
 
 huh_set_modules_dependency(HUH)
@@ -114,6 +115,10 @@ endif ()
 
 if (BUILD_THREADING)
     huh_add_module_build(HUH INTERFACE Threading)
+endif ()
+
+if (BUILD_CUDA)
+    huh_add_module_build(HUH INTERFACE Cuda)
 endif ()
 
 if (BUILD_WINDOW)

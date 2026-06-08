@@ -202,6 +202,11 @@ VulkanDevice::VulkanDevice(class VulkanDynamicRHI* parent, VkPhysicalDevice phys
       m_physicalDevice(physicalDevice) {
     QueryVulkanPropertiesAndFeatures();
     Information.name = Properties.properties_1_0.properties.deviceName;
+#ifdef HUH_USE_CUDA
+    Information.DeviceUUID = Properties.properties_ID.deviceUUID;
+    Information.DeviceUUIDSize = VK_UUID_SIZE;
+#endif
+
     switch (Properties.properties_1_0.properties.deviceType) {
         case VK_PHYSICAL_DEVICE_TYPE_OTHER:
             Information.type = Type::Other;
@@ -286,6 +291,10 @@ MemoryAllocator* VulkanDevice::CreateMemoryAllocator() {
 RenderPass* VulkanDevice::CreateRenderPass() {
     m_createdRenderPasses.push_back(new VulkanRenderPass(this));
     return m_createdRenderPasses.back();
+}
+
+Device::SharedMemoryInfo VulkanDevice::GetSharedMemory() {
+    return {};
 }
 
 Shader* VulkanDevice::CreateShader(void* byteCode, Uint64 size) {

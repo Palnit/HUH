@@ -11,21 +11,22 @@ public:
     using ValueType = T;
     T data[4];
 
-    HUH_CONSTEXPR_FORCE Quaternion() noexcept : data{1, 0, 0, 0} {}
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion() noexcept : data{1, 0, 0, 0} {}
     HUH_CONSTEXPR_FORCE Quaternion(const Quaternion& other) noexcept = default;
     HUH_CONSTEXPR_FORCE Quaternion(Quaternion&& other) noexcept = default;
     HUH_CONSTEXPR_FORCE Quaternion& operator=(const Quaternion& other) noexcept = default;
     HUH_CONSTEXPR_FORCE Quaternion& operator=(Quaternion&& other) noexcept = default;
 
-    HUH_CONSTEXPR_FORCE Quaternion(const T& w, const T& x, const T& y, const T& z) noexcept : data{w, x, y, z} {}
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion(const T& w, const T& x, const T& y, const T& z) noexcept
+        : data{w, x, y, z} {}
 
-    HUH_CONSTEXPR_FORCE Quaternion(const T& v) noexcept : data{v, v, v, v} {}
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion(const T& v) noexcept : data{v, v, v, v} {}
 
     template<std::size_t size, std::enable_if_t<size == 4, bool> = true>
-    HUH_CONSTEXPR_FORCE Quaternion(const T (&t)[size]) noexcept : data{t[0], t[1], t[2], t[3]} {}
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion(const T (&t)[size]) noexcept : data{t[0], t[1], t[2], t[3]} {}
 
     template<FloatingPoint T2>
-    HUH_CONSTEXPR_FORCE Quaternion(const T2& angle, const HUH::Vector3<T>& axis) {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion(const T2& angle, const HUH::Vector3<T>& axis) {
         auto half = angle / static_cast<T2>(2);
         T sin = std::sin(half);
         data[0] = std::cos(half);
@@ -34,31 +35,35 @@ public:
         data[3] = axis[2] * sin;
     }
 
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE T& W() noexcept { return data[0]; }
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE T& X() noexcept { return data[1]; }
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE T& Y() noexcept { return data[2]; }
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE T& Z() noexcept { return data[3]; }
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE T& W() noexcept { return data[0]; }
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE T& X() noexcept { return data[1]; }
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE T& Y() noexcept { return data[2]; }
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE T& Z() noexcept { return data[3]; }
 
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE const T& W() const noexcept { return data[0]; }
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE const T& X() const noexcept { return data[1]; }
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE const T& Y() const noexcept { return data[2]; }
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE const T& Z() const noexcept { return data[3]; }
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE const T& W() const noexcept { return data[0]; }
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE const T& X() const noexcept { return data[1]; }
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE const T& Y() const noexcept { return data[2]; }
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE const T& Z() const noexcept { return data[3]; }
 
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE T& operator[](std::size_t index) noexcept { return data[index]; }
-    HUH_NODISCARD HUH_CONSTEXPR_FORCE const T& operator[](std::size_t index) const noexcept { return data[index]; }
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE T& operator[](std::size_t index) noexcept {
+        return data[index];
+    }
+    HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE const T& operator[](std::size_t index) const noexcept {
+        return data[index];
+    }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE bool operator==(const Quaternion<T2>& rhs) {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE bool operator==(const Quaternion<T2>& rhs) {
         return data[0] == rhs.data[0] && data[1] == rhs.data[1] && data[2] == rhs.data[2] && data[3] == rhs.data[3];
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE bool operator!=(const Quaternion<T2>& rhs) {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE bool operator!=(const Quaternion<T2>& rhs) {
         return !(*this == rhs);
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE Quaternion& operator+=(const T2& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion& operator+=(const T2& rhs) noexcept {
         data[0] += rhs;
         data[1] += rhs;
         data[2] += rhs;
@@ -67,13 +72,13 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator+(const T2& rhs) const noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto operator+(const T2& rhs) const noexcept {
         Quaternion<std::common_type_t<T, T2>> result{data[0] + rhs, data[1] + rhs, data[2] + rhs, data[3] + rhs};
         return result;
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE Quaternion& operator+=(const Quaternion<T2>& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion& operator+=(const Quaternion<T2>& rhs) noexcept {
         data[0] += rhs.data[0];
         data[1] += rhs.data[1];
         data[2] += rhs.data[2];
@@ -82,14 +87,14 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator+(const Quaternion<T2>& rhs) const noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto operator+(const Quaternion<T2>& rhs) const noexcept {
         Quaternion<std::common_type_t<T, T2>> result{data[0] + rhs.data[0], data[1] + rhs.data[1],
                                                      data[2] + rhs.data[2], data[3] + rhs.data[3]};
         return result;
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE Quaternion& operator-=(const T2& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion& operator-=(const T2& rhs) noexcept {
         data[0] -= rhs;
         data[1] -= rhs;
         data[2] -= rhs;
@@ -98,13 +103,13 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator-(const T2& rhs) const noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto operator-(const T2& rhs) const noexcept {
         Quaternion<std::common_type_t<T, T2>> result{data[0] - rhs, data[1] - rhs, data[2] - rhs, data[3] - rhs};
         return result;
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE Quaternion& operator-=(const Quaternion<T2>& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion& operator-=(const Quaternion<T2>& rhs) noexcept {
         data[0] -= rhs.data[0];
         data[1] -= rhs.data[1];
         data[2] -= rhs.data[2];
@@ -113,18 +118,18 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator-(const Quaternion<T2>& rhs) const noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto operator-(const Quaternion<T2>& rhs) const noexcept {
         Quaternion<std::common_type_t<T, T2>> result{data[0] - rhs.data[0], data[1] - rhs.data[1],
                                                      data[2] - rhs.data[2], data[3] - rhs.data[3]};
         return result;
     }
 
-    HUH_CONSTEXPR_FORCE Quaternion operator-() const noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion operator-() const noexcept {
         return Quaternion(data[0], -data[1], -data[2], -data[3]);
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE Quaternion& operator*=(const T2& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion& operator*=(const T2& rhs) noexcept {
         data[0] *= rhs;
         data[1] *= rhs;
         data[2] *= rhs;
@@ -133,13 +138,13 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator*(const T2& rhs) const noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto operator*(const T2& rhs) const noexcept {
         Quaternion<std::common_type_t<T, T2>> result{data[0] * rhs, data[1] * rhs, data[2] * rhs, data[3] * rhs};
         return result;
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE Quaternion& operator*=(const Quaternion<T2>& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion& operator*=(const Quaternion<T2>& rhs) noexcept {
         Quaternion tmp;
         QuaternionMultiply(*this, rhs, tmp);
         *this = tmp;
@@ -147,14 +152,14 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator*(const Quaternion<T2>& rhs) const noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto operator*(const Quaternion<T2>& rhs) const noexcept {
         Quaternion result;
         QuaternionMultiply(*this, rhs, result);
         return result;
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE Quaternion& operator/=(const T2& rhs) noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion& operator/=(const T2& rhs) noexcept {
         data[0] /= rhs;
         data[1] /= rhs;
         data[2] /= rhs;
@@ -163,13 +168,13 @@ public:
     }
 
     template<typename T2>
-    HUH_CONSTEXPR_FORCE auto operator/(const T2& rhs) const noexcept {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto operator/(const T2& rhs) const noexcept {
         Quaternion<std::common_type_t<T, T2>> result{data[0] / rhs, data[1] / rhs, data[2] / rhs, data[3] / rhs};
         return result;
     }
 
     // template<typename T2>
-    // HUH_CONSTEXPR_FORCE Quaternion& operator/=(const Quaternion<T2>& rhs) noexcept {
+    // HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion& operator/=(const Quaternion<T2>& rhs) noexcept {
     //     data[0] /= rhs.data[0];
     //     data[1] /= rhs.data[1];
     //     data[2] /= rhs.data[2];
@@ -178,36 +183,36 @@ public:
     // }
     //
     // template<typename T2>
-    // HUH_CONSTEXPR_FORCE auto operator/(const Quaternion<T2>& rhs) const noexcept {
+    // HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE auto operator/(const Quaternion<T2>& rhs) const noexcept {
     //     Quaternion<std::common_type_t<T, T2>> result{data[0] / rhs.data[0], data[1] / rhs.data[1],
     //                                                  data[2] / rhs.data[2], data[3] / rhs.data[3]};
     //     return result;
     // }
 
-    HUH_CONSTEXPR_FORCE HUH::Vector<T, 3> RotateVector(const HUH::Vector<T, 3>& vec) const {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE HUH::Vector<T, 3> RotateVector(const HUH::Vector<T, 3>& vec) const {
         HUH::Vector<T, 3> result;
         HUH::RotateVector(*this, vec, result);
         return result;
     }
 
     template<FloatingPoint T2>
-    HUH_CONSTEXPR_FORCE void Rotate(T2 angle, const HUH::Vector<T, 3>& axis) {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE void Rotate(T2 angle, const HUH::Vector<T, 3>& axis) {
         Quaternion rot(angle, axis);
         *this *= rot;
     }
 
-    HUH_CONSTEXPR_FORCE Quaternion& Normalize() {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion& Normalize() {
         HUH::Normalize(*this);
         return *this;
     }
 
-    HUH_CONSTEXPR_FORCE Quaternion GetNormalized() const {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Quaternion GetNormalized() const {
         auto tmp = *this;
         HUH::Normalize(tmp);
         return *this;
     }
 
-    HUH_CONSTEXPR_FORCE Matrix4x4<T> ToMatrix() const noexcept { return HUH::ToMatrix(*this); }
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix4x4<T> ToMatrix() const noexcept { return HUH::ToMatrix(*this); }
 };
 
 template<typename T>

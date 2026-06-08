@@ -25,4 +25,14 @@
 #define HUH_NODISCARD [[nodiscard]]
 #define HUH_CONSTEXPR_FORCE HUH_FORCE_INLINE constexpr
 
+#if defined(__CUDACC__)
+#undef HUH_CONSTEXPR_FORCE
+#define HUH_CONSTEXPR_FORCE HUH_FORCE_INLINE
+#define HUH_HOST __host__
+#define HUH_DEVICE __device__
+#else
+#define HUH_HOST
+#define HUH_DEVICE
+#endif
+
 #include <HUH/lib_defines.h>

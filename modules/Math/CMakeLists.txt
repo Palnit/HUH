@@ -27,6 +27,7 @@ target_link_libraries(HUH-Math INTERFACE HUH)
 
 if (USE_SIMD)
     target_link_libraries(HUH-Math INTERFACE HUH::Simd)
+    get_property(test TARGET HUH-Math PROPERTY COMPILE_DEFINITIONS)
 endif ()
 
 

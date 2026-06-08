@@ -28,12 +28,18 @@ public:
                                                               VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES};
         VkPhysicalDeviceVulkan14Properties properties_1_4{.sType =
                                                               VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_4_PROPERTIES};
+#ifdef HUH_USE_CUDA
+        VkPhysicalDeviceIDProperties properties_ID{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES};
+#endif
         VulkanDeviceProperties() {
             // TODO Vulkan versioning
             properties_1_0.pNext = &properties_1_1;
             properties_1_1.pNext = &properties_1_2;
             properties_1_2.pNext = &properties_1_3;
             properties_1_3.pNext = &properties_1_4;
+#ifdef HUH_USE_CUDA
+            properties_1_4.pNext = &properties_ID;
+#endif
         }
     };
 
@@ -75,6 +81,10 @@ public:
 
     MemoryAllocator* CreateMemoryAllocator() override;
     RenderPass* CreateRenderPass() override;
+
+#ifdef HUH_USE_CUDA
+    SharedMemoryInfo GetSharedMemory() override;
+#endif
 
 protected:
     explicit VulkanDevice(VulkanDynamicRHI* parent, VkPhysicalDevice physicalDevice);

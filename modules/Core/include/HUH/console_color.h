@@ -3,6 +3,7 @@
 #ifdef HUH_WIN
 #include <windows.h>
 #endif
+
 #include <HUH/enum_define.h>
 
 #include <iostream>
