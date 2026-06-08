@@ -2,6 +2,7 @@
 #include "HUH/Math/vector.h"
 #include "HUH/definitions.h"
 #include "definitions.h"
+#include "stream.h"
 
 #include <cuda_runtime.h>
 #include <driver_types.h>
@@ -39,6 +40,7 @@ public:
 
     void SetSharedMemory(size_t sharedMemorySize) { m_sharedMemorySize = sharedMemorySize; }
 
+    // Todo Move to stream
     template<typename... Args>
     bool Execute(Args... args) {
 
@@ -58,7 +60,8 @@ public:
         }
 
         void* vargs[] = {static_cast<void*>(&args)...};
-        HUH_CUDA_ERR(cudaLaunchKernel(m_func, m_gridSize, m_blockSize, vargs, m_sharedMemorySize, nullptr)) {
+        HUH_CUDA_ERR(cudaLaunchKernel(m_func, m_gridSize, m_blockSize, vargs, m_sharedMemorySize,
+                                      m_stream ? m_stream->m_stream : nullptr)) {
             HUH_ELOG(LogCuda, "Error Launching Kernel Function  Error: {}", err)
             return false;
         }

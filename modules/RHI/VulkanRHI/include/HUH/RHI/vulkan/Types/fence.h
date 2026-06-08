@@ -16,12 +16,18 @@ public:
     operator VkFence() const { return m_fence; }
     operator VkSemaphore() const { return m_semaphore; }
 
+#ifdef HUH_USE_CUDA
+    Buffer::SharedMemoryInfo GetSharedMemory() override;
+#endif
+
     operator VkFence();
     operator VkSemaphore();
 
 protected:
     void CreateFence(VkFenceCreateFlags flags);
     void CreateSemaphore();
+
+    Buffer::SharedMemoryInfo m_handle;
 
     VulkanFence(VulkanDevice* device);
     ~VulkanFence() override;
