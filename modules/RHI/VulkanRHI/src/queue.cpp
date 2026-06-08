@@ -3,6 +3,7 @@
 #include <HUH/RHI/vulkan/queue.h>
 
 #include "HUH/RHI/vulkan/command_pool.h"
+#include "HUH/RHI/vulkan/pipeline.h"
 
 namespace HUH::RHI {
 VulkanQueue::operator VkQueue() {
@@ -38,6 +39,46 @@ bool VulkanQueue::Submit(CommandPool::CommandBuffer* commandPool, Fence* wait, F
     }
     return true;
 }
+
+bool VulkanQueue::Submit(CommandPool::CommandBuffer* commandPool,
+                         std::vector<WaitFence> wait,
+                         std::vector<Fence*> signal,
+                         Fence* waitSignal) {
+
+    auto vk_CommandBuffer = dynamic_cast<VulkanCommandPool::VulkanCommandBuffer*>(commandPool);
+    auto vk_wait_signal_fence = dynamic_cast<VulkanFence*>(waitSignal);
+    std::vector<VkSemaphore> waitSemaphores;
+    std::vector<VkPipelineStageFlags> waitStages;
+    for (auto& waitFence : wait) {
+        auto vk_wait_fence = dynamic_cast<VulkanFence*>(waitFence.waitFence);
+        waitSemaphores.push_back(*vk_wait_fence);
+        waitStages.push_back(HUH::RHI::VulkanPipeline::ConvertToPipelineStage(waitFence.stage));
+    }
+
+    std::vector<VkSemaphore> signalSemaphores;
+    for (auto& signalFence : signal) {
+        auto vk_signal_fence = dynamic_cast<VulkanFence*>(signalFence);
+        signalSemaphores.push_back(*vk_signal_fence);
+    }
+
+    VkSubmitInfo submitInfo = {
+        .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+        .waitSemaphoreCount = static_cast<HUH ::Uint32>(waitSemaphores.size()),
+        .pWaitSemaphores = waitSemaphores.empty() ? nullptr : waitSemaphores.data(),
+        .pWaitDstStageMask = waitSemaphores.empty() ? nullptr : waitStages.data(),
+        .commandBufferCount = 1,
+        .pCommandBuffers = &vk_CommandBuffer->m_commandBuffer,
+        .signalSemaphoreCount = static_cast<HUH ::Uint32>(signalSemaphores.size()),
+        .pSignalSemaphores = signalSemaphores.empty() ? nullptr : signalSemaphores.data(),
+    };
+
+    if (auto err = HUH::vkQueueSubmit(*this, 1, &submitInfo, *vk_wait_signal_fence); err != VK_SUCCESS) {
+        HUH_ELOG(LogVulkanRHI, "Submit Error: {}", err)
+        return false;
+    }
+    return true;
+}
+
 bool VulkanQueue::Submit(CommandPool::CommandBuffer* commandPool) {
 
     auto vk_CommandBuffer = dynamic_cast<VulkanCommandPool::VulkanCommandBuffer*>(commandPool);

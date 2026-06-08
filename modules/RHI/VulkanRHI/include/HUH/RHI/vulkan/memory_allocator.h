@@ -1,9 +1,10 @@
 #pragma once
 
-#include <HUH/RHI/vulkan/fwd.h>
-#include <HUH/RHI/vulkan/vulkan_defines.h>
+#include "HUH/RHI/Types/buffer.h"
 
 #include <HUH/RHI/memory_allocator.h>
+#include <HUH/RHI/vulkan/fwd.h>
+#include <HUH/RHI/vulkan/vulkan_defines.h>
 
 #include <HUH/types.h>
 
@@ -29,9 +30,14 @@ public:
         VkDeviceMemory Memory = nullptr;
 
         MemoryBlock Allocate(Uint32 size, Uint32 alignment);
+        ~Allocation();
         bool Free(MemoryBlock block);
 
+        Buffer::SharedMemoryInfo::PlatformHandle GetPlatformHandle();
+
+        Buffer::SharedMemoryInfo::PlatformHandle Handle;
         std::vector<MemoryBlock> FreeBlocks;
+        VulkanMemoryAllocator* m_parent = nullptr;
     };
 
 protected:

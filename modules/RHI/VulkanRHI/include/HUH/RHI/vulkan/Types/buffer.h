@@ -23,6 +23,10 @@ public:
     operator VkBuffer() const { return m_buffer; }
     VulkanMemoryAllocator::MemoryBlock GetMemoryBlock() const { return m_allocatedBlock; }
 
+#ifdef HUH_USE_CUDA
+    SharedMemoryInfo GetSharedMemory() override;
+#endif
+
 protected:
     VulkanBuffer(Uint64 size, VkBuffer buffer, VulkanDevice* device);
     ~VulkanBuffer() override = default;

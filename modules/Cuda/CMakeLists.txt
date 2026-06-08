@@ -32,7 +32,6 @@ if (CUDAToolkit_FOUND)
             HUH::Core
             HUH::Math
             CUDA::cudart
-            CUDA::cuda_driver
     )
 
     if (BUILD_RHI)

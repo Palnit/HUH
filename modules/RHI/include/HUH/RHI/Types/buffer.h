@@ -4,6 +4,8 @@
 #include <HUH/enum_define.h>
 #include <HUH/types.h>
 
+typedef void* HANDLE;
+
 namespace HUH {
 namespace RHI {
 // TODO rethink buffers to maybe be template resource data and go from there to be able to bind arrays ?
@@ -27,6 +29,22 @@ public:
     virtual void UnMapData() = 0;
     HUH_NODISCARD Uint64 GetSize() const { return m_size; }
     HUH_NODISCARD void* GetMappedData() const { return m_mappedData; }
+
+#ifdef HUH_USE_CUDA
+    struct SharedMemoryInfo {
+        struct PlatformHandle {
+            int Fd = -1;
+            HANDLE Handle = nullptr;
+            bool operator==(const PlatformHandle& other) const { return Handle == other.Handle && Fd == other.Fd; }
+            bool operator!=(const PlatformHandle& other) const { return !this->operator==(other); }
+            HUH_NODISCARD bool IsValid() const { return Handle != nullptr || Fd != -1; }
+        } Handle;
+        Uint32 Offset = 0;
+        Uint32 Size = 0;
+    };
+
+    virtual SharedMemoryInfo GetSharedMemory() = 0;
+#endif
 
 protected:
     Buffer(Uint64 size);

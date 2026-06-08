@@ -2,8 +2,11 @@
 
 #include "HUH/RHI/vulkan/Types/image.h"
 
+#include <HUH/RHI/memory_allocator.h>
+
 #include <HUH/RHI/vulkan/Types/buffer.h>
 #include <HUH/RHI/vulkan/device.h>
+#include <unistd.h>
 
 #include <HUH/enum_helper.h>
 
@@ -104,7 +107,12 @@ bool VulkanMemoryAllocator::Free(Buffer* buffer) {
 
 VkMemoryPropertyFlags VulkanMemoryAllocator::ConvertMemoryType(MemoryAllocator::Type type) {
     VkMemoryPropertyFlags flags = 0;
-    if (HUH::CheckAllFlag(type, RHI::MemoryAllocator::Type::Device | RHI::MemoryAllocator::Type::Host)) {
+    // TODO find out why this is broken here
+    if (HUH::CheckAllFlag(
+            type,
+            static_cast<RHI::MemoryAllocator::Type>(
+                static_cast<std::underlying_type_t<RHI::MemoryAllocator::Type>>(RHI::MemoryAllocator::Type::Device)
+                | static_cast<std::underlying_type_t<RHI::MemoryAllocator::Type>>(RHI::MemoryAllocator::Type::Host)))) {
         flags |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
             | VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
         return flags;
@@ -159,6 +167,7 @@ VulkanMemoryAllocator::Allocation* VulkanMemoryAllocator::AddAllocation(Uint32 m
     } else {
         it->second.push_back(allocation);
     }
+    allocation->m_parent = this;
     return allocation;
 }
 
@@ -203,6 +212,16 @@ VulkanMemoryAllocator::MemoryBlock VulkanMemoryAllocator::Allocation::Allocate(U
     return block;
 }
 
+VulkanMemoryAllocator::Allocation::~Allocation() {
+    if (Handle.IsValid()) {
+#ifdef HUH_LINUX
+        HUH_ILOG(LogVulkanRHI, "Destroying Memory Allocation FD: {}", Handle.Fd);
+        close(Handle.Fd);
+#elifdef HUH_WIN
+#endif
+    }
+}
+
 bool VulkanMemoryAllocator::Allocation::Free(MemoryBlock block) {
     // TODO: merging strategy ?
     FreeBlocks.push_back(block);
@@ -223,6 +242,23 @@ bool VulkanMemoryAllocator::Allocation::Free(MemoryBlock block) {
         ++it;
     }
     return true;
+}
+
+Buffer::SharedMemoryInfo::PlatformHandle VulkanMemoryAllocator::Allocation::GetPlatformHandle() {
+    if (Handle.IsValid()) {
+        return Handle;
+    }
+#ifdef HUH_LINUX
+    VkMemoryGetFdInfoKHR getFdInfo = {.sType = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR,
+                                      .pNext = nullptr,
+                                      .memory = Memory,
+                                      .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT};
+    HUH_VULKAN_ERR(HUH::vkGetMemoryFdKHR(*m_parent->m_device, &getFdInfo, &Handle.Fd)) {
+        HUH_ELOG(LogVulkanRHI, "Error During Shared Memory Export: {}", err)
+    }
+#elifdef HUH_WIN
+#endif
+    return Handle;
 }
 
 VulkanMemoryAllocator::VulkanMemoryAllocator(VulkanDevice* device) : m_device(device) {

@@ -2,6 +2,7 @@
 
 #include <HUH/RHI/command_pool.h>
 #include <HUH/RHI/fwd.h>
+#include <HUH/RHI/pipeline.h>
 #include <HUH/definitions.h>
 
 namespace HUH::RHI {
@@ -17,8 +18,16 @@ public:
         VideoDecode = 1 << 3,
         VideoEncode = 1 << 4
     };
+    struct WaitFence {
+        Fence* waitFence;
+        HUH::RHI::Pipeline::Stages stage;
+    };
 
     virtual bool Submit(CommandPool::CommandBuffer* commandPool, Fence* wait, Fence* signal, Fence* waitSignal) = 0;
+    virtual bool Submit(CommandPool::CommandBuffer* commandPool,
+                        std::vector<WaitFence> wait,
+                        std::vector<Fence*> signal,
+                        Fence* waitSignal) = 0;
     virtual bool Submit(CommandPool::CommandBuffer* commandPool) = 0;
     virtual void WaitIdle() = 0;
 

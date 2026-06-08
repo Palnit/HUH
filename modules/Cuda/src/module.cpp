@@ -3,13 +3,30 @@
 #include "HUH/Cuda/definitions.h"
 #include "HUH/Linux/dynamic_library.h"
 #include "HUH/types.h"
+
+#include <cuda_runtime_api.h>
+
 namespace HUH::Cuda {
-Function::Function(CUfunction cuFunction, Module* module) : m_func(cuFunction), m_module(module) {
+Function::Function(cudaKernel_t cuFunction, Module* module) : m_func(cuFunction), m_module(module) {
     const char* name;
-    HUH_CU_ERR(cuFuncGetName(&name, m_func)) {
+    HUH_CUDA_ERR(cudaFuncGetName(&name, m_func)) {
         HUH_ELOG(LogCuda, "Error Getting Function Name: {}", err)
         return;
     }
+    size_t paramCount;
+    HUH_CUDA_ERR(cudaFuncGetParamCount(m_func, &paramCount)) {
+        HUH_ELOG(LogCuda, "Error Getting Function Count: {}", err)
+        return;
+    }
+    for (size_t i = 0; i < paramCount; i++) {
+        ParamInfo info{};
+        HUH_CUDA_ERR(cudaFuncGetParamInfo(m_func, i, &info.Offset, &info.Size)) {
+            HUH_ELOG(LogCuda, "Error Getting Function Count: {}", err)
+            return;
+        }
+        m_params.push_back(info);
+    }
+
     Name = name;
 }
 
@@ -19,7 +36,7 @@ Module::~Module() {
 }
 
 bool Module::Load(const std::string& moduleName) {
-    HUH_CU_ERR(cuModuleLoad(&m_module, moduleName.c_str())) {
+    HUH_CUDA_ERR(cudaLibraryLoadFromFile(&m_module, moduleName.c_str(), nullptr, nullptr, 0, nullptr, nullptr, 0)) {
         HUH_ELOG(LogCuda, "Error Loading Cuda Module named: {} Err: {}", moduleName, err);
         m_module = nullptr;
     }
@@ -28,14 +45,14 @@ bool Module::Load(const std::string& moduleName) {
 
 std::vector<Function> Module::GetFunctions() {
     HUH::Uint32 functionCount = 0;
-    HUH_CU_ERR(cuModuleGetFunctionCount(&functionCount, m_module)) {
+    HUH_CUDA_ERR(cudaLibraryGetKernelCount(&functionCount, m_module)) {
         HUH_ELOG(LogCuda, " Error Getting Number of Functions in module: {}", err)
         return {};
     }
 
-    std::vector<CUfunction> tmpFunctions;
+    std::vector<cudaKernel_t> tmpFunctions;
     tmpFunctions.resize(functionCount);
-    HUH_CU_ERR(cuModuleEnumerateFunctions(tmpFunctions.data(), functionCount, m_module)) {
+    HUH_CUDA_ERR(cudaLibraryEnumerateKernels(tmpFunctions.data(), functionCount, m_module)) {
         HUH_ELOG(LogCuda, "Error Enumerating Functions in module: {}", err)
         return {};
     }

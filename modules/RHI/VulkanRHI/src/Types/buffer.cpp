@@ -87,6 +87,19 @@ VkMemoryRequirements VulkanBuffer::GetMemoryRequirements() const {
     return m_memoryRequirements;
 }
 
+#ifdef HUH_USE_CUDA
+Buffer::SharedMemoryInfo VulkanBuffer::GetSharedMemory() {
+    if (m_allocation == nullptr) {
+        return {};
+    }
+    Buffer::SharedMemoryInfo memoryInfo;
+    memoryInfo.Handle = m_allocation->GetPlatformHandle();
+    memoryInfo.Offset = m_allocatedBlock.Offset;
+    memoryInfo.Size = m_allocatedBlock.Size;
+    return memoryInfo;
+}
+#endif
+
 VulkanBuffer::VulkanBuffer(Uint64 size, VkBuffer buffer, VulkanDevice* device)
     : Buffer(size),
       m_buffer(buffer),

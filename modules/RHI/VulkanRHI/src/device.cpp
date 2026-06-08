@@ -293,10 +293,6 @@ RenderPass* VulkanDevice::CreateRenderPass() {
     return m_createdRenderPasses.back();
 }
 
-Device::SharedMemoryInfo VulkanDevice::GetSharedMemory() {
-    return {};
-}
-
 Shader* VulkanDevice::CreateShader(void* byteCode, Uint64 size) {
     m_createdShaders.push_back(new VulkanShader(this, byteCode, size));
     return m_createdShaders.back();

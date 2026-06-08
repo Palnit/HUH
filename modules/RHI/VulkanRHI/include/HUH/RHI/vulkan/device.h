@@ -82,10 +82,6 @@ public:
     MemoryAllocator* CreateMemoryAllocator() override;
     RenderPass* CreateRenderPass() override;
 
-#ifdef HUH_USE_CUDA
-    SharedMemoryInfo GetSharedMemory() override;
-#endif
-
 protected:
     explicit VulkanDevice(VulkanDynamicRHI* parent, VkPhysicalDevice physicalDevice);
     ~VulkanDevice() override;

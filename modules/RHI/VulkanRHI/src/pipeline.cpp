@@ -533,6 +533,17 @@ HUH::RHI::Image* VulkanPipeline::CreateImage(Image::Type type, const HUH::Vector
         .usage = VulkanImage::ConvertImageUsage(type),
         .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
         .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED};
+#ifdef HUH_USE_CUDA
+#ifdef HUH_LINUX
+    VkExternalMemoryImageCreateInfo externalMemoryBufferCreateInfo{
+        .sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO,
+        .pNext = nullptr,
+        .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT};
+    imageCreateInfo.pNext = &externalMemoryBufferCreateInfo;
+#elifdef HUH_WIN
+    // TODO WINDOWS
+#endif
+#endif
 
     if (auto err = HUH::vkCreateImage(*m_device, &imageCreateInfo, nullptr, &vk_tempImage); err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "Vulkan buffer creation failed: {}", HUH::ToString(err))
@@ -557,6 +568,17 @@ HUH::RHI::Image* VulkanPipeline::CreateImage(Image::Type type, const HUH::Vector
                                          .usage = VulkanImage::ConvertImageUsage(type),
                                          .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
                                          .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED};
+#ifdef HUH_USE_CUDA
+#ifdef HUH_LINUX
+    VkExternalMemoryImageCreateInfo externalMemoryBufferCreateInfo{
+        .sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO,
+        .pNext = nullptr,
+        .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT};
+    imageCreateInfo.pNext = &externalMemoryBufferCreateInfo;
+#elifdef HUH_WIN
+    // TODO WINDOWS
+#endif
+#endif
 
     if (auto err = HUH::vkCreateImage(*m_device, &imageCreateInfo, nullptr, &vk_tempImage); err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "Vulkan buffer creation failed: {}", HUH::ToString(err))
