@@ -37,6 +37,7 @@ public:
 
         Buffer::SharedMemoryInfo::PlatformHandle Handle;
         std::vector<MemoryBlock> FreeBlocks;
+        Uint32 FullSize = 0;
         VulkanMemoryAllocator* m_parent = nullptr;
     };
 

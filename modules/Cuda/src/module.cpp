@@ -13,6 +13,7 @@ Function::Function(cudaKernel_t cuFunction, Module* module) : m_func(cuFunction)
         HUH_ELOG(LogCuda, "Error Getting Function Name: {}", err)
         return;
     }
+
     size_t paramCount;
     HUH_CUDA_ERR(cudaFuncGetParamCount(m_func, &paramCount)) {
         HUH_ELOG(LogCuda, "Error Getting Function Count: {}", err)

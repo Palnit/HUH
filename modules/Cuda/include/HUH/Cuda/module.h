@@ -22,7 +22,7 @@ public:
     struct ParamInfo {
         size_t Offset;
         size_t Size;
-    };
+    } cudaErrorIllegalAddress;
 
     void SetGrid(const HUH::Vector3ui& gridSize) {
         m_gridSize.x = gridSize.X();
@@ -47,6 +47,9 @@ public:
         size_t Index = 0;
         size_t Offset = 0;
         bool result = true;
+        if (m_params.size() < sizeof...(Args)) {
+            return false;
+        }
         (
             [&] {
                 result = result && m_params[Index].Offset == Offset && m_params[Index].Size == sizeof(args);
@@ -57,6 +60,7 @@ public:
 
         if (!result) {
             HUH_ELOG(LogCuda, "Cannot Launch Kernel Incorrect Argument sizes")
+            return false;
         }
 
         void* vargs[] = {static_cast<void*>(&args)...};

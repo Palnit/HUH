@@ -96,6 +96,7 @@ Buffer::SharedMemoryInfo VulkanBuffer::GetSharedMemory() {
     memoryInfo.Handle = m_allocation->GetPlatformHandle();
     memoryInfo.Offset = m_allocatedBlock.Offset;
     memoryInfo.Size = m_allocatedBlock.Size;
+    memoryInfo.FullSize = m_allocation->FullSize;
     return memoryInfo;
 }
 #endif

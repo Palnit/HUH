@@ -35,12 +35,14 @@ public:
         struct PlatformHandle {
             int Fd = -1;
             HANDLE Handle = nullptr;
+            bool Managed = false;
             bool operator==(const PlatformHandle& other) const { return Handle == other.Handle && Fd == other.Fd; }
             bool operator!=(const PlatformHandle& other) const { return !this->operator==(other); }
             HUH_NODISCARD bool IsValid() const { return Handle != nullptr || Fd != -1; }
         } Handle;
         Uint32 Offset = 0;
         Uint32 Size = 0;
+        Uint32 FullSize = 0;
     };
 
     virtual SharedMemoryInfo GetSharedMemory() = 0;

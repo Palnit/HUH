@@ -157,6 +157,7 @@ VulkanMemoryAllocator::Allocation* VulkanMemoryAllocator::AddAllocation(Uint32 m
 
     auto* allocation = new Allocation();
     allocation->FreeBlocks.emplace_back(0, size);
+    allocation->FullSize = size;
     if (auto err = HUH::vkAllocateMemory(*m_device, &allocInfo, nullptr, &allocation->Memory); err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "Failed to allocate memory allocation Error: {}", err)
         return nullptr;
@@ -215,8 +216,10 @@ VulkanMemoryAllocator::MemoryBlock VulkanMemoryAllocator::Allocation::Allocate(U
 VulkanMemoryAllocator::Allocation::~Allocation() {
     if (Handle.IsValid()) {
 #ifdef HUH_LINUX
-        HUH_ILOG(LogVulkanRHI, "Destroying Memory Allocation FD: {}", Handle.Fd);
-        close(Handle.Fd);
+        if (!Handle.Managed) {
+            HUH_ILOG(LogVulkanRHI, "Destroying Memory Allocation FD: {}", Handle.Fd);
+            close(Handle.Fd);
+        }
 #elifdef HUH_WIN
 #endif
     }
