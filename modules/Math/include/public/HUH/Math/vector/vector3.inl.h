@@ -218,6 +218,8 @@ public:
         return *this;
     }
 
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE T Norm() noexcept { return HUH::Norm(*this); }
+
     template<typename T2>
     HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Vector<std::common_type_t<T, T2>, 3> Cross(
         const Vector<T2, 3>& rhs) noexcept {

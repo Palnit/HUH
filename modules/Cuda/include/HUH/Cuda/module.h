@@ -16,6 +16,7 @@ class Stream;
 
 class Function {
 public:
+    Function() = default;
     friend class Module;
     std::string Name;
 
@@ -23,6 +24,8 @@ public:
         size_t Offset;
         size_t Size;
     } cudaErrorIllegalAddress;
+
+    explicit operator bool() const { return m_func; }
 
     void SetGrid(const HUH::Vector3ui& gridSize) {
         m_gridSize.x = gridSize.X();
@@ -44,24 +47,42 @@ public:
     template<typename... Args>
     bool Execute(Args... args) {
 
+#ifdef HUH_DEBUG
         size_t Index = 0;
         size_t Offset = 0;
         bool result = true;
         if (m_params.size() < sizeof...(Args)) {
+            HUH_ELOG(LogCuda, "Incorrect Number of argument launches")
             return false;
         }
         (
             [&] {
+                auto AlignReq = alignof(decltype(args));
+                Offset += (AlignReq - (Offset % AlignReq)) % AlignReq;
                 result = result && m_params[Index].Offset == Offset && m_params[Index].Size == sizeof(args);
-                Offset += m_params[Index].Size;
+                Offset += sizeof(args);
                 Index++;
             }(),
             ...);
 
         if (!result) {
-            HUH_ELOG(LogCuda, "Cannot Launch Kernel Incorrect Argument sizes")
+            HUH_ELOG(LogCuda, "Cannot Launch Kernel Named: {} Incorrect Argument sizes", Name)
+            Index = 0;
+            Offset = 0;
+            (
+                [&] {
+                    const auto AlignReq = alignof(decltype(args));
+                    Offset += (AlignReq - (Offset % AlignReq)) % AlignReq;
+                    HUH_ELOG(LogCuda, "\tFunction Arg {} Supplied Offset {} Size {} | Expected Offset {} Size {}",
+                             Index, Offset, sizeof(args), m_params[Index].Offset, m_params[Index].Size,
+                             alignof(decltype(args)))
+                    Offset += sizeof(args);
+                    Index++;
+                }(),
+                ...);
             return false;
         }
+#endif
 
         void* vargs[] = {static_cast<void*>(&args)...};
         HUH_CUDA_ERR(cudaLaunchKernel(m_func, m_gridSize, m_blockSize, vargs, m_sharedMemorySize,
@@ -74,7 +95,7 @@ public:
 
 protected:
     Function(cudaKernel_t cuFunction, Module* module);
-    cudaKernel_t m_func;
+    cudaKernel_t m_func = nullptr;
     Module* m_module = nullptr;
     Stream* m_stream = nullptr;
     dim3 m_gridSize;
@@ -91,6 +112,7 @@ public:
     bool Load(const std::string& moduleName);
     HUH_NODISCARD bool IsLoaded() const { return m_module != nullptr; }
     std::vector<Function> GetFunctions();
+    Function GetFunction(const std::string& name);
 
 private:
     cudaLibrary_t m_module = nullptr;

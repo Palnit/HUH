@@ -70,6 +70,8 @@ Device::Device(int id) : m_deviceId(id) {
     Properties.MaxGrid = {prop.maxGridSize[0], prop.maxGridSize[1], prop.maxGridSize[2]};
     Properties.MaxBlock = {prop.maxThreadsDim[0], prop.maxThreadsDim[1], prop.maxThreadsDim[2]};
     Properties.MaxThread = prop.maxThreadsPerBlock;
+    Properties.Major = prop.major;
+    Properties.Minor = prop.minor;
     Properties.Name = prop.name;
 #ifdef HUH_DEBUG
     HUH_LOG(LogCuda, Logging::DebugLog, "Cuda Device Created Named: {}", Properties.Name)

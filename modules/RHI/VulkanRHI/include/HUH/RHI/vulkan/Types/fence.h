@@ -27,7 +27,7 @@ protected:
     void CreateFence(VkFenceCreateFlags flags);
     void CreateSemaphore();
 
-    Buffer::SharedMemoryInfo m_handle;
+    Buffer::SharedMemoryInfo m_handle{};
 
     VulkanFence(VulkanDevice* device);
     ~VulkanFence() override;

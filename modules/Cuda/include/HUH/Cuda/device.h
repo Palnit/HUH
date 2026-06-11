@@ -13,6 +13,8 @@ public:
         HUH::Uint64 MaxThread;
         HUH::Vector3i MaxBlock;
         HUH::Vector3i MaxGrid;
+        Uint32 Major;
+        Uint32 Minor;
         std::string Name;
     };
 

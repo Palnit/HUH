@@ -11,9 +11,10 @@
 
 namespace HUH {
 
-template<typename T, std::size_t N>
-HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE T Dot(const HUH::Vector<T, N>& lhs, const HUH::Vector<T, N>& rhs) noexcept {
-    T result{};
+template<typename T, typename T2, std::size_t N>
+HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE std::common_type_t<T, T2> Dot(const HUH::Vector<T, N>& lhs,
+                                                                      const HUH::Vector<T2, N>& rhs) noexcept {
+    std::common_type_t<T, T2> result{};
     for (std::size_t i = 0; i < N; ++i) {
         result = std::fma(lhs[i], rhs[i], result);
     }
@@ -58,6 +59,7 @@ HUH_FORCE_INLINE void Normalize(HUH::Vector<float, 3>& vec) noexcept;
 // HUH_FORCE_INLINE void Normalize(HUH::Vector<float, 2>& vec) noexcept;
 #endif
 
+// TODO simd version ?
 template<typename T, typename T2>
 HUH_FORCE_INLINE void Cross(const Vector<T, 3>& lhs,
                             const Vector<T2, 3>& rhs,
@@ -65,7 +67,11 @@ HUH_FORCE_INLINE void Cross(const Vector<T, 3>& lhs,
     result[0] = lhs[1] * rhs[2] - lhs[2] * rhs[1];
     result[1] = lhs[2] * rhs[0] - lhs[0] * rhs[2];
     result[2] = lhs[0] * rhs[1] - lhs[1] * rhs[0];
-    // TODO simd version ?
+}
+
+template<typename T, size_t N>
+HUH_FORCE_INLINE void Norm(const Vector<T, N>& lhs) noexcept {
+    return HUH::Dot(lhs, lhs);
 }
 
 }// namespace HUH

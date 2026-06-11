@@ -189,4 +189,6 @@ public:
         HUH::Normalize(*this);
         return *this;
     }
+
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE T Norm() noexcept { return HUH::Norm(*this); }
 };

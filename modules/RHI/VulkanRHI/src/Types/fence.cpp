@@ -27,11 +27,11 @@ void VulkanFence::Reset() {
 }
 #ifdef HUH_USE_CUDA
 Buffer::SharedMemoryInfo VulkanFence::GetSharedMemory() {
-    if (m_handle.Handle.IsValid()) {
-        return m_handle;
-    }
+    // if (m_handle.Handle.IsValid()) {
+    //     return m_handle;
+    // }
     CreateSemaphore();
-#ifdef HUH_LINUX
+#if defined(HUH_LINUX)
     VkSemaphoreGetFdInfoKHR semaphoreGetFdInfo{
         .sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR,
         .semaphore = m_semaphore,
@@ -40,7 +40,7 @@ Buffer::SharedMemoryInfo VulkanFence::GetSharedMemory() {
     HUH_VULKAN_ERR(vkGetSemaphoreFdKHR(*m_device, &semaphoreGetFdInfo, &m_handle.Handle.Fd)) {
         HUH_ELOG(LogVulkanRHI, "Error During Initialization of Semaphore FD {}", err)
     }
-#elifdef HUH_WIN
+#elif defined(HUH_WIN)
 #endif
     return m_handle;
 }
@@ -74,12 +74,12 @@ void VulkanFence::CreateSemaphore() {
     VkSemaphoreCreateInfo semaphoreCreateInfo{.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
 #ifdef HUH_USE_CUDA
     VkExportSemaphoreCreateInfo exportInfo{.sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO};
-    semaphoreCreateInfo.pNext = &exportInfo;
-#ifdef HUH_LINUX
+#if defined(HUH_LINUX)
     exportInfo.handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT;
-#elifdef HUH_WIN
+#elif defined(HUH_WIN)
 #endif
 #endif
+    semaphoreCreateInfo.pNext = &exportInfo;
     if (auto err = HUH::vkCreateSemaphore(*m_device, &semaphoreCreateInfo, nullptr, &m_semaphore); err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "Vulkan Semaphore Creation Error: {}", err)
     }

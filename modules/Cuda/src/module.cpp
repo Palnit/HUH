@@ -8,6 +8,10 @@
 
 namespace HUH::Cuda {
 Function::Function(cudaKernel_t cuFunction, Module* module) : m_func(cuFunction), m_module(module) {
+    if (!cuFunction) {
+        HUH_WLOG(LogCuda, "Invalid function ptr")
+        return;
+    }
     const char* name;
     HUH_CUDA_ERR(cudaFuncGetName(&name, m_func)) {
         HUH_ELOG(LogCuda, "Error Getting Function Name: {}", err)
@@ -33,6 +37,7 @@ Function::Function(cudaKernel_t cuFunction, Module* module) : m_func(cuFunction)
 
 Module::Module() {
 }
+
 Module::~Module() {
 }
 
@@ -63,6 +68,14 @@ std::vector<Function> Module::GetFunctions() {
         functions.push_back(Function(func, this));
     }
     return functions;
+}
+
+Function Module::GetFunction(const std::string& name) {
+    cudaKernel_t cuFunction = nullptr;
+    HUH_CUDA_ERR(cudaLibraryGetKernel(&cuFunction, m_module, name.c_str())) {
+        HUH_ELOG(LogCuda, "Error Couldn't load cuda kernel by name: {}", name)
+    }
+    return Function(cuFunction, this);
 }
 
 }// namespace HUH::Cuda
