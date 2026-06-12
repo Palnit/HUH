@@ -47,14 +47,15 @@ public:
     template<typename... Args>
     bool Execute(Args... args) {
 
-#ifdef HUH_DEBUG
+#if defined(HUH_DEBUG) and false
         size_t Index = 0;
         size_t Offset = 0;
         bool result = true;
-        if (m_params.size() < sizeof...(Args)) {
-            HUH_ELOG(LogCuda, "Incorrect Number of argument launches")
-            return false;
-        }
+        if (m_params.size() < sizeof...(Args))
+            args {
+                HUH_ELOG(LogCuda, "Incorrect Number of argument launches")
+                return false;
+            }
         (
             [&] {
                 auto AlignReq = alignof(decltype(args));
@@ -66,21 +67,20 @@ public:
             ...);
 
         if (!result) {
-            HUH_ELOG(LogCuda, "Cannot Launch Kernel Named: {} Incorrect Argument sizes", Name)
+            HUH_WLOG(LogCuda, "Cannot Launch Kernel Named: {} Incorrect Argument sizes", Name)
             Index = 0;
             Offset = 0;
             (
                 [&] {
                     const auto AlignReq = alignof(decltype(args));
                     Offset += (AlignReq - (Offset % AlignReq)) % AlignReq;
-                    HUH_ELOG(LogCuda, "\tFunction Arg {} Supplied Offset {} Size {} | Expected Offset {} Size {}",
+                    HUH_WLOG(LogCuda, "\tFunction Arg {} Supplied Offset {} Size {} | Expected Offset {} Size {}",
                              Index, Offset, sizeof(args), m_params[Index].Offset, m_params[Index].Size,
                              alignof(decltype(args)))
                     Offset += sizeof(args);
                     Index++;
                 }(),
                 ...);
-            return false;
         }
 #endif
 

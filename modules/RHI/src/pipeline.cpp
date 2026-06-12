@@ -18,12 +18,18 @@ void RHI::Pipeline::Destroy() {
 }
 
 bool RHI::Pipeline::DestroyBuffer(Buffer* buffer) {
+    if (buffer == nullptr) {
+        return true;
+    }
     buffer->Destroy();
     delete buffer;
     return true;
 }
 
 bool RHI::Pipeline::DestroyImage(Image* buffer) {
+    if (buffer == nullptr) {
+        return true;
+    }
     buffer->Destroy();
     delete buffer;
     return true;
