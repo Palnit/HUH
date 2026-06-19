@@ -5,11 +5,12 @@
 #include "stream.h"
 
 #include <cuda_runtime.h>
-#include <driver_types.h>
+#include <nvJitLink.h>
 #include <string>
 #include <vector>
 
 namespace HUH::Cuda {
+class Device;
 
 class Module;
 class Stream;
@@ -104,12 +105,33 @@ protected:
     std::vector<ParamInfo> m_params;
 };
 
+inline LogCategory LogCudaLinker("CudaLinker");
+
+class Linker {
+public:
+    friend class Module;
+    Linker();
+    void AddPtx(const std::string& moduleName) const;
+    void AddLib(const std::string& moduleName) const;
+    void AddObject(const std::string& moduleName) const;
+    void AddFatbin(const std::string& moduleName) const;
+    bool Init(const Cuda::Device& device);
+    void Complete() const;
+    void* GetCubin();
+    ~Linker();
+
+private:
+    nvJitLinkHandle m_linker = nullptr;
+    void* m_cubin = nullptr;
+};
+
 class Module {
 public:
     explicit Module();
     ~Module();
 
     bool Load(const std::string& moduleName);
+    bool Load(Linker& linker);
     HUH_NODISCARD bool IsLoaded() const { return m_module != nullptr; }
     std::vector<Function> GetFunctions();
     Function GetFunction(const std::string& name);

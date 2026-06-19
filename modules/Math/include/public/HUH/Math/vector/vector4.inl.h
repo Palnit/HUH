@@ -49,6 +49,20 @@ public:
     template<std::size_t size, std::enable_if_t<size == 4, bool> = true>
     HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Vector(const T (&t)[size]) noexcept : data{t[0], t[1], t[2], t[3]} {}
 
+    template<HUH::ConvertableFrom<T> T2, size_t N>
+        requires(N > 4)
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Vector(const Vector<T2, N>& other) noexcept
+        : data{static_cast<ValueType>(other.data[0]), static_cast<ValueType>(other.data[1]),
+               static_cast<ValueType>(other.data[2])} {}
+
+    template<HUH::ConvertableFrom<T> T2, size_t N>
+        requires(N < 4)
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Vector(const Vector<T2, N>& other) noexcept : data{0} {
+        for (int i = 0; i < N; ++i) {
+            data[i] = other[i];
+        }
+    }
+
     HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE T& X() noexcept { return data[0]; }
     HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE T& Y() noexcept { return data[1]; }
     HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE T& Z() noexcept { return data[2]; }

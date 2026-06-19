@@ -61,17 +61,35 @@ HUH_FORCE_INLINE void Normalize(HUH::Vector<float, 3>& vec) noexcept;
 
 // TODO simd version ?
 template<typename T, typename T2>
-HUH_FORCE_INLINE void Cross(const Vector<T, 3>& lhs,
-                            const Vector<T2, 3>& rhs,
-                            HUH::Vector<std::common_type_t<T, T2>, 3>& result) noexcept {
+HUH_HOST HUH_DEVICE HUH_FORCE_INLINE void Cross(const Vector<T, 3>& lhs,
+                                                const Vector<T2, 3>& rhs,
+                                                HUH::Vector<std::common_type_t<T, T2>, 3>& result) noexcept {
     result[0] = lhs[1] * rhs[2] - lhs[2] * rhs[1];
     result[1] = lhs[2] * rhs[0] - lhs[0] * rhs[2];
     result[2] = lhs[0] * rhs[1] - lhs[1] * rhs[0];
 }
 
 template<typename T, size_t N>
-HUH_FORCE_INLINE void Norm(const Vector<T, N>& lhs) noexcept {
-    return HUH::Dot(lhs, lhs);
+HUH_HOST HUH_DEVICE HUH_FORCE_INLINE T Norm(const Vector<T, N>& lhs) noexcept {
+    return std::sqrt(HUH::Dot(lhs, lhs));
+}
+
+template<typename T, size_t N>
+HUH_HOST HUH_DEVICE HUH_FORCE_INLINE auto Max(const Vector<T, N>& lhs, const Vector<T, N>& rhs) noexcept {
+    HUH::Vector<T, N> result;
+    for (std::size_t i = 0; i < N; ++i) {
+        result[i] = lhs[i] > rhs[i] ? lhs[i] : rhs[i];
+    }
+    return result;
+}
+
+template<typename T, size_t N>
+HUH_HOST HUH_DEVICE HUH_FORCE_INLINE auto Min(const Vector<T, N>& lhs, const Vector<T, N>& rhs) noexcept {
+    HUH::Vector<T, N> result;
+    for (std::size_t i = 0; i < N; ++i) {
+        result[i] = lhs[i] < rhs[i] ? lhs[i] : rhs[i];
+    }
+    return result;
 }
 
 }// namespace HUH

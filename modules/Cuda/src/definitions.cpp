@@ -494,4 +494,49 @@ std::string ToString(CUresult err) {
             return "Unknown error";
     }
 }
+
+std::string ToString(nvJitLinkResult err) {
+    switch (err) {
+        case NVJITLINK_SUCCESS:
+            return "NVJITLINK_SUCCESS";
+        case NVJITLINK_ERROR_UNRECOGNIZED_OPTION:
+            return "NVJITLINK_ERROR_UNRECOGNIZED_OPTION";
+        case NVJITLINK_ERROR_MISSING_ARCH:
+            return "NVJITLINK_ERROR_MISSING_ARCH";
+        case NVJITLINK_ERROR_INVALID_INPUT:
+            return "NVJITLINK_ERROR_INVALID_INPUT";
+        case NVJITLINK_ERROR_PTX_COMPILE:
+            return "NVJITLINK_ERROR_PTX_COMPILE";
+        case NVJITLINK_ERROR_NVVM_COMPILE:
+            return "NVJITLINK_ERROR_NVVM_COMPILE";
+        case NVJITLINK_ERROR_INTERNAL:
+            return "NVJITLINK_ERROR_INTERNAL";
+        case NVJITLINK_ERROR_THREADPOOL:
+            return "NVJITLINK_ERROR_THREADPOOL";
+        case NVJITLINK_ERROR_UNRECOGNIZED_INPUT:
+            return "NVJITLINK_ERROR_UNRECOGNIZED_INPUT";
+        case NVJITLINK_ERROR_FINALIZE:
+            return "NVJITLINK_ERROR_FINALIZE";
+        case NVJITLINK_ERROR_NULL_INPUT:
+            return "NVJITLINK_ERROR_NULL_INPUT";
+        case NVJITLINK_ERROR_INCOMPATIBLE_OPTIONS:
+            return "NVJITLINK_ERROR_INCOMPATIBLE_OPTIONS";
+        case NVJITLINK_ERROR_INCORRECT_INPUT_TYPE:
+            return "NVJITLINK_ERROR_INCORRECT_INPUT_TYPE";
+        case NVJITLINK_ERROR_ARCH_MISMATCH:
+            return "NVJITLINK_ERROR_ARCH_MISMATCH";
+        case NVJITLINK_ERROR_OUTDATED_LIBRARY:
+            return "NVJITLINK_ERROR_OUTDATED_LIBRARY";
+        case NVJITLINK_ERROR_MISSING_FATBIN:
+            return "NVJITLINK_ERROR_MISSING_FATBIN";
+        case NVJITLINK_ERROR_UNRECOGNIZED_ARCH:
+            return "NVJITLINK_ERROR_UNRECOGNIZED_ARCH";
+        case NVJITLINK_ERROR_UNSUPPORTED_ARCH:
+            return "NVJITLINK_ERROR_UNSUPPORTED_ARCH";
+        case NVJITLINK_ERROR_LTO_NOT_ENABLED:
+            return "NVJITLINK_ERROR_LTO_NOT_ENABLED";
+        default:
+            return "Unknown error";
+    }
+}
 }// namespace HUH

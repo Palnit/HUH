@@ -9,6 +9,7 @@ class Device;
 
 class Device {
 public:
+    friend class Linker;
     struct Properties {
         HUH::Uint64 MaxThread;
         HUH::Vector3i MaxBlock;

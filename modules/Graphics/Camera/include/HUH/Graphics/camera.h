@@ -11,7 +11,7 @@ public:
     HUH::Graphics::Transform Transform;
 
     float NearClipPlane = 0.1;
-    float FarClipPlane = 100;
+    float FarClipPlane = 1000;
     float AspectRatio;
     float Fov = HUH::DegToRad(90);
 

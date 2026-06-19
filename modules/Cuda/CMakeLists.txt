@@ -32,6 +32,10 @@ if (CUDAToolkit_FOUND)
             HUH::Core
             HUH::Math
             CUDA::cudart
+            CUDA::cuda_driver
+            CUDA::nvJitLink
+            CUDA::nvrtc
+
     )
 
     if (BUILD_RHI)

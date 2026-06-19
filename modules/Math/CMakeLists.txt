@@ -14,6 +14,7 @@ set(HEADER_FILES
         ${MATH_INC_PATH}/quaternion_functions.h
         ${MATH_INC_PATH}/functions.h
         ${MATH_INC_PATH}/definitions.h
+        ${MATH_INC_PATH}/eigen_calculator.h
 )
 
 
