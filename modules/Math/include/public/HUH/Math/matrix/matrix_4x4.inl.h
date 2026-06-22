@@ -146,12 +146,12 @@ public:
         return *this;
     }
 
-    Matrix& Transpose() {
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix& Transpose() {
         *this = HUH::Transpose(*this);
         return *this;
     }
 
-    Matrix& GetTransposed() const { return Transpose(*this); }
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix GetTransposed() const { return HUH::Transpose(*this); }
 
     HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE static Matrix GetPerspective(T FOV, T AspectRation, T NearClipZ, T FarClipZ)
         requires(FloatingPoint<T>)

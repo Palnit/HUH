@@ -1,14 +1,15 @@
 #pragma once
 
 #include <HUH/RHI/device.h>
+#include <cuda_runtime.h>
 #include <driver_types.h>
-#include <map>
 
 namespace HUH::Cuda {
 
 template<typename T>
 class UniquePtr {
 public:
+    UniquePtr() : m_ptr(nullptr) {}
     UniquePtr(T* ptr) : m_ptr(ptr) {}
     UniquePtr(const UniquePtr&) = delete;
     UniquePtr& operator=(const UniquePtr&) = delete;
@@ -26,8 +27,15 @@ public:
     T* Get() { return m_ptr; }
     T operator*() { return *m_ptr; }
 
+    T* operator->() { return m_ptr; }
+    T const* operator->() const { return m_ptr; }
+
+    T** operator&() { return &m_ptr; }
+
     void Reset(T* ptr) {
-        cudaFree(m_ptr);
+        if (m_ptr) {
+            cudaFree(m_ptr);
+        }
         m_ptr = ptr;
     }
 

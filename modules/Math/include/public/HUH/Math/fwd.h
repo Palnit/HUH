@@ -77,7 +77,7 @@ class Matrix;
 
 template<typename T>
 class Matrix<T, 4, 4>;
-//
+
 // template<typename T>
 // class Matrix<T, 3, 3>;
 //
@@ -87,8 +87,8 @@ class Matrix<T, 4, 4>;
 template<typename T>
 using Matrix4x4 = Matrix<T, 4, 4>;
 
-// template<typename T>
-// using Matrix3x3 = Matrix<T, 3, 3>;
+template<typename T>
+using Matrix3x3 = Matrix<T, 3, 3>;
 //
 // template<typename T>
 // using Matrix2x2 = Matrix<T, 2, 2>;
@@ -97,6 +97,11 @@ using Matrix4x4f = Matrix4x4<float>;
 using Matrix4x4d = Matrix4x4<double>;
 using Matrix4x4i = Matrix4x4<int>;
 using Matrix4x4ui = Matrix4x4<unsigned int>;
+
+using Matrix3x3f = Matrix3x3<float>;
+using Matrix3x3d = Matrix3x3<double>;
+using Matrix3x3i = Matrix3x3<int>;
+using Matrix3x3ui = Matrix3x3<unsigned int>;
 
 // template<typename>
 // struct IsVector : public std::false_type {};
