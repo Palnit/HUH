@@ -219,4 +219,5 @@ struct std::formatter<HUH::Matrix<T, C, R>> : std::formatter<std::string> {
     }
 };
 
+#include <HUH/Math/matrix/matrix_3x3.inl.h>
 #include <HUH/Math/matrix/matrix_4x4.inl.h>

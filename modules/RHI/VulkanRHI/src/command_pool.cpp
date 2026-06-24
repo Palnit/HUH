@@ -113,21 +113,22 @@ void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPa
     VkRect2D scissor{.offset = {0, 0}, .extent = {m_scissor.X(), m_scissor.Y()}};
     HUH::vkCmdSetScissor(m_commandBuffer, 0, 1, &scissor);
 
-    if (m_attachments[0] != *vk_image || m_attachments[1] != *vk_depth || m_attachments.size() != 2) {
-        vkDestroyFramebuffer(*m_parent->m_device, m_frameBuffer, nullptr);
-        m_attachments.clear();
-        m_attachments.push_back(*vk_image);
-        m_attachments.push_back(*vk_depth);
+    if (m_attachmentsDepth[0] != *vk_image || m_attachmentsDepth[1] != *vk_depth || m_attachmentsDepth.size() != 2) {
+        vkDestroyFramebuffer(*m_parent->m_device, m_frameBufferDepth, nullptr);
+        m_attachmentsDepth.clear();
+        m_attachmentsDepth.push_back(*vk_image);
+        m_attachmentsDepth.push_back(*vk_depth);
         VkFramebufferCreateInfo framebufferCreateInfo = {
             .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
             .renderPass = *vk_renderPass,
-            .attachmentCount = static_cast<Uint32>(m_attachments.size()),
-            .pAttachments = m_attachments.data(),
+            .attachmentCount = static_cast<Uint32>(m_attachmentsDepth.size()),
+            .pAttachments = m_attachmentsDepth.data(),
             .width = vk_image->GetSize().X(),
             .height = vk_image->GetSize().Y(),
             .layers = 1,
         };
-        if (auto err = HUH::vkCreateFramebuffer(*m_parent->m_device, &framebufferCreateInfo, nullptr, &m_frameBuffer);
+        if (auto err =
+                HUH::vkCreateFramebuffer(*m_parent->m_device, &framebufferCreateInfo, nullptr, &m_frameBufferDepth);
             err != VK_SUCCESS) {
             HUH_ELOG(LogVulkanRHI, "Error creating vulkan framebuffer: {}", err)
         }
@@ -138,7 +139,7 @@ void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPa
     clearValues[1].depthStencil = {1.0f, 0};
     VkRenderPassBeginInfo renderPassInfo = {.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
                                             .renderPass = *vk_renderPass,
-                                            .framebuffer = m_frameBuffer,
+                                            .framebuffer = m_frameBufferDepth,
                                             .renderArea =
                                                 {
                                                     .offset = {offset.X(), offset.Y()},
@@ -157,6 +158,7 @@ void VulkanCommandPool::VulkanCommandBuffer::EndRendering() {
 VulkanCommandPool::VulkanCommandBuffer::~VulkanCommandBuffer() {
     HUH_ILOG(LogVulkanRHI, "CommandBuffer Destruction Successful")
     vkDestroyFramebuffer(*m_parent->m_device, m_frameBuffer, nullptr);
+    vkDestroyFramebuffer(*m_parent->m_device, m_frameBufferDepth, nullptr);
 }
 
 bool VulkanCommandPool::Init(Uint32 bufferCount, Queue* queue) {

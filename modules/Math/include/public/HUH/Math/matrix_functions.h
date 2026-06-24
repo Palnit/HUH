@@ -58,4 +58,11 @@ HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix4x4<T> GetPerspectiveMatrix(T FOV,
                         {0, 0, ClipRange * -NearClipZ, 0});
 }
 
+template<typename T, std::size_t R, std::size_t C>
+HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE void MatrixInverse(const Matrix<T, R, C>& mat, Matrix<T, R, C>& result) {
+}
+
+template<typename T>
+HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE void MatrixInverse(const Matrix4x4<T>& mat, Matrix4x4<T>& result);
+
 }// namespace HUH

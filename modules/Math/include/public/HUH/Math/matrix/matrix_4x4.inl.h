@@ -153,6 +153,19 @@ public:
 
     HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix GetTransposed() const { return HUH::Transpose(*this); }
 
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix& Inverse() {
+        Matrix result;
+        HUH::MatrixInverse(*this, result);
+        *this = result;
+        return *this;
+    }
+
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix GetInversed() const {
+        Matrix result;
+        HUH::MatrixInverse(*this, result);
+        return result;
+    }
+
     HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE static Matrix GetPerspective(T FOV, T AspectRation, T NearClipZ, T FarClipZ)
         requires(FloatingPoint<T>)
     {
@@ -179,6 +192,55 @@ HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE void MatrixMultiply(const Matrix4x4<T>& 
     result[1] = rhsRow0 * lhsRow1[0] + rhsRow1 * lhsRow1[1] + rhsRow2 * lhsRow1[2] + rhsRow3 * lhsRow1[3];
     result[2] = rhsRow0 * lhsRow2[0] + rhsRow1 * lhsRow2[1] + rhsRow2 * lhsRow2[2] + rhsRow3 * lhsRow2[3];
     result[3] = rhsRow0 * lhsRow3[0] + rhsRow1 * lhsRow3[1] + rhsRow2 * lhsRow3[2] + rhsRow3 * lhsRow3[3];
+}
+
+template<typename T>
+HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE void MatrixInverse(const Matrix4x4<T>& mat, Matrix4x4<T>& result) {
+    T SubFactor00 = mat[2][2] * mat[3][3] - mat[3][2] * mat[2][3];
+    T SubFactor01 = mat[2][1] * mat[3][3] - mat[3][1] * mat[2][3];
+    T SubFactor02 = mat[2][1] * mat[3][2] - mat[3][1] * mat[2][2];
+    T SubFactor03 = mat[2][0] * mat[3][3] - mat[3][0] * mat[2][3];
+    T SubFactor04 = mat[2][0] * mat[3][2] - mat[3][0] * mat[2][2];
+    T SubFactor05 = mat[2][0] * mat[3][1] - mat[3][0] * mat[2][1];
+    T SubFactor06 = mat[1][2] * mat[3][3] - mat[3][2] * mat[1][3];
+    T SubFactor07 = mat[1][1] * mat[3][3] - mat[3][1] * mat[1][3];
+    T SubFactor08 = mat[1][1] * mat[3][2] - mat[3][1] * mat[1][2];
+    T SubFactor09 = mat[1][0] * mat[3][3] - mat[3][0] * mat[1][3];
+    T SubFactor10 = mat[1][0] * mat[3][2] - mat[3][0] * mat[1][2];
+    T SubFactor11 = mat[1][0] * mat[3][1] - mat[3][0] * mat[1][1];
+    T SubFactor12 = mat[1][2] * mat[2][3] - mat[2][2] * mat[1][3];
+    T SubFactor13 = mat[1][1] * mat[2][3] - mat[2][1] * mat[1][3];
+    T SubFactor14 = mat[1][1] * mat[2][2] - mat[2][1] * mat[1][2];
+    T SubFactor15 = mat[1][0] * mat[2][3] - mat[2][0] * mat[1][3];
+    T SubFactor16 = mat[1][0] * mat[2][2] - mat[2][0] * mat[1][2];
+    T SubFactor17 = mat[1][0] * mat[2][1] - mat[2][0] * mat[1][1];
+
+    result[0][0] = +(mat[1][1] * SubFactor00 - mat[1][2] * SubFactor01 + mat[1][3] * SubFactor02);
+    result[0][1] = -(mat[1][0] * SubFactor00 - mat[1][2] * SubFactor03 + mat[1][3] * SubFactor04);
+    result[0][2] = +(mat[1][0] * SubFactor01 - mat[1][1] * SubFactor03 + mat[1][3] * SubFactor05);
+    result[0][3] = -(mat[1][0] * SubFactor02 - mat[1][1] * SubFactor04 + mat[1][2] * SubFactor05);
+
+    result[1][0] = -(mat[0][1] * SubFactor00 - mat[0][2] * SubFactor01 + mat[0][3] * SubFactor02);
+    result[1][1] = +(mat[0][0] * SubFactor00 - mat[0][2] * SubFactor03 + mat[0][3] * SubFactor04);
+    result[1][2] = -(mat[0][0] * SubFactor01 - mat[0][1] * SubFactor03 + mat[0][3] * SubFactor05);
+    result[1][3] = +(mat[0][0] * SubFactor02 - mat[0][1] * SubFactor04 + mat[0][2] * SubFactor05);
+
+    result[2][0] = +(mat[0][1] * SubFactor06 - mat[0][2] * SubFactor07 + mat[0][3] * SubFactor08);
+    result[2][1] = -(mat[0][0] * SubFactor06 - mat[0][2] * SubFactor09 + mat[0][3] * SubFactor10);
+    result[2][2] = +(mat[0][0] * SubFactor07 - mat[0][1] * SubFactor09 + mat[0][3] * SubFactor11);
+    result[2][3] = -(mat[0][0] * SubFactor08 - mat[0][1] * SubFactor10 + mat[0][2] * SubFactor11);
+
+    result[3][0] = -(mat[0][1] * SubFactor12 - mat[0][2] * SubFactor13 + mat[0][3] * SubFactor14);
+    result[3][1] = +(mat[0][0] * SubFactor12 - mat[0][2] * SubFactor15 + mat[0][3] * SubFactor16);
+    result[3][2] = -(mat[0][0] * SubFactor13 - mat[0][1] * SubFactor15 + mat[0][3] * SubFactor17);
+    result[3][3] = +(mat[0][0] * SubFactor14 - mat[0][1] * SubFactor16 + mat[0][2] * SubFactor17);
+
+    T Determinant =
+        +mat[0][0] * result[0][0] + mat[0][1] * result[0][1] + mat[0][2] * result[0][2] + mat[0][3] * result[0][3];
+
+    for (size_t i = 0; i < 4; i++) {
+        result[i] /= Determinant;
+    }
 }
 
 #if HUH_USE_SIMD

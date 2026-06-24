@@ -10,6 +10,7 @@ set(HEADER_FILES
         ${MATH_INC_PATH}/vector_functions.h
         ${MATH_INC_PATH}/fwd.h
         ${MATH_INC_PATH}/matrix/matrix_4x4.inl.h
+        ${MATH_INC_PATH}/matrix/matrix_3x3.inl.h
         ${MATH_INC_PATH}/quaternion.h
         ${MATH_INC_PATH}/quaternion_functions.h
         ${MATH_INC_PATH}/functions.h

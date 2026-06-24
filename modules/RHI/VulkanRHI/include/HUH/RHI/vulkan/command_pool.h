@@ -51,13 +51,16 @@ public:
         std::vector<VkDescriptorSet> m_descriptorSets;
         // TODO this is bad design
         std::vector<VkImageView> m_attachments;
+        std::vector<VkImageView> m_attachmentsDepth;
         VkFramebuffer m_frameBuffer = nullptr;
+        VkFramebuffer m_frameBufferDepth = nullptr;
 
         VulkanCommandBuffer(VulkanCommandPool* parent, VkCommandBuffer commandBuffer)
             : CommandBuffer(),
               m_parent(parent),
               m_commandBuffer(commandBuffer) {
             m_attachments.resize(2);
+            m_attachmentsDepth.resize(2);
         }
         ~VulkanCommandBuffer() override;
     };
