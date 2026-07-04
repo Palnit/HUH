@@ -31,7 +31,7 @@ public:
     static VkDescriptorType ConvertDescriptorType(const Pipeline::DescriptorTypes& descriptor);
 
 protected:
-    VulkanPipeline(VulkanDevice* device) : m_device(device) {}
+    explicit VulkanPipeline(VulkanDevice* device) : m_device(device) {}
     ~VulkanPipeline() override;
 
     struct DescriptorSet {

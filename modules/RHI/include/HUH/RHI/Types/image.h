@@ -38,10 +38,10 @@ public:
     virtual bool Init(Initializer&& init) = 0;
     virtual void Destroy() = 0;
     // TODO manual uploading of image data without copying from normal buffer
-    HUH::Vector2u32 GetSize() const { return m_size; }
+    HUH_NODISCARD HUH::Vector2u32 GetSize() const { return m_size; }
 
 protected:
-    Image(bool created) : m_created(created) {}
+    explicit Image(bool created) : m_created(created) {}
     virtual ~Image() = default;
     bool m_created = false;
     HUH::Vector2u32 m_size;

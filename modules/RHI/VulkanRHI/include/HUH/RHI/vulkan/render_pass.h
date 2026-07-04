@@ -17,7 +17,7 @@ public:
     static VkAttachmentStoreOp ConvertStoreOp(StoreOp storeOp);
 
 protected:
-    VulkanRenderPass(VulkanDevice* device);
+    explicit VulkanRenderPass(VulkanDevice* device);
     ~VulkanRenderPass() override;
 
     VulkanDevice* m_device = nullptr;

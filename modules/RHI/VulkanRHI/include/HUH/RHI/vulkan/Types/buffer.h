@@ -21,7 +21,7 @@ public:
     void UnMapData() override;
     HUH_NODISCARD VkMemoryRequirements GetMemoryRequirements() const;
     operator VkBuffer() const { return m_buffer; }
-    VulkanMemoryAllocator::MemoryBlock GetMemoryBlock() const { return m_allocatedBlock; }
+    HUH_NODISCARD VulkanMemoryAllocator::MemoryBlock GetMemoryBlock() const { return m_allocatedBlock; }
 
 #ifdef HUH_USE_CUDA
     SharedMemoryInfo GetSharedMemory() override;

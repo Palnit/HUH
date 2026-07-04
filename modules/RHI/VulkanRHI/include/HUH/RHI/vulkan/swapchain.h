@@ -32,7 +32,7 @@ public:
 protected:
     bool CreateSwapchain();
     bool RecreateSwapchain();
-    VulkanSwapchain(VulkanDevice* device, Window* window, VkSurfaceKHR surface, VulkanDynamicRHI* parent);
+    explicit VulkanSwapchain(VulkanDevice* device, Window* window, VkSurfaceKHR surface, VulkanDynamicRHI* parent);
     ~VulkanSwapchain() override;
 
     VkPhysicalDeviceSurfaceInfo2KHR m_surface{.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR};

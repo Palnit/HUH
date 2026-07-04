@@ -42,7 +42,7 @@ public:
     };
 
 protected:
-    VulkanMemoryAllocator(VulkanDevice* m_device);
+    explicit VulkanMemoryAllocator(VulkanDevice* m_device);
     ~VulkanMemoryAllocator() override;
 
     static VkMemoryPropertyFlags ConvertMemoryType(MemoryAllocator::Type type);

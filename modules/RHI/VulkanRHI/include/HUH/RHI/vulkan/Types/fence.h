@@ -29,7 +29,7 @@ protected:
 
     Buffer::SharedMemoryInfo m_handle{};
 
-    VulkanFence(VulkanDevice* device);
+    explicit VulkanFence(VulkanDevice* device);
     ~VulkanFence() override;
 
     VulkanDevice* m_device;

@@ -57,7 +57,7 @@ public:
     friend class Device;
     virtual bool Init(Initializer&& initializer) = 0;
     virtual void Destroy();
-    virtual void AddShader(class Shader* shader) = 0;
+    virtual void AddShader(Shader* shader) = 0;
     virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size) = 0;
     virtual Buffer* CreateBuffer(Buffer::Type type, Uint64 Size, Uint64 Binding) = 0;
     virtual HUH::RHI::Image* CreateImage(Image::Type type, const HUH::Vector2u32& size) = 0;

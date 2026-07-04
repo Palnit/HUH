@@ -1,7 +1,6 @@
 #pragma once
 
 #include <HUH/RHI/Types/buffer.h>
-
 #include <HUH/RHI/fwd.h>
 #include <HUH/RHI/types.h>
 

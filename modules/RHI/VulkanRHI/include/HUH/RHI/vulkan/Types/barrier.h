@@ -18,8 +18,8 @@ public:
 protected:
     void InitImage(Initializer&& initializer);
     void InitBuffer(Initializer&& initializer);
-    VulkanBarrier(VulkanDevice* device);
-    ~VulkanBarrier() override {}
+    explicit VulkanBarrier(VulkanDevice* device);
+    ~VulkanBarrier() override = default;
 
     VulkanDevice* m_device;
     VulkanBuffer* m_buffer;

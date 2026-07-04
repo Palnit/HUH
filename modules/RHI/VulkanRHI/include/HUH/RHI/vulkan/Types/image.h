@@ -28,7 +28,7 @@ public:
 
     operator VkImage() const { return m_image; }
 
-    VkMemoryRequirements GetMemoryRequirements() const;
+    HUH_NODISCARD VkMemoryRequirements GetMemoryRequirements() const;
 
     static VkImageUsageFlags ConvertImageUsage(Image::Type type);
 

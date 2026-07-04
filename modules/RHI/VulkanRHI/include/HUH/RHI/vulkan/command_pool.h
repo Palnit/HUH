@@ -55,13 +55,7 @@ public:
         VkFramebuffer m_frameBuffer = nullptr;
         VkFramebuffer m_frameBufferDepth = nullptr;
 
-        VulkanCommandBuffer(VulkanCommandPool* parent, VkCommandBuffer commandBuffer)
-            : CommandBuffer(),
-              m_parent(parent),
-              m_commandBuffer(commandBuffer) {
-            m_attachments.resize(2);
-            m_attachmentsDepth.resize(2);
-        }
+        explicit VulkanCommandBuffer(VulkanCommandPool* parent, VkCommandBuffer commandBuffer);
         ~VulkanCommandBuffer() override;
     };
 

@@ -49,7 +49,7 @@ public:
 #endif
 
 protected:
-    Buffer(Uint64 size);
+    explicit Buffer(Uint64 size);
     virtual ~Buffer() = default;
     MemoryAllocator* m_allocator = nullptr;
     Uint64 m_size = 0;

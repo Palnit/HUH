@@ -3,8 +3,6 @@
 #include <HUH/RHI/Types/buffer.h>
 #include <HUH/RHI/fwd.h>
 #include <HUH/RHI/queue.h>
-#include <HUH/RHI/rhi_module.h>
-#include <HUH/RHI/types.h>
 #include <HUH/definitions.h>
 #include <HUH/types.h>
 #include <vector>

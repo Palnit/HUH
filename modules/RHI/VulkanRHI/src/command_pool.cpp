@@ -155,6 +155,14 @@ void VulkanCommandPool::VulkanCommandBuffer::EndRendering() {
     vkCmdEndRenderPass(m_commandBuffer);
 }
 
+VulkanCommandPool::VulkanCommandBuffer::VulkanCommandBuffer(VulkanCommandPool* parent, VkCommandBuffer commandBuffer)
+    : CommandBuffer(),
+      m_parent(parent),
+      m_commandBuffer(commandBuffer) {
+    m_attachments.resize(2);
+    m_attachmentsDepth.resize(2);
+}
+
 VulkanCommandPool::VulkanCommandBuffer::~VulkanCommandBuffer() {
     HUH_ILOG(LogVulkanRHI, "CommandBuffer Destruction Successful")
     vkDestroyFramebuffer(*m_parent->m_device, m_frameBuffer, nullptr);
