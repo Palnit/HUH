@@ -36,6 +36,9 @@ concept Same = std::is_same_v<T, U>;
 template<typename T>
 concept DefaultConstructable = std::is_default_constructible_v<T>;
 
+template<typename T>
+concept TriviallyDestructable = std::is_trivially_destructible_v<T>;
+
 template<typename T, typename U>
 concept Constructable = std::is_constructible_v<U, T>;
 
@@ -62,6 +65,29 @@ concept Pointer = std::is_pointer_v<T>;
 
 template<typename T>
 concept Enum = std::is_enum_v<T>;
+
+template<typename T>
+concept ZeroConstructable = Aritmatic<T> || Enum<T> || Pointer<T>;
+
+template<typename T>
+concept ForwardIterator = requires(T a, size_t i) {
+    { a++ } -> Same<T>;
+    { ++a } -> Same<T&>;
+};
+
+template<typename T>
+concept BidirectionalIterator = ForwardIterator<T> && requires(T a, size_t i) {
+    { a-- } -> Same<T>;
+    { --a } -> Same<T&>;
+};
+
+template<typename T>
+concept RandomAccessIterator = BidirectionalIterator<T> && requires(T a, size_t i) {
+    { a + i } -> Same<T>;
+    { a = +i } -> Same<T&>;
+    { a - i } -> Same<T>;
+    { a = -i } -> Same<T&>;
+};
 
 // Concepts for niche but helpful things
 

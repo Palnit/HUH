@@ -5,11 +5,16 @@ set(CORE_WIN_INC_PATH "platform/include/HUH/Windows")
 
 set(CORE_HEADER_FILE
         ${CORE_INC_PATH}/Singleton.h
+        ${CORE_INC_PATH}/array.h
+        ${CORE_INC_PATH}/views.h
+        ${CORE_INC_PATH}/Allocators/base_allocator.h
+        ${CORE_INC_PATH}/Allocators/malloc_allocator.h
         ${CORE_INC_PATH}/dynamic_library.h
         ${CORE_INC_PATH}/logging.h
         ${CORE_INC_PATH}/string_operations.h
         ${CORE_INC_PATH}/console_color.h
         ${CORE_INC_PATH}/event.h
+        ${CORE_INC_PATH}/memory_movement.h
         ${CORE_INC_PATH}/Types/tuple.h
 )
 set(CORE_SOURCE_FILES
@@ -54,4 +59,8 @@ target_include_directories(HUH-Core PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/include/"
         "${CMAKE_CURRENT_SOURCE_DIR}/platform/include"
 )
+
+if (BUILD_BENCHMARKS)
+    add_subdirectory(benchmarks)
+endif ()
 

@@ -4,7 +4,6 @@ option(BUILD_RHI "Build Render Hardware Interface module" OFF)
 option(BUILD_WINDOW "Build Window management module" OFF)
 option(BUILD_VULKAN_LOADER "Build Vulkan Loader" OFF)
 option(BUILD_MATH "Build Math module" OFF)
-option(BUILD_ARRAY "Build numpy like array module" OFF)
 option(BUILD_THREADING "Build threading library" OFF)
 option(BUILD_PYTHON_BINDING "Build the python binding module" OFF)
 option(BUILD_HUH_PYTHON_BINDING "Build the python binding for all building HUH module" OFF)
@@ -31,8 +30,7 @@ project(HUH
         LANGUAGES CXX C
 )
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 23)
 
 
 if (BUILD_TESTS)
@@ -110,10 +108,6 @@ if (BUILD_MATH)
     huh_add_module_build(HUH INTERFACE Math)
 endif ()
 
-
-if (BUILD_ARRAY)
-    huh_add_module_build(HUH INTERFACE Array)
-endif ()
 
 if (BUILD_THREADING)
     huh_add_module_build(HUH INTERFACE Threading)
