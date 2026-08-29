@@ -601,6 +601,9 @@ WaylandWindow::WaylandWindow(const std::string& name, HUH::Vector2u32 size) : Wi
 }
 
 WaylandWindow::~WaylandWindow() {
+    xkb_keymap_unref(m_xkbKeymap);
+    xkb_state_unref(m_xkbState);
+    wl_seat_destroy(m_seat);
     zxdg_toplevel_decoration_v1_destroy(m_zxdgToplevelDecoration);
     xdg_toplevel_destroy(m_xdgToplevel);
     xdg_surface_destroy(m_xdgSurface);
