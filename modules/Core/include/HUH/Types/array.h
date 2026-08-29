@@ -241,21 +241,32 @@ private:
             result = newMax;
         }
         m_max = result;
-        m_data = static_cast<Type*>(m_allocator.Reallocate(m_data, sizeof(Type) * result));
+        auto tmp = static_cast<Type*>(m_allocator.Allocate(sizeof(Type) * m_max));
+        DefaultMove<Type>(tmp, m_data, m_size);
+        m_allocator.Deallocate(m_data);
+        m_data = tmp;
     }
 
     HUH_FORCE_INLINE void FixedGrow(const size_t newMax) {
         assert(m_max >= newMax + m_max);
 
         m_max = newMax + m_max;
-        m_data = static_cast<Type*>(m_allocator.Reallocate(m_data, sizeof(Type) * m_max));
+        auto tmp = static_cast<Type*>(m_allocator.Allocate(sizeof(Type) * m_max));
+        DefaultMove<Type>(tmp, m_data, m_size);
+        m_allocator.Deallocate(m_data);
+        m_data = tmp;
     }
 
     HUH_FORCE_INLINE void Shrink(const size_t newMax) {
         if (m_size > newMax) {
             DefaultDestruct(m_data + newMax + 1, m_size - newMax);
+            m_size = newMax;
         }
-        m_allocator.Reallocate(m_data, sizeof(Type) * newMax);
+        m_max = newMax;
+        auto tmp = static_cast<Type*>(m_allocator.Allocate(sizeof(Type) * m_max));
+        DefaultMove<Type>(tmp, m_data, m_size);
+        m_allocator.Deallocate(m_data);
+        m_data = tmp;
     }
 
     size_t m_size = 0;
