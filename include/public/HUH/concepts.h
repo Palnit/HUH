@@ -37,6 +37,9 @@ template<typename T>
 concept DefaultConstructable = std::is_default_constructible_v<T>;
 
 template<typename T>
+concept TrivialCopyConstructible = std::is_trivially_copy_constructible_v<T>;
+
+template<typename T>
 concept TriviallyDestructable = std::is_trivially_destructible_v<T>;
 
 template<typename T, typename U>

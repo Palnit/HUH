@@ -171,7 +171,44 @@ public:
     HUH_NODISCARD HUH_FORCE_INLINE bool IsEmpty() const { return m_size == 0; }
     HUH_NODISCARD HUH_FORCE_INLINE bool empty() const { return m_size == 0; }
 
+    HUH_FORCE_INLINE void Clear() {
+        DefaultDestruct(m_data, m_size);
+        m_size = 0;
+    }
+
+    HUH_FORCE_INLINE void clear() {
+        DefaultDestruct(m_data, m_size);
+        m_size = 0;
+    }
+
     HUH_NODISCARD HUH_FORCE_INLINE size_t NumBytes() const { return m_size * sizeof(Type); }
+
+    HUH_FORCE_INLINE void ShrinkToSize() { Shrink(m_size); }
+
+    HUH_FORCE_INLINE void Resize(const size_t newMax) {
+        if (newMax > m_size) {
+            AddDefaultConstructed(newMax - m_size);
+        }
+        if (m_size < newMax) {
+            Shrink(newMax);
+        }
+    }
+
+    HUH_FORCE_INLINE void Reserve(const size_t newMax) {
+        if (newMax > m_max) {
+            AddUnInitialized(newMax - m_max);
+        }
+    }
+
+    HUH_FORCE_INLINE void AddUnInitialized(const size_t count) { FixedGrow(count); }
+
+    HUH_FORCE_INLINE void AddDefaultConstructed(const size_t count) {
+        if (m_size + count > m_max) {
+            Grow(m_size + count);
+        }
+        DefaultConstruct<Type>(m_data + m_size, count);
+        m_size += count;
+    }
 
     template<typename... Args>
     HUH_FORCE_INLINE size_t Emplace(Args&&... args) {
@@ -187,23 +224,32 @@ public:
 private:
     HUH_FORCE_INLINE void CopyPtrDataToEmpty(const void* data, const size_t size) {
         Grow(size);
-        std::memcpy(m_data, data, size);
+        DefaultCopy<Type>(m_data, data, size);
     }
 
     HUH_FORCE_INLINE void Grow(const size_t newMax) {
         size_t result = 4;
         if (m_max) {
             result = static_cast<size_t>(m_max * 1.5);
+        } else if (newMax > result) {
+            result = newMax;
         }
-        // if (newMax) {
-        //     result = newMax;
-        //     if (newMax < m_size) {
-        //         DefaultDestruct(m_data + newMax, m_size - newMax);
-        //         m_size = newMax;
-        //     }
-        // }
         m_max = result;
         m_data = static_cast<Type*>(m_allocator.Reallocate(m_data, sizeof(Type) * result));
+    }
+
+    HUH_FORCE_INLINE void FixedGrow(const size_t newMax) {
+        assert(m_max >= newMax + m_max);
+
+        m_max = newMax + m_max;
+        m_data = static_cast<Type*>(m_allocator.Reallocate(m_data, sizeof(Type) * m_max));
+    }
+
+    HUH_FORCE_INLINE void Shrink(const size_t newMax) {
+        if (m_size > newMax) {
+            DefaultDestruct(m_data + newMax + 1, m_size - newMax);
+        }
+        m_allocator.Reallocate(m_data, sizeof(Type) * newMax);
     }
 
     size_t m_size = 0;

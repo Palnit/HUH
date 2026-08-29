@@ -43,6 +43,8 @@ elseif (HUH_LINUX)
     )
 endif ()
 
+find_path(RAPIDHASH_INCLUDE_DIRS "rapidhash.h")
+
 add_library(HUH-Core SHARED ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES})
 add_library(HUH::Core ALIAS HUH-Core)
 huh_target_compile_options(HUH-Core PUBLIC MSVC /Zc:preprocessor)
@@ -58,6 +60,7 @@ target_link_libraries(HUH-Core PUBLIC HUH)
 target_include_directories(HUH-Core PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/include/"
         "${CMAKE_CURRENT_SOURCE_DIR}/platform/include"
+        ${RAPIDHASH_INCLUDE_DIRS}
 )
 
 if (BUILD_BENCHMARKS)
