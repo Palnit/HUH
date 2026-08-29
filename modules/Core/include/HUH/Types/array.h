@@ -222,7 +222,8 @@ public:
     }
 
 private:
-    HUH_FORCE_INLINE void CopyPtrDataToEmpty(const void* data, const size_t size) {
+    template<typename OtherType>
+    HUH_FORCE_INLINE void CopyPtrDataToEmpty(const OtherType* data, const size_t size) {
         Grow(size);
         DefaultCopy<Type>(m_data, data, size);
     }

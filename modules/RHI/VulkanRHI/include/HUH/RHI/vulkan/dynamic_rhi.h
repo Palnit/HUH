@@ -15,7 +15,7 @@ public:
     void Destroy() override;
     bool Init() override;
     Device* GetDevice(size_t index) override;
-    std::vector<Device*> GetDevices() override;
+    HUH::Array<Device*> GetDevices() override;
 
     HUH_VULKANRHI_API friend HUH::RHI::DynamicRHI* DynamicRHICreate();
 

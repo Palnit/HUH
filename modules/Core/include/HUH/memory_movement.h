@@ -26,13 +26,13 @@ HUH_FORCE_INLINE void DefaultConstruct(void* ptr, const size_t size) {
 }
 
 template<typename DstType, typename SrcType>
-    requires(TrivialCopyConstructible<DstType>)
-HUH_FORCE_INLINE void DefaultCopy(void* dst, SrcType* src, const size_t size) {
+    requires(TrivialCopyConstructible<DstType> && Same<DstType, SrcType>)
+HUH_FORCE_INLINE void DefaultCopy(void* dst, const SrcType* src, const size_t size) {
     std::memcpy(dst, src, sizeof(SrcType) * size);
 }
 
 template<typename DstType, typename SrcType>
-HUH_FORCE_INLINE void DefaultCopy(void* dst, SrcType* src, const size_t size) {
+HUH_FORCE_INLINE void DefaultCopy(void* dst, const SrcType* src, const size_t size) {
     for (size_t i = 0; i < size; ++i) {
         ::new (dst) DstType(*src);
         ++static_cast<DstType*&>(dst);

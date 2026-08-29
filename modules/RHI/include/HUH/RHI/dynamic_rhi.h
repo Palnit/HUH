@@ -1,10 +1,12 @@
 #pragma once
 
-#include <vector>
-#include <HUH/RHI/types.h>
+#include "HUH/Types/array.h"
+
 #include <HUH/RHI/fwd.h>
+#include <HUH/RHI/types.h>
 #include <HUH/definitions.h>
 #include <HUH/dynamic_library.h>
+#include <vector>
 
 namespace HUH {
 class Window;
@@ -19,7 +21,7 @@ public:
     virtual bool Init() = 0;
     virtual void Destroy();
     virtual Device* GetDevice(size_t index) = 0;
-    virtual std::vector<Device*> GetDevices() = 0;
+    virtual HUH::Array<Device*> GetDevices() = 0;
 
     DynamicRHI(const DynamicRHI&) = delete;
     DynamicRHI& operator=(const DynamicRHI&) = delete;
@@ -29,7 +31,7 @@ public:
 protected:
     DynamicRHI() = default;
     virtual ~DynamicRHI();
-    std::vector<Device*> m_createdDevices;
+    HUH::Array<Device*> m_createdDevices;
     RenderApi m_renderApi = RenderApi::Unknown;
     static DynamicLibrary s_RHIImplSharedLibrary;
 };

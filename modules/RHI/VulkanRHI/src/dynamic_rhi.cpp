@@ -108,7 +108,7 @@ Device* VulkanDynamicRHI::GetDevice(size_t index) {
     return nullptr;
 }
 
-std::vector<Device*> VulkanDynamicRHI::GetDevices() {
+HUH::Array<Device*> VulkanDynamicRHI::GetDevices() {
     Uint32 deviceCount = 0;
     HUH::vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
     if (deviceCount == 0) {
@@ -118,7 +118,7 @@ std::vector<Device*> VulkanDynamicRHI::GetDevices() {
     std::vector<VkPhysicalDevice> devices(deviceCount);
     HUH::vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
     for (auto device : devices) {
-        m_createdDevices.push_back(new VulkanDevice(this, device));
+        m_createdDevices.Emplace(new VulkanDevice(this, device));
     }
 
     return m_createdDevices;
