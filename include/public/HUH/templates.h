@@ -24,7 +24,7 @@ template<bool IsConst, typename ClassType, typename Function>
 using ClassFuncTypeHelper_t = ClassFuncTypeHelper<IsConst, ClassType, Function>::Type;
 
 template<typename T, typename R, R T::* M>
-HUH_FORCE_INLINE constexpr size_t OffsetOf() {
+HUH_FORCE_INLINE size_t OffsetOf() {
     return reinterpret_cast<size_t>(&(((T*)0)->*M));
 };
 
@@ -35,7 +35,7 @@ template<class ClassType, class MemberType, MemberType ClassType::* M>
 struct ClassMemberTypeHelper<M> {
     typedef MemberType Type;
     typedef ClassType StructType;
-    constexpr static size_t Offset = OffsetOf<ClassType, MemberType, M>();
+    inline static size_t Offset = OffsetOf<ClassType, MemberType, M>();
 };
 
 // Copy Cv

@@ -88,7 +88,10 @@ public:
     };
 
     Array() noexcept : m_size(0), m_data(nullptr) {};
-    Array(const Array& other) noexcept { CopyPtrDataToEmpty(other.m_data, other.m_size); }
+    Array(const Array& other) noexcept {
+        CopyPtrDataToEmpty(other.m_data, other.m_size);
+        m_size = other.m_size;
+    }
     Array(Array&& other) noexcept
         : m_size(other.m_size),
           m_max(other.m_max),
@@ -107,6 +110,7 @@ public:
         m_size = 0;
         m_max = 0;
         CopyPtrDataToEmpty(other.m_data, other.m_size);
+        m_size = other.m_size;
         return *this;
     }
 
