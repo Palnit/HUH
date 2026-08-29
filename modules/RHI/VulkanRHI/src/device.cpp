@@ -57,7 +57,7 @@ bool VulkanDevice::Init() {
 
     // TODO MAKE THIS A VECTOR FROM DEFAULT
     const std::string requiredExtensionsString = HUH_REQUIRED_DEVICE_EXTENSIONS;
-    std::vector<std::string> requiredExtensionsStrings = HUH::Split(requiredExtensionsString, ";");
+    HUH::Array<std::string> requiredExtensionsStrings = HUH::Split(requiredExtensionsString, ";");
     std::vector<const char*> requiredExtensions;
 
     for (auto& extension : requiredExtensionsStrings) {

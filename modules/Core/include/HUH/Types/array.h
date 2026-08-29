@@ -88,6 +88,7 @@ public:
     };
 
     Array() noexcept : m_size(0), m_data(nullptr) {};
+    explicit Array(const size_t count) { AddDefaultConstructed(count); }
     Array(const Array& other) noexcept {
         CopyPtrDataToEmpty(other.m_data, other.m_size);
         m_size = other.m_size;

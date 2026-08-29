@@ -20,7 +20,7 @@ bool VulkanDynamicRHI::Init() {
 
     Uint32 extensionCount;
     HUH::vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-    std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+    HUH::Array<VkExtensionProperties> availableExtensions(extensionCount);
     HUH::vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
 
 #if HUH_DEBUG
@@ -31,8 +31,8 @@ bool VulkanDynamicRHI::Init() {
 #endif
 
     const std::string requiredExtensionsString = HUH_REQUIRED_INSTANCE_EXTENSIONS;
-    std::vector<std::string> requiredExtensionsStrings = HUH::Split(requiredExtensionsString, ";");
-    std::vector<const char*> requiredExtensions;
+    HUH::Array<std::string> requiredExtensionsStrings = HUH::Split(requiredExtensionsString, ";");
+    HUH::Array<const char*> requiredExtensions;
 
     for (auto& extension : requiredExtensionsStrings) {
         auto found_extension = std::find_if(availableExtensions.begin(), availableExtensions.end(),
@@ -47,17 +47,17 @@ bool VulkanDynamicRHI::Init() {
                     extension)
             continue;
         }
-        requiredExtensions.push_back(extension.c_str());
+        requiredExtensions.Emplace(extension.c_str());
     }
 
     Uint32 layerCount;
     HUH::vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-    std::vector<VkLayerProperties> availableLayers(layerCount);
+    HUH::Array<VkLayerProperties> availableLayers(layerCount);
     HUH::vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
 
     const std::string requiredLayersString = HUH_REQUIRED_INSTANCE_LAYERS;
-    std::vector<std::string> requiredLayersStrings = HUH::Split(requiredLayersString, ";");
-    std::vector<const char*> requiredLayers;
+    HUH::Array<std::string> requiredLayersStrings = HUH::Split(requiredLayersString, ";");
+    HUH::Array<const char*> requiredLayers;
 
 #if HUH_DEBUG
     HUH_LOG(LogVulkanRHI, Logging::Level::DebugLog, "Available Layers:")
@@ -79,7 +79,7 @@ bool VulkanDynamicRHI::Init() {
                     layer)
             continue;
         }
-        requiredLayers.push_back(layer.c_str());
+        requiredLayers.Emplace(layer.c_str());
     }
 
     VkApplicationInfo appInfo{.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -115,7 +115,7 @@ HUH::Array<Device*> VulkanDynamicRHI::GetDevices() {
         HUH_LOG(LogVulkanRHI, Logging::Level::Log, "No Physical device with vulkan support");
         return {};
     }
-    std::vector<VkPhysicalDevice> devices(deviceCount);
+    HUH::Array<VkPhysicalDevice> devices(deviceCount);
     HUH::vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
     for (auto device : devices) {
         m_createdDevices.Emplace(new VulkanDevice(this, device));

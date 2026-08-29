@@ -16,7 +16,7 @@ HUH_FORCE_INLINE void DefaultConstruct(void* ptr, const size_t size) {
 }
 
 template<typename Type>
-    requires(DefaultConstructable<Type>)
+    requires(DefaultConstructable<Type> && !ZeroConstructable<Type>)
 HUH_FORCE_INLINE void DefaultConstruct(void* ptr, const size_t size) {
     Type* typePtr = static_cast<Type*>(ptr);
     for (size_t i = 0; i < size; ++i) {
