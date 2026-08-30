@@ -253,6 +253,19 @@ public:
         }
     }
 
+    void InsertUninitialized(const size_t index, const size_t count) {
+        assert(index <= m_size);
+        assert(count >= 1);
+
+        m_max += count;
+        auto tmp = static_cast<Type*>(m_allocator.Allocate(sizeof(Type) * m_max));
+        DefaultMove<Type>(tmp, m_data, index);
+        DefaultMove<Type>((tmp + index + count), (m_data + index), m_size - index);
+        m_allocator.Deallocate(m_data);
+        m_data = tmp;
+        m_size += count;
+    }
+
     HUH_FORCE_INLINE void AddUnInitialized(const size_t count) { FixedGrow(count); }
 
     HUH_FORCE_INLINE void AddDefaultConstructed(const size_t count) {
@@ -281,6 +294,25 @@ public:
         AddUnInitialized(initializerList.size());
         DefaultConstruct<Type>(m_data + m_size, initializerList.size());
         m_size += initializerList.size();
+    }
+
+    template<typename... Args>
+    HUH_FORCE_INLINE void Insert(size_t index, Args&&... args) {
+        InsertUninitialized(index, 1);
+        auto ptr = m_data + index;
+        (void)new (ptr) Type(std::forward<Args>(args)...);
+    }
+
+    HUH_FORCE_INLINE void Insert(size_t index, const Type& other) { Insert<const Type&>(other, index); }
+    HUH_FORCE_INLINE void Insert(size_t index, Type&& other) { Insert<Type&&>(other, index); }
+
+    HUH_FORCE_INLINE void Insert(const size_t index, std::initializer_list<Type> initializerList) {
+        InsertUninitialized(index, initializerList.size());
+        auto ptr = m_data + index;
+        for (auto& element : initializerList) {
+            (void)new (ptr) Type(std::forward<decltype(element)>(element));
+            ++ptr;
+        }
     }
 
     template<typename Key>
@@ -317,21 +349,13 @@ private:
         } else if (newMax > result) {
             result = newMax;
         }
-        m_max = result;
-        auto tmp = static_cast<Type*>(m_allocator.Allocate(sizeof(Type) * m_max));
-        DefaultMove<Type>(tmp, m_data, m_size);
-        m_allocator.Deallocate(m_data);
-        m_data = tmp;
+        ResizeAllocator(result);
     }
 
     HUH_FORCE_INLINE void FixedGrow(const size_t newMax) {
         assert(m_max >= newMax + m_max);
 
-        m_max = newMax + m_max;
-        auto tmp = static_cast<Type*>(m_allocator.Allocate(sizeof(Type) * m_max));
-        DefaultMove<Type>(tmp, m_data, m_size);
-        m_allocator.Deallocate(m_data);
-        m_data = tmp;
+        ResizeAllocator(newMax);
     }
 
     HUH_FORCE_INLINE void Shrink(const size_t newMax) {
@@ -339,6 +363,10 @@ private:
             DefaultDestruct(m_data + newMax + 1, m_size - newMax);
             m_size = newMax;
         }
+        ResizeAllocator(newMax);
+    }
+
+    void ResizeAllocator(const size_t newMax) {
         m_max = newMax;
         auto tmp = static_cast<Type*>(m_allocator.Allocate(sizeof(Type) * m_max));
         DefaultMove<Type>(tmp, m_data, m_size);
