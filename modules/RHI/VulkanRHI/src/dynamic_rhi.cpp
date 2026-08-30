@@ -9,7 +9,7 @@
 #include <HUH/enum_helper.h>
 #include <HUH/string_operations.h>
 
-#include <vector>
+#include <HUH/Types/array.h>
 
 namespace HUH::RHI {
 bool VulkanDynamicRHI::Init() {
@@ -35,14 +35,14 @@ bool VulkanDynamicRHI::Init() {
     HUH::Array<const char*> requiredExtensions;
 
     for (auto& extension : requiredExtensionsStrings) {
-        auto found_extension = std::find_if(availableExtensions.begin(), availableExtensions.end(),
-                                            [extension](const VkExtensionProperties& properties) {
-                                                if (std::string(properties.extensionName) == extension) {
-                                                    return true;
-                                                }
-                                                return false;
-                                            });
-        if (found_extension == availableExtensions.end()) {
+        auto found_extension =
+            availableExtensions.FindIndexByPred([extension](const VkExtensionProperties& properties) {
+                if (std::string(properties.extensionName) == extension) {
+                    return true;
+                }
+                return false;
+            });
+        if (found_extension == -1) {
             HUH_LOG(LogVulkanRHI, Logging::Level::Warning, "Required instance extension is not available skipping: {}",
                     extension)
             continue;
@@ -67,14 +67,13 @@ bool VulkanDynamicRHI::Init() {
 #endif
 
     for (auto& layer : requiredLayersStrings) {
-        auto found_extension =
-            std::find_if(availableLayers.begin(), availableLayers.end(), [layer](const VkLayerProperties& properties) {
-                if (std::string(properties.layerName) == layer) {
-                    return true;
-                }
-                return false;
-            });
-        if (found_extension == availableLayers.end()) {
+        auto found_extension = availableLayers.FindIndexByPred([layer](const VkLayerProperties& properties) {
+            if (std::string(properties.layerName) == layer) {
+                return true;
+            }
+            return false;
+        });
+        if (found_extension == -1) {
             HUH_LOG(LogVulkanRHI, Logging::Level::Warning, "Required instance extension is not available skipping: {}",
                     layer)
             continue;

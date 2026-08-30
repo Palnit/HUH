@@ -166,7 +166,7 @@ VulkanMemoryAllocator::Allocation* VulkanMemoryAllocator::AddAllocation(Uint32 m
     if (it == m_deviceMemoryTypeMap.end()) {
         m_deviceMemoryTypeMap.insert({memoryTypeIndex, {allocation}});
     } else {
-        it->second.push_back(allocation);
+        it->second.Emplace(allocation);
     }
     allocation->m_parent = this;
     return allocation;
@@ -227,7 +227,7 @@ VulkanMemoryAllocator::Allocation::~Allocation() {
 
 bool VulkanMemoryAllocator::Allocation::Free(MemoryBlock block) {
     // TODO: merging strategy ?
-    FreeBlocks.push_back(block);
+    FreeBlocks.emplace_back(block);
     std::sort(FreeBlocks.begin(), FreeBlocks.end(),
               [](MemoryBlock lht, MemoryBlock rht) { return lht.Offset < rht.Offset; });
     for (auto it = FreeBlocks.begin();;) {

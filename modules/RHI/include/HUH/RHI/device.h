@@ -3,9 +3,9 @@
 #include <HUH/RHI/Types/buffer.h>
 #include <HUH/RHI/fwd.h>
 #include <HUH/RHI/queue.h>
+#include <HUH/Types/array.h>
 #include <HUH/definitions.h>
 #include <HUH/types.h>
-#include <vector>
 
 namespace HUH {
 class Window;
@@ -47,7 +47,7 @@ public:
     virtual MemoryAllocator* CreateMemoryAllocator() = 0;
     virtual Fence* CreateFence() = 0;
     virtual Barrier* CreateBarrier() = 0;
-    virtual std::vector<Fence*> CreateFence(Uint32 num) = 0;
+    virtual HUH::Array<Fence*> CreateFence(Uint32 num) = 0;
     virtual RenderPass* CreateRenderPass() = 0;
 
     HUH_NODISCARD Queue* GetQueue(size_t index) const;
@@ -56,15 +56,15 @@ public:
 protected:
     Device() = default;
     virtual ~Device();
-    std::vector<Queue*> m_queues;
-    std::vector<Shader*> m_createdShaders;
-    std::vector<Pipeline*> m_createdPipelines;
-    std::vector<CommandPool*> m_createdCommandBuffers;
-    std::vector<Swapchain*> m_createdSwapchains;
-    std::vector<Fence*> m_createdFences;
-    std::vector<Barrier*> m_createdBarriers;
-    std::vector<MemoryAllocator*> m_createdMemoryAllocators;
-    std::vector<RenderPass*> m_createdRenderPasses;
+    HUH::Array<Queue*> m_queues;
+    HUH::Array<Shader*> m_createdShaders;
+    HUH::Array<Pipeline*> m_createdPipelines;
+    HUH::Array<CommandPool*> m_createdCommandBuffers;
+    HUH::Array<Swapchain*> m_createdSwapchains;
+    HUH::Array<Fence*> m_createdFences;
+    HUH::Array<Barrier*> m_createdBarriers;
+    HUH::Array<MemoryAllocator*> m_createdMemoryAllocators;
+    HUH::Array<RenderPass*> m_createdRenderPasses;
 };
 }// namespace RHI
 

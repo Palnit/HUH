@@ -47,11 +47,11 @@ public:
         VulkanCommandPool* m_parent;
         VulkanPipeline* m_pipeline = nullptr;
         VkCommandBuffer m_commandBuffer;
-        std::vector<VkWriteDescriptorSet> m_descriptorWrites;
-        std::vector<VkDescriptorSet> m_descriptorSets;
+        HUH::Array<VkWriteDescriptorSet> m_descriptorWrites;
+        HUH::Array<VkDescriptorSet> m_descriptorSets;
         // TODO this is bad design
-        std::vector<VkImageView> m_attachments;
-        std::vector<VkImageView> m_attachmentsDepth;
+        HUH::Array<VkImageView> m_attachments;
+        HUH::Array<VkImageView> m_attachmentsDepth;
         VkFramebuffer m_frameBuffer = nullptr;
         VkFramebuffer m_frameBufferDepth = nullptr;
 

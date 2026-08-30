@@ -9,7 +9,7 @@
 
 #include <HUH/FileHandling/Image/image.h>
 
-#include <vector>
+#include <HUH/Types/array.h>
 
 namespace HUH {
 namespace RHI {
@@ -50,7 +50,7 @@ public:
     struct Initializer {
         RenderPass* renderPass;
         VertexFactory& vertexFactory;
-        std::vector<Descriptor> descriptorTypes;
+        HUH::Array<Descriptor> descriptorTypes;
         bool depthTest = false;
     };
     friend class CommandPool;

@@ -4,9 +4,9 @@
 
 #include <HUH/RHI/fwd.h>
 #include <HUH/RHI/types.h>
+#include <HUH/Types/array.h>
 #include <HUH/definitions.h>
 #include <HUH/dynamic_library.h>
-#include <vector>
 
 namespace HUH {
 class Window;

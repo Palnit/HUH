@@ -15,8 +15,8 @@ public:
     operator VkQueue();
     bool Submit(CommandPool::CommandBuffer* commandPool, Fence* wait, Fence* signal, Fence* waitSignal) override;
     bool Submit(CommandPool::CommandBuffer* commandPool,
-                std::vector<WaitFence> wait,
-                std::vector<Fence*> signal,
+                HUH::Array<WaitFence> wait,
+                HUH::Array<Fence*> signal,
                 Fence* waitSignal) override;
     bool Submit(CommandPool::CommandBuffer* commandPool) override;
     void WaitIdle() override;

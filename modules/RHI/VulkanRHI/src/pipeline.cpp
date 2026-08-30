@@ -220,7 +220,7 @@ void VulkanPipeline::CreateDescriptorSet() {
         .descriptorSetCount = 1,
         .pSetLayouts = &m_descriptorSetLayout,
     };
-    m_descriptorSets.emplace_back(nullptr, std::vector<bool>(m_descriptorSetLayoutBindings.size(), false));
+    m_descriptorSets.Emplace(nullptr, HUH::Array<bool>(m_descriptorSetLayoutBindings.size(), false));
     if (auto err = HUH::vkAllocateDescriptorSets(*m_device, &allocInfo, &m_descriptorSets.back().set);
         err != VK_SUCCESS) {
         HUH_ELOG(LogVulkanRHI, "Failed to create descriptor set: {}")
@@ -229,7 +229,7 @@ void VulkanPipeline::CreateDescriptorSet() {
 
 bool VulkanPipeline::Init(Initializer&& initializer) {
     // TODO REFACTOR THIS TO MAKE IT WORK WITHOUT ME HAVING TO DO MAGIC
-    std::vector<VkDynamicState> dynamicStates{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+    HUH::Array<VkDynamicState> dynamicStates{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
         .dynamicStateCount = static_cast<Uint32>(dynamicStates.size()),
@@ -240,18 +240,18 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
         .viewportCount = 1,
         .scissorCount = 1,
     };
-    std::vector<VkVertexInputBindingDescription> bindingDescription;
-    std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+    HUH::Array<VkVertexInputBindingDescription> bindingDescription;
+    HUH::Array<VkVertexInputAttributeDescription> attributeDescriptions;
 
     Uint32 binding = 0;
     Uint32 attribute = 0;
     for (auto stream : initializer.vertexFactory.m_streams) {
-        bindingDescription.emplace_back();
+        bindingDescription.Emplace();
         bindingDescription.back().binding = binding;
         bindingDescription.back().inputRate = ConvertToVertexInputRate(stream.Rate);
         bindingDescription.back().stride = stream.Stride;
         for (auto descriptor : stream.descriptors) {
-            attributeDescriptions.emplace_back();
+            attributeDescriptions.Emplace();
             attributeDescriptions.back().binding = binding;
             attributeDescriptions.back().location = attribute++;
             attributeDescriptions.back().format = ConvertToFormat(descriptor);
@@ -332,7 +332,7 @@ bool VulkanPipeline::Init(Initializer&& initializer) {
             .stageFlags = VulkanShader::ConvertStage(descriptor.stage),
             .pImmutableSamplers = nullptr,
         };
-        m_descriptorSetLayoutBindings.push_back(pipelineLayoutBinding);
+        m_descriptorSetLayoutBindings.Emplace(pipelineLayoutBinding);
     }
 
     if (!m_descriptorSetLayoutBindings.empty()) {
@@ -435,7 +435,7 @@ void VulkanPipeline::Destroy() {
 
 void VulkanPipeline::AddShader(class Shader* shader) {
     auto vk_shader = dynamic_cast<VulkanShader*>(shader);
-    m_shaderStages.push_back(vk_shader->m_shaderStageInfo);
+    m_shaderStages.Emplace(vk_shader->m_shaderStageInfo);
 }
 
 Buffer* VulkanPipeline::CreateBuffer(Buffer::Type type, Uint64 Size) {

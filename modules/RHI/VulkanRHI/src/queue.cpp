@@ -41,24 +41,24 @@ bool VulkanQueue::Submit(CommandPool::CommandBuffer* commandPool, Fence* wait, F
 }
 
 bool VulkanQueue::Submit(CommandPool::CommandBuffer* commandPool,
-                         std::vector<WaitFence> wait,
-                         std::vector<Fence*> signal,
+                         HUH::Array<WaitFence> wait,
+                         HUH::Array<Fence*> signal,
                          Fence* waitSignal) {
 
     auto vk_CommandBuffer = dynamic_cast<VulkanCommandPool::VulkanCommandBuffer*>(commandPool);
     auto vk_wait_signal_fence = dynamic_cast<VulkanFence*>(waitSignal);
-    std::vector<VkSemaphore> waitSemaphores;
-    std::vector<VkPipelineStageFlags> waitStages;
+    HUH::Array<VkSemaphore> waitSemaphores;
+    HUH::Array<VkPipelineStageFlags> waitStages;
     for (auto& waitFence : wait) {
         auto vk_wait_fence = dynamic_cast<VulkanFence*>(waitFence.waitFence);
-        waitSemaphores.push_back(*vk_wait_fence);
-        waitStages.push_back(HUH::RHI::VulkanPipeline::ConvertToPipelineStage(waitFence.stage));
+        waitSemaphores.Emplace(*vk_wait_fence);
+        waitStages.Emplace(HUH::RHI::VulkanPipeline::ConvertToPipelineStage(waitFence.stage));
     }
 
-    std::vector<VkSemaphore> signalSemaphores;
+    HUH::Array<VkSemaphore> signalSemaphores;
     for (auto& signalFence : signal) {
         auto vk_signal_fence = dynamic_cast<VulkanFence*>(signalFence);
-        signalSemaphores.push_back(*vk_signal_fence);
+        signalSemaphores.Emplace(*vk_signal_fence);
     }
 
     VkSubmitInfo submitInfo = {

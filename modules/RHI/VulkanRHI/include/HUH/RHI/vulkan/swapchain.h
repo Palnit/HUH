@@ -2,7 +2,7 @@
 
 #include <HUH/RHI/swapchain.h>
 #include <HUH/RHI/vulkan/vulkan_defines.h>
-#include <vector>
+#include <HUH/Types/array.h>
 
 namespace HUH::RHI {
 class VulkanDynamicRHI;
@@ -16,8 +16,8 @@ public:
 
     struct SwapchainDetails {
         VkSurfaceCapabilities2KHR capabilities{.sType = VK_STRUCTURE_TYPE_SURFACE_CAPABILITIES_2_KHR};
-        std::vector<VkSurfaceFormat2KHR> surfaceFormats;
-        std::vector<VkPresentModeKHR> presentModes;
+        HUH::Array<VkSurfaceFormat2KHR> surfaceFormats;
+        HUH::Array<VkPresentModeKHR> presentModes;
     };
 
     SwapchainDetails Details;

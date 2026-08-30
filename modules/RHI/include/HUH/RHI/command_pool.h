@@ -1,7 +1,7 @@
 #pragma once
 #include <HUH/Math/vector.h>
 #include <HUH/RHI/fwd.h>
-#include <vector>
+#include <HUH/Types/array.h>
 
 namespace HUH::RHI {
 class HUH_RHI_API CommandPool {
@@ -56,6 +56,6 @@ public:
 protected:
     CommandPool() = default;
     virtual ~CommandPool() = default;
-    std::vector<CommandBuffer*> m_commandBuffers;
+    HUH::Array<CommandBuffer*> m_commandBuffers;
 };
 }// namespace HUH::RHI

@@ -28,6 +28,14 @@ public:
             }
         }
 
+        HUH_NODISCARD HUH_FORCE_INLINE IterType* operator->() const {
+            if constexpr (Reverse) {
+                return (m_ptr - 1);
+            } else {
+                return m_ptr;
+            }
+        }
+
         HUH_FORCE_INLINE Iterator& operator++() {
             if constexpr (Reverse) {
                 --m_ptr;
@@ -89,6 +97,16 @@ public:
 
     Array() noexcept : m_size(0), m_data(nullptr) {};
     explicit Array(const size_t count) { AddDefaultConstructed(count); }
+    Array(std::initializer_list<Type> initializerList) {
+        CopyPtrDataToEmpty(initializerList.begin(), initializerList.size());
+        m_size = initializerList.size();
+    }
+    Array(const size_t count, const Type& inElement) {
+        AddDefaultConstructed(count);
+        for (auto& element : *this) {
+            element = inElement;
+        }
+    }
     Array(const Array& other) noexcept {
         CopyPtrDataToEmpty(other.m_data, other.m_size);
         m_size = other.m_size;
@@ -101,6 +119,15 @@ public:
         other.m_data = nullptr;
         other.m_max = 0;
         other.m_size = 0;
+    }
+
+    Array& operator=(std::initializer_list<Type> initializerList) noexcept {
+        DefaultDestruct(m_data, m_size);
+        m_size = 0;
+        m_max = 0;
+        CopyPtrDataToEmpty(initializerList.begin(), initializerList.size());
+        m_size = initializerList.size();
+        return *this;
     }
 
     Array& operator=(const Array& other) noexcept {
@@ -176,6 +203,12 @@ public:
     HUH_NODISCARD HUH_FORCE_INLINE bool IsEmpty() const { return m_size == 0; }
     HUH_NODISCARD HUH_FORCE_INLINE bool empty() const { return m_size == 0; }
 
+    HUH_NODISCARD HUH_FORCE_INLINE Type& Back() { return m_data[m_size - 1]; }
+    HUH_NODISCARD HUH_FORCE_INLINE const Type& Back() const { return m_data[m_size - 1]; }
+
+    HUH_NODISCARD HUH_FORCE_INLINE Type& back() { return m_data[m_size - 1]; }
+    HUH_NODISCARD HUH_FORCE_INLINE const Type& back() const { return m_data[m_size - 1]; }
+
     HUH_FORCE_INLINE void Clear() {
         DefaultDestruct(m_data, m_size);
         m_size = 0;
@@ -196,6 +229,21 @@ public:
         }
         if (m_size < newMax) {
             Shrink(newMax);
+        }
+    }
+
+    HUH_FORCE_INLINE void Resize(const size_t newMax, const Type& inElement) {
+        if (newMax > m_size) {
+            AddDefaultConstructed(newMax - m_size);
+            for (auto& element : *this) {
+                element = inElement;
+            }
+        }
+        if (m_size < newMax) {
+            Shrink(newMax);
+            for (auto& element : *this) {
+                element = inElement;
+            }
         }
     }
 
@@ -224,6 +272,35 @@ public:
         auto ptr = m_data + m_size;
         (void)new (ptr) Type(std::forward<Args>(args)...);
         return m_size++;
+    }
+
+    HUH_FORCE_INLINE size_t Emplace(const Type& other) { return Emplace<const Type&>(other); }
+    HUH_FORCE_INLINE size_t Emplace(Type&& other) { return Emplace<Type&&>(std::move(other)); }
+
+    HUH_FORCE_INLINE void Emplace(std::initializer_list<Type> initializerList) {
+        AddUnInitialized(initializerList.size());
+        DefaultConstruct<Type>(m_data + m_size, initializerList.size());
+        m_size += initializerList.size();
+    }
+
+    template<typename Key>
+    HUH_NODISCARD size_t FindIndex(const Key& key) {
+        for (const Type *element = m_data, *end = m_data + m_size; element != end; ++element) {
+            if (*element == key) {
+                return element - m_data;
+            }
+        }
+        return -1;
+    }
+
+    template<typename Pred>
+    HUH_NODISCARD size_t FindIndexByPred(Pred pred) {
+        for (const Type *element = m_data, *end = m_data + m_size; element != end; ++element) {
+            if (std::invoke(pred, *element)) {
+                return element - m_data;
+            }
+        }
+        return -1;
     }
 
 private:

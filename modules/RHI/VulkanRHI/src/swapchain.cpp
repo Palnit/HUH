@@ -18,7 +18,7 @@ bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minIma
     HUH::vkGetPhysicalDeviceSurfaceCapabilities2KHR(m_device->m_physicalDevice, &m_surface, &Details.capabilities);
     Uint32 size = 0;
     HUH::vkGetPhysicalDeviceSurfaceFormats2KHR(m_device->m_physicalDevice, &m_surface, &size, nullptr);
-    Details.surfaceFormats.resize(size, {.sType = VK_STRUCTURE_TYPE_SURFACE_FORMAT_2_KHR});
+    Details.surfaceFormats.Resize(size, {.sType = VK_STRUCTURE_TYPE_SURFACE_FORMAT_2_KHR});
     HUH::vkGetPhysicalDeviceSurfaceFormats2KHR(m_device->m_physicalDevice, &m_surface, &size,
                                                Details.surfaceFormats.data());
 #ifdef HUH_DEBUG
@@ -30,7 +30,7 @@ bool VulkanSwapchain::Init(Format format, PresentMode presentMode, Uint32 minIma
 #endif
 
     HUH::vkGetPhysicalDeviceSurfacePresentModesKHR(m_device->m_physicalDevice, m_surface.surface, &size, nullptr);
-    Details.presentModes.resize(size);
+    Details.presentModes.Resize(size);
     HUH::vkGetPhysicalDeviceSurfacePresentModesKHR(m_device->m_physicalDevice, m_surface.surface, &size,
                                                    Details.presentModes.data());
 
@@ -181,12 +181,12 @@ bool VulkanSwapchain::CreateSwapchain() {
     HUH::vkDestroySwapchainKHR(m_device->m_device, oldSwapchain, nullptr);
 
     Uint32 imageCount = 0;
-    std::vector<VkImage> images;
+    HUH::Array<VkImage> images;
     HUH::vkGetSwapchainImagesKHR(m_device->m_device, m_swapchain, &imageCount, nullptr);
-    images.resize(imageCount);
+    images.Resize(imageCount);
     HUH::vkGetSwapchainImagesKHR(m_device->m_device, m_swapchain, &imageCount, images.data());
     for (auto image : images) {
-        m_images.push_back(new VulkanImage(m_device, image));
+        m_images.Emplace(new VulkanImage(m_device, image));
         m_images.back()->Init({VulkanDynamicRHI::ConvertFormat(m_vkFormat), 1, {m_extent.width, m_extent.height}});
     }
 

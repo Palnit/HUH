@@ -9,15 +9,15 @@
 namespace HUH::RHI {
 
 bool VulkanRenderPass::Init() {
-    std::vector<VkAttachmentDescription2> Attachments;
-    std::vector<std::vector<VkAttachmentReference2>> inputAttachmentsRef;
-    std::vector<std::vector<VkAttachmentReference2>> colorAttachmentsRef;
-    std::vector<VkAttachmentReference2> depthAttachmentsRef;
-    std::vector<VkSubpassDescription2> subpasses;
-    std::vector<VkSubpassDependency2> dependencies;
+    HUH::Array<VkAttachmentDescription2> Attachments;
+    HUH::Array<HUH::Array<VkAttachmentReference2>> inputAttachmentsRef;
+    HUH::Array<HUH::Array<VkAttachmentReference2>> colorAttachmentsRef;
+    HUH::Array<VkAttachmentReference2> depthAttachmentsRef;
+    HUH::Array<VkSubpassDescription2> subpasses;
+    HUH::Array<VkSubpassDependency2> dependencies;
     for (const auto& subpass : m_subPasses) {
-        inputAttachmentsRef.emplace_back();
-        colorAttachmentsRef.emplace_back();
+        inputAttachmentsRef.Emplace();
+        colorAttachmentsRef.Emplace();
         for (auto [Format, ColorLoadOp, ColorStoreOp, StencilLoadOp, StencilStoreOp, InitialLayout, FinalLayout,
                    Index] : subpass.InputAttachments) {
 
@@ -27,7 +27,7 @@ bool VulkanRenderPass::Init() {
                 .layout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL};
 
             if (Index == -1) {
-                Attachments.push_back({
+                Attachments.Emplace({
                     .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2,
                     .format = VulkanDynamicRHI::ConvertFormat(Format),
                     // TODO other samples
@@ -40,7 +40,7 @@ bool VulkanRenderPass::Init() {
                     .finalLayout = ConvertImageLayout(FinalLayout),
                 });
             }
-            inputAttachmentsRef.back().emplace_back(attachmentRef);
+            inputAttachmentsRef.back().Emplace(attachmentRef);
         }
         for (auto [Format, ColorLoadOp, ColorStoreOp, StencilLoadOp, StencilStoreOp, InitialLayout, FinalLayout,
                    Index] : subpass.ColorAttachments) {
@@ -49,7 +49,7 @@ bool VulkanRenderPass::Init() {
                 .attachment = Index == -1 ? static_cast<Uint32>(Attachments.size()) : static_cast<Uint32>(Index),
                 .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
             if (Index == -1) {
-                Attachments.push_back({
+                Attachments.Emplace({
                     .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2_KHR,
                     .format = VulkanDynamicRHI::ConvertFormat(Format),
                     .samples = VK_SAMPLE_COUNT_1_BIT,
@@ -61,17 +61,17 @@ bool VulkanRenderPass::Init() {
                     .finalLayout = ConvertImageLayout(FinalLayout),
                 });
             }
-            colorAttachmentsRef.back().emplace_back(attachmentRef);
+            colorAttachmentsRef.back().Emplace(attachmentRef);
         }
         auto [Format, ColorLoadOp, ColorStoreOp, StencilLoadOp, StencilStoreOp, InitialLayout, FinalLayout, Index] =
             subpass.DepthAttachments;
         if (Format != Format::Unknown) {
-            depthAttachmentsRef.push_back(
+            depthAttachmentsRef.Emplace(
                 {.sType = VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2,
                  .attachment = Index == -1 ? static_cast<Uint32>(Attachments.size()) : static_cast<Uint32>(Index),
                  .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL});
             if (Index == -1) {
-                Attachments.push_back({
+                Attachments.Emplace({
                     .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2_KHR,
                     .format = VulkanDynamicRHI::ConvertFormat(Format),
                     .samples = VK_SAMPLE_COUNT_1_BIT,
@@ -95,7 +95,7 @@ bool VulkanRenderPass::Init() {
             .pColorAttachments = colorAttachmentsRef.back().empty() ? nullptr : colorAttachmentsRef.back().data(),
             .pDepthStencilAttachment = Format == Format::Unknown ? nullptr : &depthAttachmentsRef.back(),
         };
-        subpasses.push_back(vk_subpass);
+        subpasses.Emplace(vk_subpass);
     }
 
     for (auto dependency : m_dependencies) {
@@ -107,7 +107,7 @@ bool VulkanRenderPass::Init() {
             .dstStageMask = VulkanPipeline::ConvertToPipelineStage(dependency.DstStageMask),
             .srcAccessMask = VulkanDynamicRHI::ConvertAccess(dependency.SrcAccessType),
             .dstAccessMask = VulkanDynamicRHI::ConvertAccess(dependency.DstAccessType)};
-        dependencies.push_back(vk_dependency);
+        dependencies.Emplace(vk_dependency);
     }
 
     VkRenderPassCreateInfo2 renderPassCreateInfo{

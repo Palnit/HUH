@@ -1,8 +1,8 @@
 #pragma once
 #include <HUH/RHI/pipeline.h>
 #include <HUH/RHI/types.h>
+#include <HUH/Types/array.h>
 #include <HUH/types.h>
-#include <vector>
 
 namespace HUH::RHI {
 // TODO: A LOT FOR DX12 TO WORK WITH THIS
@@ -43,8 +43,8 @@ public:
     };
 
     struct SubPass {
-        std::vector<Attachment> InputAttachments;
-        std::vector<Attachment> ColorAttachments;
+        HUH::Array<Attachment> InputAttachments;
+        HUH::Array<Attachment> ColorAttachments;
         Attachment DepthAttachments;
     };
     struct Dependency {
@@ -58,13 +58,13 @@ public:
         static constexpr Uint32 UnknownSubpass = (~0U);
     };
 
-    void AddSubPass(const SubPass& subPass) { m_subPasses.push_back(subPass); }
-    void AddDependency(const Dependency& dependency) { m_dependencies.push_back(dependency); }
+    void AddSubPass(const SubPass& subPass) { m_subPasses.Emplace(subPass); }
+    void AddDependency(const Dependency& dependency) { m_dependencies.Emplace(dependency); }
 
 protected:
     RenderPass() = default;
     virtual ~RenderPass() = default;
-    std::vector<SubPass> m_subPasses;
-    std::vector<Dependency> m_dependencies;
+    HUH::Array<SubPass> m_subPasses;
+    HUH::Array<Dependency> m_dependencies;
 };
 }// namespace HUH::RHI

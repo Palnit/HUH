@@ -30,7 +30,7 @@ Device::MemoryStatistics VulkanDevice::GetMemoryStatistics() {
     return {};
 }
 bool VulkanDevice::Init() {
-    std::vector<VkDeviceQueueCreateInfo> queueInfos;
+    HUH::Array<VkDeviceQueueCreateInfo> queueInfos;
     float queuePriority = 1.0f;
     for (auto [index, size] : m_familyQueueCount) {
         if (size == 0) {
@@ -40,12 +40,12 @@ bool VulkanDevice::Init() {
                                           .queueFamilyIndex = static_cast<Uint32>(index),
                                           .queueCount = static_cast<Uint32>(size),
                                           .pQueuePriorities = &queuePriority};
-        queueInfos.emplace_back(queueInfo);
+        queueInfos.Emplace(queueInfo);
     }
 
     Uint32 extensionCount;
     HUH::vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, nullptr);
-    std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+    HUH::Array<VkExtensionProperties> availableExtensions(extensionCount);
     HUH::vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, availableExtensions.data());
 
 #if HUH_DEBUG
@@ -58,7 +58,7 @@ bool VulkanDevice::Init() {
     // TODO MAKE THIS A VECTOR FROM DEFAULT
     const std::string requiredExtensionsString = HUH_REQUIRED_DEVICE_EXTENSIONS;
     HUH::Array<std::string> requiredExtensionsStrings = HUH::Split(requiredExtensionsString, ";");
-    std::vector<const char*> requiredExtensions;
+    HUH::Array<const char*> requiredExtensions;
 
     for (auto& extension : requiredExtensionsStrings) {
         auto found_extension = std::find_if(availableExtensions.begin(), availableExtensions.end(),
@@ -73,7 +73,7 @@ bool VulkanDevice::Init() {
                     extension)
             continue;
         }
-        requiredExtensions.push_back(extension.c_str());
+        requiredExtensions.Emplace(extension.c_str());
     }
 
     VkDeviceCreateInfo deviceInfo{.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
@@ -108,7 +108,7 @@ Queue* VulkanDevice::RequestQueue(Queue::Type type) {
 
         Uint32 queueFamilyIndex = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyIndex, nullptr);
-        m_queueFamilies.resize(queueFamilyIndex);
+        m_queueFamilies.Resize(queueFamilyIndex);
         vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyIndex, m_queueFamilies.data());
 #ifdef HUH_DEBUG
         HUH_LOG(LogVulkanRHI, Logging::Level::DebugLog, "Available Queue Families:")
@@ -186,7 +186,7 @@ Queue* VulkanDevice::RequestQueue(Queue::Type type) {
         return nullptr;
     }
 
-    m_queues.emplace_back(
+    m_queues.Emplace(
         new VulkanQueue(this, match_index, m_familyQueueCount[match_index]++, m_queueFamilies[match_index]));
     return m_queues.back();
 }
@@ -240,7 +240,7 @@ Swapchain* VulkanDevice::CreateSwapchain(Window& window) {
         HUH_LOG(LogVulkanRHI, Logging::Level::Log, "Vulkan surface creation failed: {}", HUH::ToString(err))
         return nullptr;
     }
-    m_createdSwapchains.push_back(new VulkanSwapchain(this, &window, surface, m_parent));
+    m_createdSwapchains.Emplace(new VulkanSwapchain(this, &window, surface, m_parent));
     return m_createdSwapchains.back();
 #elif defined(HUH_LINUX)
     WindowProto::PlatformVariables platform = window.GetPlatformVariables();
@@ -254,7 +254,7 @@ Swapchain* VulkanDevice::CreateSwapchain(Window& window) {
             err != VK_SUCCESS) {
             HUH_ELOG(LogVulkanRHI, "Vulkan surface creation failed: {}", HUH::ToString(err))
         }
-        m_createdSwapchains.push_back(new VulkanSwapchain(this, &window, surface, m_parent));
+        m_createdSwapchains.Emplace(new VulkanSwapchain(this, &window, surface, m_parent));
         return m_createdSwapchains.back();
     }
     return nullptr;
@@ -264,48 +264,48 @@ Swapchain* VulkanDevice::CreateSwapchain(Window& window) {
 }
 
 Fence* VulkanDevice::CreateFence() {
-    m_createdFences.push_back(new VulkanFence(this));
+    m_createdFences.Emplace(new VulkanFence(this));
     return m_createdFences.back();
 }
 
 Barrier* VulkanDevice::CreateBarrier() {
-    m_createdBarriers.push_back(new VulkanBarrier(this));
+    m_createdBarriers.Emplace(new VulkanBarrier(this));
     return m_createdBarriers.back();
 }
 
-std::vector<Fence*> VulkanDevice::CreateFence(Uint32 num) {
-    std::vector<Fence*> fences;
-    fences.reserve(num);
+HUH::Array<Fence*> VulkanDevice::CreateFence(Uint32 num) {
+    HUH::Array<Fence*> fences;
+    fences.AddUnInitialized(num);
     for (size_t i = 0; i < num; i++) {
         auto fence = new VulkanFence(this);
-        m_createdFences.push_back(fence);
-        fences.push_back(fence);
+        m_createdFences.Emplace(fence);
+        fences.Emplace(fence);
     }
     return fences;
 }
 
 MemoryAllocator* VulkanDevice::CreateMemoryAllocator() {
-    m_createdMemoryAllocators.push_back(new VulkanMemoryAllocator(this));
+    m_createdMemoryAllocators.Emplace(new VulkanMemoryAllocator(this));
     return m_createdMemoryAllocators.back();
 }
 
 RenderPass* VulkanDevice::CreateRenderPass() {
-    m_createdRenderPasses.push_back(new VulkanRenderPass(this));
+    m_createdRenderPasses.Emplace(new VulkanRenderPass(this));
     return m_createdRenderPasses.back();
 }
 
 Shader* VulkanDevice::CreateShader(void* byteCode, Uint64 size) {
-    m_createdShaders.push_back(new VulkanShader(this, byteCode, size));
+    m_createdShaders.Emplace(new VulkanShader(this, byteCode, size));
     return m_createdShaders.back();
 }
 
 Pipeline* VulkanDevice::CreatePipeline() {
-    m_createdPipelines.push_back(new VulkanPipeline(this));
+    m_createdPipelines.Emplace(new VulkanPipeline(this));
     return m_createdPipelines.back();
 }
 
 CommandPool* VulkanDevice::CreateCommandPool() {
-    m_createdCommandBuffers.push_back(new VulkanCommandPool(this));
+    m_createdCommandBuffers.Emplace(new VulkanCommandPool(this));
     return m_createdCommandBuffers.back();
 }
 

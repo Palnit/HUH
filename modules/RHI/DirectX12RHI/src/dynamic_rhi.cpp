@@ -1,7 +1,7 @@
-#include "HUH/logging.h"
-#include "HUH/types.h"
 #include "HUH/RHI/DX12/device.h"
 #include "HUH/RHI/DX12/dx12_defines.h"
+#include "HUH/logging.h"
+#include "HUH/types.h"
 
 #include <HUH/RHI/DX12/dynamic_rhi.h>
 
@@ -45,7 +45,7 @@ bool DX12DynamicRHI::Init() {
 Device* DX12DynamicRHI::GetDevice(size_t index) {
     return nullptr;
 }
-std::vector<Device*> DX12DynamicRHI::GetDevices() {
+HUH::Array<Device*> DX12DynamicRHI::GetDevices() {
     IDXGIAdapter1* adapter;
     for (Uint i = 0; DXGI_ERROR_NOT_FOUND != m_factory->EnumAdapters1(i, &adapter); i++) {
         if (D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_0, _uuidof(ID3D12Device), nullptr) != S_FALSE) {
@@ -57,7 +57,7 @@ std::vector<Device*> DX12DynamicRHI::GetDevices() {
         if (tmp_device->m_adapter == nullptr) {
             continue;
         }
-        m_created_devices.push_back(tmp_device);
+        m_created_devices.Emplace(tmp_device);
     }
     return m_created_devices;
 }

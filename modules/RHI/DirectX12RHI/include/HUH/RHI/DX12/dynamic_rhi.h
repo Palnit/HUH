@@ -16,7 +16,7 @@ public:
     void Destroy() override;
     bool Init() override;
     Device* GetDevice(size_t index) override;
-    std::vector<Device*> GetDevices() override;
+    HUH::Array<Device*> GetDevices() override;
     Swapchain* CreateSwapchain(const Window& window) override;
 
     friend HUH::RHI::DynamicRHI* DynamicRHICreate();

@@ -8,7 +8,7 @@
 
 #include <HUH/types.h>
 
-#include <vector>
+#include <HUH/Types/array.h>
 
 namespace HUH::RHI {
 class VulkanMemoryAllocator : public MemoryAllocator {
@@ -49,6 +49,6 @@ protected:
     HUH_NODISCARD Uint32 FindMemoryType(VkMemoryRequirements requirements, VkMemoryPropertyFlags properties) const;
     VulkanMemoryAllocator::Allocation* AddAllocation(Uint32 memoryTypeIndex, Uint32 size);
     VulkanDevice* m_device;
-    std::map<Uint32, std::vector<Allocation*>> m_deviceMemoryTypeMap;
+    std::map<Uint32, HUH::Array<Allocation*>> m_deviceMemoryTypeMap;
 };
 }// namespace HUH::RHI

@@ -77,7 +77,7 @@ public:
 
     Fence* CreateFence() override;
     Barrier* CreateBarrier() override;
-    std::vector<Fence*> CreateFence(Uint32 num) override;
+    HUH::Array<Fence*> CreateFence(Uint32 num) override;
 
     MemoryAllocator* CreateMemoryAllocator() override;
     RenderPass* CreateRenderPass() override;
@@ -91,7 +91,7 @@ protected:
     VkDevice m_device = nullptr;
     // TODO: replace with 2
     VkPhysicalDeviceMemoryProperties m_memoryProperties;
-    std::vector<VkQueueFamilyProperties> m_queueFamilies;
+    HUH::Array<VkQueueFamilyProperties> m_queueFamilies;
     std::unordered_map<size_t, size_t> m_familyQueueCount;
 };
 

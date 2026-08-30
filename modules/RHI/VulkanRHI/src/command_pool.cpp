@@ -62,7 +62,7 @@ void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPa
     if (m_attachments[0] != *vk_image || m_attachments.size() != 1) {
         vkDestroyFramebuffer(*m_parent->m_device, m_frameBuffer, nullptr);
         m_attachments.clear();
-        m_attachments.push_back(*vk_image);
+        m_attachments.Emplace(*vk_image);
         VkFramebufferCreateInfo framebufferCreateInfo = {
             .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
             .renderPass = *vk_renderPass,
@@ -116,8 +116,8 @@ void VulkanCommandPool::VulkanCommandBuffer::BeginRendering(RenderPass* renderPa
     if (m_attachmentsDepth[0] != *vk_image || m_attachmentsDepth[1] != *vk_depth || m_attachmentsDepth.size() != 2) {
         vkDestroyFramebuffer(*m_parent->m_device, m_frameBufferDepth, nullptr);
         m_attachmentsDepth.clear();
-        m_attachmentsDepth.push_back(*vk_image);
-        m_attachmentsDepth.push_back(*vk_depth);
+        m_attachmentsDepth.Emplace(*vk_image);
+        m_attachmentsDepth.Emplace(*vk_depth);
         VkFramebufferCreateInfo framebufferCreateInfo = {
             .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
             .renderPass = *vk_renderPass,
@@ -159,8 +159,8 @@ VulkanCommandPool::VulkanCommandBuffer::VulkanCommandBuffer(VulkanCommandPool* p
     : CommandBuffer(),
       m_parent(parent),
       m_commandBuffer(commandBuffer) {
-    m_attachments.resize(2);
-    m_attachmentsDepth.resize(2);
+    m_attachments.AddDefaultConstructed(2);
+    m_attachmentsDepth.AddDefaultConstructed(2);
 }
 
 VulkanCommandPool::VulkanCommandBuffer::~VulkanCommandBuffer() {
@@ -178,7 +178,7 @@ bool VulkanCommandPool::Init(Uint32 bufferCount, Queue* queue) {
         HUH_ELOG(LogVulkanRHI, "CommandBuffer Creation Error: {}", err)
         return false;
     }
-    std::vector<VkCommandBuffer> buffersTmp(bufferCount, nullptr);
+    HUH::Array<VkCommandBuffer> buffersTmp(bufferCount, nullptr);
     VkCommandBufferAllocateInfo commandBufferAllocateInfo = {
         .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
         .commandPool = m_commandPool,
@@ -192,9 +192,9 @@ bool VulkanCommandPool::Init(Uint32 bufferCount, Queue* queue) {
         return false;
     }
 
-    m_commandBuffers.reserve(bufferCount);
+    m_commandBuffers.AddUnInitialized(bufferCount);
     for (auto cbuffer : buffersTmp) {
-        m_commandBuffers.push_back(new VulkanCommandBuffer(this, cbuffer));
+        m_commandBuffers.Emplace(new VulkanCommandBuffer(this, cbuffer));
     }
 
     HUH_ILOG(LogVulkanRHI, "CommandPool Creation Successful")
@@ -230,8 +230,8 @@ void VulkanCommandPool::VulkanCommandBuffer::BindUniformBuffers(Buffer* buffer) 
     }
     auto vk_buffer = dynamic_cast<VulkanBuffer*>(buffer);
     // TODO RETHINK THIS A LOT
-    m_descriptorSets.push_back(vk_buffer->m_descriptorSet);
-    m_descriptorWrites.push_back(vk_buffer->m_descriptorWriter);
+    m_descriptorSets.Emplace(vk_buffer->m_descriptorSet);
+    m_descriptorWrites.Emplace(vk_buffer->m_descriptorWriter);
 }
 
 void VulkanCommandPool::VulkanCommandBuffer::BindSampledImage(Image* image) {
@@ -240,8 +240,8 @@ void VulkanCommandPool::VulkanCommandBuffer::BindSampledImage(Image* image) {
         return;
     }
     auto vk_image = dynamic_cast<VulkanImage*>(image);
-    m_descriptorSets.push_back(vk_image->m_descriptorSet);
-    m_descriptorWrites.push_back(vk_image->GetDescriptorWriter());
+    m_descriptorSets.Emplace(vk_image->m_descriptorSet);
+    m_descriptorWrites.Emplace(vk_image->GetDescriptorWriter());
 }
 
 void VulkanCommandPool::VulkanCommandBuffer::Draw(Uint32 vertexCount, Uint32 instanceCount) {

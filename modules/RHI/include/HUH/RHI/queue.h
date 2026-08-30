@@ -25,8 +25,8 @@ public:
 
     virtual bool Submit(CommandPool::CommandBuffer* commandPool, Fence* wait, Fence* signal, Fence* waitSignal) = 0;
     virtual bool Submit(CommandPool::CommandBuffer* commandPool,
-                        std::vector<WaitFence> wait,
-                        std::vector<Fence*> signal,
+                        HUH::Array<WaitFence> wait,
+                        HUH::Array<Fence*> signal,
                         Fence* waitSignal) = 0;
     virtual bool Submit(CommandPool::CommandBuffer* commandPool) = 0;
     virtual void WaitIdle() = 0;

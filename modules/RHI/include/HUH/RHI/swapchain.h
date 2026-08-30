@@ -1,7 +1,7 @@
 #pragma once
-#include "HUH/types.h"
-#include <HUH/definitions.h>
 #include <HUH/RHI/dynamic_rhi.h>
+#include <HUH/definitions.h>
+#include "HUH/types.h"
 
 namespace HUH {
 class Window;
@@ -31,7 +31,7 @@ protected:
     explicit Swapchain(Window* window) : m_windowParent(window) {}
     virtual ~Swapchain() = default;
     Window* m_windowParent;
-    std::vector<Image*> m_images;
+    HUH::Array<Image*> m_images;
     Format m_format = Format::Unknown;
 };
 }// namespace RHI

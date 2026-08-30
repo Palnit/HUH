@@ -36,18 +36,18 @@ protected:
 
     struct DescriptorSet {
         VkDescriptorSet set = nullptr;
-        std::vector<bool> bound;
+        HUH::Array<bool> bound;
     };
 
     void CreateDescriptorSet();
 
     VulkanDevice* m_device;
-    std::vector<VkDescriptorSetLayoutBinding> m_descriptorSetLayoutBindings;
+    HUH::Array<VkDescriptorSetLayoutBinding> m_descriptorSetLayoutBindings;
     VkDescriptorSetLayout m_descriptorSetLayout = nullptr;
     VkPipelineLayout m_layout = nullptr;
     VkPipeline m_pipeline = nullptr;
     VkDescriptorPool m_descriptorPool = nullptr;
-    std::vector<DescriptorSet> m_descriptorSets;
-    std::vector<VkPipelineShaderStageCreateInfo> m_shaderStages;
+    HUH::Array<DescriptorSet> m_descriptorSets;
+    HUH::Array<VkPipelineShaderStageCreateInfo> m_shaderStages;
 };
 }// namespace HUH::RHI
