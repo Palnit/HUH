@@ -111,7 +111,16 @@ function(huh_create_prototype)
     message(STATUS "Include: ${INCLUDE_LIB_PATHS}")
 
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Generated/Cuda)
-    add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/Generated/Cuda/test.cpp DEPENDS HUHCudaPrototypeBuilder COMMAND HUHCudaPrototypeBuilder "-n" ${CreateOptions_TARGET} "-f" "$<FILTER:$<TARGET_PROPERTY:${CreateOptions_TARGET},SOURCES>,INCLUDE,\\.(cu|cuh)$>" "-o" "${CMAKE_BINARY_DIR}/Generated/Cuda" "-l" "$<JOIN:$<REMOVE_DUPLICATES:$<LIST:TRANSFORM,${SHARED_LIB_NAMES},REPLACE,^.*[/\\],>>, >" "-l" "$<REMOVE_DUPLICATES:$<LIST:TRANSFORM,${CUDA_cudadevrt_LIBRARY},REPLACE,^.*[/\\],>>" "-i" "$<JOIN:${INCLUDE_LIB_PATHS}, >" VERBATIM)
+    add_custom_command(
+            OUTPUT ${CMAKE_BINARY_DIR}/Generated/Cuda/test.cpp
+            DEPENDS HUHCudaPrototypeBuilder
+            COMMAND HUHCudaPrototypeBuilder
+            "-n" ${CreateOptions_TARGET}
+            "-f" "$<FILTER:$<TARGET_PROPERTY:${CreateOptions_TARGET},SOURCES>,INCLUDE,\\.(cu|cuh)$>"
+            "-o" "${CMAKE_BINARY_DIR}/Generated/Cuda"
+            "-l" "$<JOIN:$<REMOVE_DUPLICATES:$<LIST:TRANSFORM,${SHARED_LIB_NAMES},REPLACE,^.*[/\\],>>, >"
+            "-l" "$<REMOVE_DUPLICATES:$<LIST:TRANSFORM,${CUDA_cudadevrt_LIBRARY},REPLACE,^.*[/\\],>>"
+            "-i" "$<JOIN:${INCLUDE_LIB_PATHS}, >" VERBATIM)
 
     add_library(TESTLIB ${CMAKE_BINARY_DIR}/Generated/Cuda/test.cpp)
     get_target_property(test_a ${CreateOptions_TARGET} STATIC_LIBRARY_OPTIONS)

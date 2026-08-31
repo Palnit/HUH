@@ -371,7 +371,7 @@ private:
     HUH_FORCE_INLINE void FixedGrow(const size_t newMax) {
         assert(m_max >= newMax + m_max);
 
-        ResizeAllocator(newMax);
+        ResizeAllocator(m_max + newMax);
     }
 
     HUH_FORCE_INLINE void Shrink(const size_t newMax) {
