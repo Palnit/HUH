@@ -277,6 +277,7 @@ public:
     }
 
     template<typename... Args>
+        requires(std::constructible_from<Type, Args...>)
     HUH_FORCE_INLINE size_t Emplace(Args&&... args) {
         if (m_size == m_max) {
             Grow(0);
@@ -290,9 +291,24 @@ public:
     HUH_FORCE_INLINE size_t Emplace(const Type& other) { return Emplace<const Type&>(other); }
     HUH_FORCE_INLINE size_t Emplace(Type&& other) { return Emplace<Type&&>(std::move(other)); }
 
+    HUH_FORCE_INLINE void Emplace(const HUH::Array<Type>& other) {
+        AddUnInitialized(other.size());
+
+        auto ptr = m_data + m_size;
+        for (auto& element : other) {
+            (void)new (ptr) Type(element);
+            ++ptr;
+        }
+        m_size += other.size();
+    }
+
     HUH_FORCE_INLINE void Emplace(std::initializer_list<Type> initializerList) {
         AddUnInitialized(initializerList.size());
-        DefaultConstruct<Type>(m_data + m_size, initializerList.size());
+        auto ptr = m_data + m_size;
+        for (auto& element : initializerList) {
+            (void)new (ptr) Type(std::forward<decltype(element)>(element));
+            ++ptr;
+        }
         m_size += initializerList.size();
     }
 
