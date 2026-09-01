@@ -81,6 +81,33 @@ function(get_all_public_include_directories TARGET OUTPUT_VAR)
     set("${OUTPUT_VAR}" "${_result}" PARENT_SCOPE)
 endfunction()
 
+function(get_target_sources_absolute TARGET OUTPUT_VAR)
+    get_target_property(_sources "${TARGET}" SOURCES)
+
+    if (NOT _sources)
+        set(${OUTPUT_VAR} "" PARENT_SCOPE)
+        return()
+    endif ()
+
+    set(_absolute_sources "")
+
+    foreach (_source IN LISTS _sources)
+        if (IS_ABSOLUTE "${_source}")
+            list(APPEND _absolute_sources "${_source}")
+        else ()
+            get_filename_component(
+                    _absolute_source
+                    "${_source}"
+                    ABSOLUTE
+                    BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
+            )
+            list(APPEND _absolute_sources "${_absolute_source}")
+        endif ()
+    endforeach ()
+
+    set(${OUTPUT_VAR} "${_absolute_sources}" PARENT_SCOPE)
+endfunction()
+
 function(huh_create_prototype)
     set(single_args TARGET)
     cmake_parse_arguments(PARSE_ARGV 0 CreateOptions "" "${single_args}" "")
@@ -100,30 +127,32 @@ function(huh_create_prototype)
         target_link_libraries(HUHCudaPrototypeBuilder PRIVATE taywee::args libclang HUH::Core)
     endif ()
 
-    get_target_property(out ${CreateOptions_TARGET} LINK_LIBRARIES)
-    message(STATUS "LIBS ${out}")
-
     # TODO create try run to get number of files
     get_transitive_shared_library_names(${CreateOptions_TARGET} SHARED_LIB_NAMES)
     get_all_public_include_directories(${CreateOptions_TARGET} INCLUDE_LIB_PATHS)
+    get_target_sources_absolute(${CreateOptions_TARGET} SOURCE_FILES)
 
-
-    message(STATUS "Include: ${INCLUDE_LIB_PATHS}")
 
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Generated/Cuda)
     add_custom_command(
-            OUTPUT ${CMAKE_BINARY_DIR}/Generated/Cuda/test.cpp
+            OUTPUT ${CMAKE_BINARY_DIR}/Generated/Cuda/${CreateOptions_TARGET}.gen.cpp ${CMAKE_BINARY_DIR}/Generated/Cuda/include/HUH/Cuda/Gen/${CreateOptions_TARGET}.gen.h
             DEPENDS HUHCudaPrototypeBuilder
             COMMAND HUHCudaPrototypeBuilder
             "-n" ${CreateOptions_TARGET}
-            "-f" "$<FILTER:$<TARGET_PROPERTY:${CreateOptions_TARGET},SOURCES>,INCLUDE,\\.(cu|cuh)$>"
+            "-f" "$<FILTER:${SOURCE_FILES},INCLUDE,\\.(cu|cuh)$>"
+            "-c" "${CUDA_TOOLKIT_ROOT_DIR}"
+            "-r" "${CLANG_RESOURCE_DIR}"
             "-o" "${CMAKE_BINARY_DIR}/Generated/Cuda"
+            "-i" "${SOURCE_FILES}"
             "-l" "$<JOIN:$<REMOVE_DUPLICATES:$<LIST:TRANSFORM,${SHARED_LIB_NAMES},REPLACE,^.*[/\\],>>, >"
             "-l" "$<REMOVE_DUPLICATES:$<LIST:TRANSFORM,${CUDA_cudadevrt_LIBRARY},REPLACE,^.*[/\\],>>"
             "-i" "$<JOIN:${INCLUDE_LIB_PATHS}, >" VERBATIM)
 
-    add_library(TESTLIB ${CMAKE_BINARY_DIR}/Generated/Cuda/test.cpp)
-    get_target_property(test_a ${CreateOptions_TARGET} STATIC_LIBRARY_OPTIONS)
-    message(WARNING "HUH: ${CUDA_TOOLKIT_ROOT_DIR}")
+    add_library(${CreateOptions_TARGET}_Gen
+            ${CMAKE_BINARY_DIR}/Generated/Cuda/${CreateOptions_TARGET}.gen.cpp
+            ${CMAKE_BINARY_DIR}/Generated/Cuda/include/HUH/Cuda/Gen/${CreateOptions_TARGET}.gen.h
+    )
+
+    target_include_directories(${CreateOptions_TARGET}_Gen PUBLIC ${CMAKE_BINARY_DIR}/Generated/Cuda/include)
 
 endfunction()
