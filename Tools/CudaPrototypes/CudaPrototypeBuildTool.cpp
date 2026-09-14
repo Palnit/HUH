@@ -23,6 +23,22 @@ struct ClangCTX {
     bool InsideExternC = false;
 };
 
+bool isCudaGlobalFunction(CXCursor cursor) {
+    bool found = false;
+    clang_visitChildren(
+        cursor,
+        [](CXCursor child, CXCursor, CXClientData data) {
+            auto* found = static_cast<bool*>(data);
+            if (clang_getCursorKind(child) == CXCursor_CUDAGlobalAttr) {
+                *found = true;
+                return CXChildVisit_Break;
+            }
+            return CXChildVisit_Continue;
+        },
+        &found);
+    return found;
+}
+
 CXChildVisitResult Visitor(CXCursor cursor, CXCursor parent, CXClientData clientData) {
     CXCursorKind kind = clang_getCursorKind(cursor);
 
@@ -36,22 +52,19 @@ CXChildVisitResult Visitor(CXCursor cursor, CXCursor parent, CXClientData client
 
     ClangCTX ctx = *static_cast<ClangCTX*>(clientData);
 
-    if (kind == CXCursor_LinkageSpec) {
-        std::string spelling = ToString(clang_getCursorSpelling(cursor));
-        HUH_TLOG("Spelling {}", spelling)
-        ctx.InsideExternC = !spelling.empty() && spelling == "C";
-    }
-
     if (kind == CXCursor_FunctionDecl && ctx.InsideExternC) {
-        auto name = ToString(clang_getCursorSpelling(cursor));
-        HUH_TLOG("Name {}", name)
+        if (isCudaGlobalFunction(cursor)) {
+            auto name = ToString(clang_getCursorSpelling(cursor));
+            HUH_TLOG("Name {}", name)
 
-        if (!name.empty()) {
-            ctx.FunctionNames.Emplace(name);
+            if (!name.empty()) {
+                ctx.FunctionNames.Emplace(name);
+            }
         }
-
-        clang_visitChildren(cursor, Visitor, &ctx);
     }
+
+    ClangCTX ctx2 = ctx;
+    clang_visitChildren(cursor, Visitor, &ctx2);
 
     return CXChildVisit_Continue;
 }
