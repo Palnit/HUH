@@ -5,9 +5,11 @@
 
 #include <turbojpeg.h>
 #include <vector>
+
+#include <HUH/lib_defines.h>
 namespace HUH::FileHandling {
 
-class JpegReader {
+class HUH_FILEHANDLING_IMAGE_API JpegReader {
 public:
     explicit JpegReader(const std::vector<HUH::Uint8>& bytes);
     ~JpegReader();

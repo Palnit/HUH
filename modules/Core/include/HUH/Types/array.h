@@ -131,7 +131,7 @@ public:
     }
 
     Array& operator=(const Array& other) noexcept {
-        if (this == other) {
+        if (this == &other || *this == other) {
             return *this;
         }
         DefaultDestruct(m_data, m_size);

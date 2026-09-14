@@ -55,7 +55,7 @@ private:
     T* m_ptr = nullptr;
 };
 
-class MemoryAllocator {
+class HUH_CUDA_API MemoryAllocator {
 public:
     HUH_NODISCARD void* MapRHIBuffer(HUH::RHI::Buffer* Buffer);
 

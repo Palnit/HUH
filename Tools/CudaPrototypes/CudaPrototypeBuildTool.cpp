@@ -97,106 +97,106 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    HUH::Array<std::string> libraries;
-    for (auto& lib : libs) {
-        libraries.Emplace(HUH::Split(lib, " "));
-    }
-
-    HUH::Array<std::string> includes;
-    for (auto& inc : include) {
-        includes.Emplace(HUH::Split(inc, " "));
-    }
-    std::string cudaPathOption = "--cuda-path=" + cudaPath.Get();
-    std::string resourceDirOption = "-resource-dir=" + clangResourceDir.Get();
-
-    HUH::Array<const char*> clangOptions;
-    clangOptions.Emplace("-x");
-    clangOptions.Emplace("cuda");
-    clangOptions.Emplace("-std=c++20");
-    clangOptions.Emplace("--cuda-gpu-arch=sm_75");
-    clangOptions.Emplace(cudaPathOption.c_str());
-    clangOptions.Emplace(resourceDirOption.c_str());
-    for (auto& inc : includes) {
-        inc = "-I" + inc;
-        clangOptions.Emplace(inc.c_str());
-    }
-
-    HUH_ILOG(CudaBuilder, "Options for clang: ")
-    for (auto& option : clangOptions) {
-        HUH_ILOG(CudaBuilder, "{}", option)
-    }
-
-    CXIndex Index = clang_createIndex(0, 0);// Create index
-    HUH::Array<CXTranslationUnit> units;
-    HUH_ILOG(CudaBuilder, "Starting File Parse:")
-    for (auto& file : files) {
-        HUH_ILOG(CudaBuilder, "Building Translation Unit for: {}", file)
-        CXTranslationUnit unit = clang_parseTranslationUnit(
-            Index, file.c_str(), clangOptions.GetData(), static_cast<int>(clangOptions.Size()), nullptr, 0,
-            CXTranslationUnit_IncludeAttributedTypes | CXTranslationUnit_VisitImplicitAttributes
-                | CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_DetailedPreprocessingRecord);
-
-        if (unit == nullptr) {
-            HUH_ELOG(CudaBuilder, "Failed to parse translation unit");
-            continue;
-        }
-
-        for (unsigned i = 0; i < clang_getNumDiagnostics(unit); ++i) {
-            CXDiagnostic diag = clang_getDiagnostic(unit, i);
-
-            auto severity = clang_getDiagnosticSeverity(diag);
-
-            auto text =
-                ToString(clang_formatDiagnostic(diag,
-                                                CXDiagnostic_DisplaySourceLocation | CXDiagnostic_DisplayColumn
-                                                    | CXDiagnostic_DisplaySourceRanges | CXDiagnostic_DisplayOption));
-
-            if (severity == CXDiagnostic_Error || severity == CXDiagnostic_Fatal) {
-                HUH_ELOG(CudaBuilder, "Error during translation unit creation: {}", text);
-                clang_disposeDiagnostic(diag);
-                clang_disposeTranslationUnit(unit);
-                continue;
-            }
-
-            if (severity == CXDiagnostic_Warning || severity == CXDiagnostic_Ignored) {
-                HUH_WLOG(CudaBuilder, "Warning during translation unit creation: {}", text);
-            }
-
-            if (severity == CXDiagnostic_Note) {
-                HUH_ILOG(CudaBuilder, "Note during translation unit creation: {}", text);
-            }
-
-            clang_disposeDiagnostic(diag);
-        }
-        units.Emplace(unit);
-    }
-    ClangCTX ctx;
-    for (auto& unit : units) {
-        ctx.InsideExternC = false;
-        CXCursor cursor = clang_getTranslationUnitCursor(unit);
-
-        clang_visitChildren(cursor, Visitor, &ctx);
-    }
-
-    for (auto& function : ctx.FunctionNames) {
-        HUH_ILOG(CudaBuilder, "Function Name: {}", function)
-    }
+    // HUH::Array<std::string> libraries;
+    // for (auto& lib : libs) {
+    //     libraries.Emplace(HUH::Split(lib, " "));
+    // }
+    //
+    // HUH::Array<std::string> includes;
+    // for (auto& inc : include) {
+    //     includes.Emplace(HUH::Split(inc, " "));
+    // }
+    // std::string cudaPathOption = "--cuda-path=" + cudaPath.Get();
+    // std::string resourceDirOption = "-resource-dir=" + clangResourceDir.Get();
+    //
+    // HUH::Array<const char*> clangOptions;
+    // clangOptions.Emplace("-x");
+    // clangOptions.Emplace("cuda");
+    // clangOptions.Emplace("-std=c++20");
+    // clangOptions.Emplace("--cuda-gpu-arch=sm_75");
+    // clangOptions.Emplace(cudaPathOption.c_str());
+    // clangOptions.Emplace(resourceDirOption.c_str());
+    // for (auto& inc : includes) {
+    //     inc = "-I" + inc;
+    //     clangOptions.Emplace(inc.c_str());
+    // }
+    //
+    // HUH_ILOG(CudaBuilder, "Options for clang: ")
+    // for (auto& option : clangOptions) {
+    //     HUH_ILOG(CudaBuilder, "{}", option)
+    // }
+    //
+    // CXIndex Index = clang_createIndex(0, 0);// Create index
+    // HUH::Array<CXTranslationUnit> units;
+    // HUH_ILOG(CudaBuilder, "Starting File Parse:")
+    // for (auto& file : files) {
+    //     HUH_ILOG(CudaBuilder, "Building Translation Unit for: {}", file)
+    //     CXTranslationUnit unit = clang_parseTranslationUnit(
+    //         Index, file.c_str(), clangOptions.GetData(), static_cast<int>(clangOptions.Size()), nullptr, 0,
+    //         CXTranslationUnit_IncludeAttributedTypes | CXTranslationUnit_VisitImplicitAttributes
+    //             | CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_DetailedPreprocessingRecord);
+    //
+    //     if (unit == nullptr) {
+    //         HUH_ELOG(CudaBuilder, "Failed to parse translation unit");
+    //         continue;
+    //     }
+    //
+    //     for (unsigned i = 0; i < clang_getNumDiagnostics(unit); ++i) {
+    //         CXDiagnostic diag = clang_getDiagnostic(unit, i);
+    //
+    //         auto severity = clang_getDiagnosticSeverity(diag);
+    //
+    //         auto text =
+    //             ToString(clang_formatDiagnostic(diag,
+    //                                             CXDiagnostic_DisplaySourceLocation | CXDiagnostic_DisplayColumn
+    //                                                 | CXDiagnostic_DisplaySourceRanges | CXDiagnostic_DisplayOption));
+    //
+    //         if (severity == CXDiagnostic_Error || severity == CXDiagnostic_Fatal) {
+    //             HUH_ELOG(CudaBuilder, "Error during translation unit creation: {}", text);
+    //             clang_disposeDiagnostic(diag);
+    //             clang_disposeTranslationUnit(unit);
+    //             continue;
+    //         }
+    //
+    //         if (severity == CXDiagnostic_Warning || severity == CXDiagnostic_Ignored) {
+    //             HUH_WLOG(CudaBuilder, "Warning during translation unit creation: {}", text);
+    //         }
+    //
+    //         if (severity == CXDiagnostic_Note) {
+    //             HUH_ILOG(CudaBuilder, "Note during translation unit creation: {}", text);
+    //         }
+    //
+    //         clang_disposeDiagnostic(diag);
+    //     }
+    //     units.Emplace(unit);
+    // }
+    // ClangCTX ctx;
+    // for (auto& unit : units) {
+    //     ctx.InsideExternC = false;
+    //     CXCursor cursor = clang_getTranslationUnitCursor(unit);
+    //
+    //     clang_visitChildren(cursor, Visitor, &ctx);
+    // }
+    //
+    // for (auto& function : ctx.FunctionNames) {
+    //     HUH_ILOG(CudaBuilder, "Function Name: {}", function)
+    // }
 
     if (output) {
         std::ofstream test(output.Get() / "include" / "HUH" / "Cuda" / "Gen"
                            / std::filesystem::path(libname.Get() + ".gen.h"));
-        test << "Hello World!" << std::endl;
+        test << "#pragma once" << std::endl;
         test.close();
 
         std::ofstream test2(output.Get() / std::filesystem::path(libname.Get() + ".gen.cpp"));
-        test2 << "Hello World!" << std::endl;
+        test2 << "#include <HUH/Cuda/Gen/" << libname.Get() << ".gen.h>";
         test2.close();
     }
 
-    for (auto& unit : units) {
-        clang_disposeTranslationUnit(unit);
-    }
-    clang_disposeIndex(Index);
+    // for (auto& unit : units) {
+    //     clang_disposeTranslationUnit(unit);
+    // }
+    // clang_disposeIndex(Index);
 
     return 0;
 }

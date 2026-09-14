@@ -1,8 +1,10 @@
 #pragma once
 #include <HUH/Math/vector.h>
 
+#include <HUH/lib_defines.h>
+
 namespace HUH {
-class Image {
+class HUH_FILEHANDLING_IMAGE_API Image {
 public:
     Image() : Size(0, 0), Pixels() {}
 

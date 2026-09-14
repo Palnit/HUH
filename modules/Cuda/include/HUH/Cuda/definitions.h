@@ -8,8 +8,8 @@
 inline HUH::LogCategory LogCuda("Cuda");
 
 namespace HUH {
-std::string ToString(cudaError_t err);
-std::string ToString(CUresult err);
+std::string HUH_CUDA_API ToString(cudaError_t err);
+std::string HUH_CUDA_API ToString(CUresult err);
 std::string ToString(nvJitLinkResult err);
 
 #define HUH_CUDA_ERR(Func) \

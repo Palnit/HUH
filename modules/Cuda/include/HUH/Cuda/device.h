@@ -5,7 +5,7 @@
 #endif
 
 namespace HUH::Cuda {
-class Device;
+class  HUH_CUDA_API Device;
 
 class Device {
 public:

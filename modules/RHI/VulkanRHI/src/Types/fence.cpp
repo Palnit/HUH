@@ -1,7 +1,10 @@
 #include <HUH/RHI/vulkan/Types/fence.h>
 
 #include <HUH/RHI/vulkan/device.h>
+#ifdef HUH_LINUX
 #include <unistd.h>
+#elifdef HUH_WIN
+#endif
 #undef max
 
 namespace HUH::RHI {

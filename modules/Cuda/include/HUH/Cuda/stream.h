@@ -2,9 +2,11 @@
 
 #include <HUH/RHI/Types/fence.h>
 #include <driver_types.h>
+#include <HUH/definitions.h>
+#include <HUH/lib_defines.h>
 
 namespace HUH::Cuda {
-class Stream {
+class HUH_CUDA_API Stream {
 public:
     friend class Function;
     Stream();

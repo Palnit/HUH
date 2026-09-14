@@ -15,7 +15,7 @@ class Device;
 class Module;
 class Stream;
 
-class Function {
+class HUH_CUDA_API Function {
 public:
     Function() = default;
     friend class Module;
@@ -125,7 +125,7 @@ private:
     void* m_cubin = nullptr;
 };
 
-class Module {
+class HUH_CUDA_API Module {
 public:
     explicit Module();
     ~Module();

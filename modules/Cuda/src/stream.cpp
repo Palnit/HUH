@@ -1,3 +1,4 @@
+#include <HUH/lib_defines.h>
 #include <HUH/Cuda/stream.h>
 
 #include "HUH/Cuda/definitions.h"

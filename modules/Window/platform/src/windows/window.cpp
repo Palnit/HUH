@@ -46,6 +46,9 @@ void Window::Show() {
     ShowWindow(m_windowHandle, HUH::g_CmdShow);
 }
 bool Window::Loop() {
+    RECT rect;
+    GetClientRect(m_windowHandle,&rect);
+    OnSizeChange.ExecuteAll(this,{static_cast<Uint32>(rect.right - rect.left), static_cast<Uint32>(rect.bottom - rect.top)});
     MSG msg = {};
     // peak message
     auto value = GetMessage(&msg, m_windowHandle, 0, 0);
@@ -70,7 +73,10 @@ LRESULT Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
             return 0;
         }
         case WM_SIZE: {
-            OnSizeChange.ExecuteAll(this, {LOWORD(lParam), HIWORD(lParam)});
+            RECT rect;
+            GetClientRect(m_windowHandle,&rect);
+            OnSizeChange.ExecuteAll(this,{static_cast<Uint32>(rect.right - rect.left), static_cast<Uint32>(rect.bottom - rect.top)});
+            // OnSizeChange.ExecuteAll(this, {LOWORD(lParam), HIWORD(lParam)});
             return 0;
         }
         case WM_SYSKEYDOWN:

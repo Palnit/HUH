@@ -6,7 +6,11 @@
 
 #include <HUH/RHI/vulkan/Types/buffer.h>
 #include <HUH/RHI/vulkan/device.h>
+
+#ifdef HUH_LINUX
 #include <unistd.h>
+#elifdef HUH_WIN
+#endif
 
 #include <HUH/enum_helper.h>
 

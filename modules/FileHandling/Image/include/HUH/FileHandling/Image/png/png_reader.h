@@ -10,8 +10,11 @@
 
 #include <vector>
 
+#include <HUH/lib_defines.h>
+
 namespace HUH::FileHandling {
-class PngReader {
+
+class HUH_FILEHANDLING_IMAGE_API PngReader {
 public:
     explicit PngReader(const std::vector<HUH::Uint8>& bytes);
     static bool IsPng(const std::vector<HUH::Uint8>& bytes);

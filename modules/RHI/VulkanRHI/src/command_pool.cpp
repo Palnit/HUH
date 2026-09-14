@@ -13,6 +13,8 @@
 #include <HUH/RHI/vulkan/pipeline.h>
 #include <HUH/RHI/vulkan/queue.h>
 
+#include <array>
+
 namespace HUH::RHI {
 bool VulkanCommandPool::VulkanCommandBuffer::Begin() {
     VkCommandBufferBeginInfo beginInfo = {
