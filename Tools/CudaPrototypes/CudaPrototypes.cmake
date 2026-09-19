@@ -140,6 +140,7 @@ function(huh_create_prototype)
             DEPENDS
             HUHCudaPrototypeBuilder
             ${SOURCE_FILES}
+            ${CreateOptions_TARGET}
             COMMAND HUHCudaPrototypeBuilder
             "-n" ${CreateOptions_TARGET}
             "-f" "$<FILTER:${SOURCE_FILES},INCLUDE,\\.(cu|cuh)$>"
@@ -160,6 +161,7 @@ function(huh_create_prototype)
     add_custom_command(TARGET ${CreateOptions_TARGET}-Gen POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
             "$<REMOVE_DUPLICATES:${SHARED_LIB_NAMES}>"
+            ${CUDA_cudadevrt_LIBRARY}
             ${CMAKE_BINARY_DIR}/
             COMMAND_EXPAND_LISTS
             COMMENT "Copying shared libs and ptx files for ${CreateOptions_TARGET}"

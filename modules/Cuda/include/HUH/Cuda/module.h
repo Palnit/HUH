@@ -52,11 +52,10 @@ public:
         size_t Index = 0;
         size_t Offset = 0;
         bool result = true;
-        if (m_params.size() < sizeof...(Args))
-            args {
-                HUH_ELOG(LogCuda, "Incorrect Number of argument launches")
-                return false;
-            }
+        if (m_params.size() < sizeof...(Args)) {
+            HUH_ELOG(LogCuda, "Incorrect Number of argument launches")
+            return false;
+        }
         (
             [&] {
                 auto AlignReq = alignof(decltype(args));
@@ -88,7 +87,7 @@ public:
         void* vargs[] = {static_cast<void*>(&args)...};
         HUH_CUDA_ERR(cudaLaunchKernel(m_func, m_gridSize, m_blockSize, vargs, m_sharedMemorySize,
                                       m_stream ? m_stream->m_stream : nullptr)) {
-            HUH_ELOG(LogCuda, "Error Launching Kernel Function  Error: {}", err)
+            HUH_ELOG(LogCuda, "Error Launching Kernel Function {}  Error: {}", Name, err)
             return false;
         }
         return true;

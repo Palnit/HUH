@@ -246,7 +246,7 @@ int main(int argc, char* argv[]) {
 
             std::stringstream ss3;
             for (auto& param : function.ParamNames) {
-                ss3 << param << ", ";
+                ss3 << "std::forward<" << param << "Type>(" << param << "), ";
             }
             auto inputParams = ss3.str();
             inputParams.pop_back();
