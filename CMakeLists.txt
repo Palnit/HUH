@@ -153,21 +153,8 @@ if (GENERATE_DOCS)
 endif ()
 
 get_property(HUH_LIB_IMPORT_DEFINES TARGET HUH PROPERTY HUH_LIB_IMPORT_DEFINES)
-foreach (LIB_IMPORT IN LISTS HUH_LIB_IMPORT_DEFINES)
-
-endforeach ()
-
-get_property(HUH_LIB_IMPORT_DEFINES TARGET HUH PROPERTY HUH_LIB_IMPORT_DEFINES)
-if (HUH_LIB_IMPORT_DEFINES)
-    list(GET HUH_LIB_IMPORT_DEFINES 0 temp)
-    list(LENGTH HUH_LIB_IMPORT_DEFINES LIB_LENGTH)
-    math(EXPR N "${LIB_LENGTH}-1")
-    foreach (IDX RANGE 1 ${N})
-        list(GET HUH_LIB_IMPORT_DEFINES ${IDX} STR)
-        set(temp "${temp}\n${STR}")
-    endforeach ()
-    set_property(TARGET HUH PROPERTY HUH_LIB_IMPORT_DEFINES ${temp})
-endif ()
+string(JOIN "\n" temp ${HUH_LIB_IMPORT_DEFINES})
+set_property(TARGET HUH PROPERTY HUH_LIB_IMPORT_DEFINES "${temp}")
 
 file(GENERATE OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/public/HUH/lib_defines.h INPUT configure/lib_defines.h.ini)
 

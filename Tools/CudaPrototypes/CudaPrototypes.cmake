@@ -137,10 +137,13 @@ function(huh_create_prototype)
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Generated/Cuda)
     add_custom_command(
             OUTPUT ${CMAKE_BINARY_DIR}/Generated/Cuda/${CreateOptions_TARGET}.gen.cpp ${CMAKE_BINARY_DIR}/Generated/Cuda/include/HUH/Cuda/Gen/${CreateOptions_TARGET}.gen.h
-            DEPENDS HUHCudaPrototypeBuilder
+            DEPENDS
+            HUHCudaPrototypeBuilder
+            ${SOURCE_FILES}
             COMMAND HUHCudaPrototypeBuilder
             "-n" ${CreateOptions_TARGET}
             "-f" "$<FILTER:${SOURCE_FILES},INCLUDE,\\.(cu|cuh)$>"
+            "-p" "$<JOIN:$<REMOVE_DUPLICATES:$<LIST:TRANSFORM,$<TARGET_OBJECTS:${CreateOptions_TARGET}>,REPLACE,^.*[/\\],>>, >"
             "-c" "${CUDA_TOOLKIT_ROOT_DIR}"
             "-r" "${CLANG_RESOURCE_DIR}"
             "-o" "${CMAKE_BINARY_DIR}/Generated/Cuda"
@@ -149,11 +152,30 @@ function(huh_create_prototype)
             "-l" "$<REMOVE_DUPLICATES:$<LIST:TRANSFORM,${CUDA_cudadevrt_LIBRARY},REPLACE,^.*[/\\],>>"
             "-i" "$<JOIN:${INCLUDE_LIB_PATHS}, >" VERBATIM)
 
-    add_library(${CreateOptions_TARGET}_Gen
+    add_library(${CreateOptions_TARGET}-Gen
             ${CMAKE_BINARY_DIR}/Generated/Cuda/${CreateOptions_TARGET}.gen.cpp
             ${CMAKE_BINARY_DIR}/Generated/Cuda/include/HUH/Cuda/Gen/${CreateOptions_TARGET}.gen.h
     )
 
-    target_include_directories(${CreateOptions_TARGET}_Gen PUBLIC ${CMAKE_BINARY_DIR}/Generated/Cuda/include)
+    add_custom_command(TARGET ${CreateOptions_TARGET}-Gen POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "$<REMOVE_DUPLICATES:${SHARED_LIB_NAMES}>"
+            ${CMAKE_BINARY_DIR}/
+            COMMAND_EXPAND_LISTS
+            COMMENT "Copying shared libs and ptx files for ${CreateOptions_TARGET}"
+    )
+
+    add_library(${CreateOptions_TARGET}::Gen ALIAS ${CreateOptions_TARGET}-Gen)
+    target_link_libraries(${CreateOptions_TARGET}-Gen PUBLIC
+            HUH::Cuda
+    )
+
+    huh_target_create_definition(${CreateOptions_TARGET}-Gen)
+
+    get_property(HUH_LIB_IMPORT_DEFINES TARGET HUH PROPERTY HUH_LIB_IMPORT_DEFINES)
+    string(JOIN "\n" temp ${HUH_LIB_IMPORT_DEFINES})
+    set_property(TARGET HUH PROPERTY HUH_LIB_IMPORT_DEFINES "${temp}")
+
+    target_include_directories(${CreateOptions_TARGET}-Gen PUBLIC ${CMAKE_BINARY_DIR}/Generated/Cuda/include)
 
 endfunction()

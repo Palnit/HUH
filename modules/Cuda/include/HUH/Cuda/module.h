@@ -24,7 +24,7 @@ public:
     struct ParamInfo {
         size_t Offset;
         size_t Size;
-    } cudaErrorIllegalAddress;
+    };
 
     explicit operator bool() const { return m_func; }
 
@@ -92,6 +92,11 @@ public:
             return false;
         }
         return true;
+    }
+
+    template<typename... Args>
+    HUH_FORCE_INLINE bool operator()(Args... args) {
+        return Execute(std::forward<Args>(args)...);
     }
 
 protected:

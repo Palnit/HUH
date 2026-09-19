@@ -18,30 +18,22 @@ std::string ToString(CXString str) {
     return s;
 }
 
-struct ClangCTX {
-    HUH::Array<std::string> FunctionNames;
-    bool InsideExternC = false;
+struct FunctionData {
+    std::string Name;
+    HUH::Array<std::string> ParamNames;
 };
 
-bool isCudaGlobalFunction(CXCursor cursor) {
-    bool found = false;
-    clang_visitChildren(
-        cursor,
-        [](CXCursor child, CXCursor, CXClientData data) {
-            auto* found = static_cast<bool*>(data);
-            if (clang_getCursorKind(child) == CXCursor_CUDAGlobalAttr) {
-                *found = true;
-                return CXChildVisit_Break;
-            }
-            return CXChildVisit_Continue;
-        },
-        &found);
-    return found;
-}
+struct ClangCTX {
+    HUH::Array<FunctionData> FunctionNames;
+    bool InsideExternC = false;
+    bool InsideFunction = false;
+};
 
-CXChildVisitResult Visitor(CXCursor cursor, CXCursor parent, CXClientData clientData) {
-    CXCursorKind kind = clang_getCursorKind(cursor);
+CXChildVisitResult Visitor(CXCursor cursor, CXCursor parent, const CXClientData clientData) {
 
+    auto kind = clang_getCursorKind(cursor);
+
+    // Only filter declarations by location.
     if (kind == CXCursor_MacroExpansion) {
         return CXChildVisit_Continue;
     }
@@ -50,29 +42,56 @@ CXChildVisitResult Visitor(CXCursor cursor, CXCursor parent, CXClientData client
             return CXChildVisit_Continue;
     }
 
-    ClangCTX ctx = *static_cast<ClangCTX*>(clientData);
+    const auto ctx = static_cast<ClangCTX*>(clientData);
 
-    if (kind == CXCursor_FunctionDecl && ctx.InsideExternC) {
-        if (isCudaGlobalFunction(cursor)) {
-            auto name = ToString(clang_getCursorSpelling(cursor));
-            HUH_TLOG("Name {}", name)
-
-            if (!name.empty()) {
-                ctx.FunctionNames.Emplace(name);
-            }
+    if (!ctx->InsideExternC) {
+        if (kind == CXCursor_LinkageSpec) {
+            ctx->InsideExternC = true;
+            clang_visitChildren(cursor, Visitor, ctx);
+            ctx->InsideExternC = false;
+            return CXChildVisit_Continue;
         }
+        return CXChildVisit_Recurse;
     }
 
-    ClangCTX ctx2 = ctx;
-    clang_visitChildren(cursor, Visitor, &ctx2);
+    if (!ctx->InsideFunction) {
+        if (kind == CXCursor_FunctionDecl) {
+            ctx->InsideFunction = true;
+            clang_visitChildren(cursor, Visitor, ctx);
+            ctx->InsideFunction = false;
+            return CXChildVisit_Continue;
+        }
+        return CXChildVisit_Recurse;
+    }
 
-    return CXChildVisit_Continue;
+    if (kind == CXCursor_CUDAGlobalAttr) {
+        ctx->FunctionNames.Emplace(ToString(clang_getCursorSpelling(parent)));
+        return CXChildVisit_Continue;
+    }
+
+    if (kind == CXCursor_ParmDecl) {
+        ctx->FunctionNames.Back().ParamNames.Emplace(ToString(clang_getCursorSpelling(cursor)));
+        return CXChildVisit_Continue;
+    }
+
+    return CXChildVisit_Recurse;
+}
+
+std::string toUpperUnderscore(std::string str) {
+    for (char& c : str) {
+        if (c == '-')
+            c = '_';
+        else
+            c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+    }
+    return str;
 }
 
 int main(int argc, char* argv[]) {
     args::ArgumentParser parser("This is a program to generate cpp bindings for a cuda file");
     args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
     args::ValueFlagList<std::string> files(parser, "files", "The files to parse", {'f', "files"});
+    args::ValueFlagList<std::string> ptxFiles(parser, "ptxFiles", "The ptx files", {'p', "ptxFiles"});
     args::ValueFlagList<std::string> libs(parser, "libs", "The libs to bind", {'l', "libs"});
     args::ValueFlagList<std::string> include(parser, "include", "The name of the cuda library", {'i', "include"});
     args::ValueFlag<std::string> libname(parser, "libname", "The name of the cuda library", {'n', "name"});
@@ -97,106 +116,208 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // HUH::Array<std::string> libraries;
-    // for (auto& lib : libs) {
-    //     libraries.Emplace(HUH::Split(lib, " "));
-    // }
-    //
-    // HUH::Array<std::string> includes;
-    // for (auto& inc : include) {
-    //     includes.Emplace(HUH::Split(inc, " "));
-    // }
-    // std::string cudaPathOption = "--cuda-path=" + cudaPath.Get();
-    // std::string resourceDirOption = "-resource-dir=" + clangResourceDir.Get();
-    //
-    // HUH::Array<const char*> clangOptions;
-    // clangOptions.Emplace("-x");
-    // clangOptions.Emplace("cuda");
-    // clangOptions.Emplace("-std=c++20");
-    // clangOptions.Emplace("--cuda-gpu-arch=sm_75");
-    // clangOptions.Emplace(cudaPathOption.c_str());
-    // clangOptions.Emplace(resourceDirOption.c_str());
-    // for (auto& inc : includes) {
-    //     inc = "-I" + inc;
-    //     clangOptions.Emplace(inc.c_str());
-    // }
-    //
-    // HUH_ILOG(CudaBuilder, "Options for clang: ")
-    // for (auto& option : clangOptions) {
-    //     HUH_ILOG(CudaBuilder, "{}", option)
-    // }
-    //
-    // CXIndex Index = clang_createIndex(0, 0);// Create index
-    // HUH::Array<CXTranslationUnit> units;
-    // HUH_ILOG(CudaBuilder, "Starting File Parse:")
-    // for (auto& file : files) {
-    //     HUH_ILOG(CudaBuilder, "Building Translation Unit for: {}", file)
-    //     CXTranslationUnit unit = clang_parseTranslationUnit(
-    //         Index, file.c_str(), clangOptions.GetData(), static_cast<int>(clangOptions.Size()), nullptr, 0,
-    //         CXTranslationUnit_IncludeAttributedTypes | CXTranslationUnit_VisitImplicitAttributes
-    //             | CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_DetailedPreprocessingRecord);
-    //
-    //     if (unit == nullptr) {
-    //         HUH_ELOG(CudaBuilder, "Failed to parse translation unit");
-    //         continue;
-    //     }
-    //
-    //     for (unsigned i = 0; i < clang_getNumDiagnostics(unit); ++i) {
-    //         CXDiagnostic diag = clang_getDiagnostic(unit, i);
-    //
-    //         auto severity = clang_getDiagnosticSeverity(diag);
-    //
-    //         auto text =
-    //             ToString(clang_formatDiagnostic(diag,
-    //                                             CXDiagnostic_DisplaySourceLocation | CXDiagnostic_DisplayColumn
-    //                                                 | CXDiagnostic_DisplaySourceRanges | CXDiagnostic_DisplayOption));
-    //
-    //         if (severity == CXDiagnostic_Error || severity == CXDiagnostic_Fatal) {
-    //             HUH_ELOG(CudaBuilder, "Error during translation unit creation: {}", text);
-    //             clang_disposeDiagnostic(diag);
-    //             clang_disposeTranslationUnit(unit);
-    //             continue;
-    //         }
-    //
-    //         if (severity == CXDiagnostic_Warning || severity == CXDiagnostic_Ignored) {
-    //             HUH_WLOG(CudaBuilder, "Warning during translation unit creation: {}", text);
-    //         }
-    //
-    //         if (severity == CXDiagnostic_Note) {
-    //             HUH_ILOG(CudaBuilder, "Note during translation unit creation: {}", text);
-    //         }
-    //
-    //         clang_disposeDiagnostic(diag);
-    //     }
-    //     units.Emplace(unit);
-    // }
-    // ClangCTX ctx;
-    // for (auto& unit : units) {
-    //     ctx.InsideExternC = false;
-    //     CXCursor cursor = clang_getTranslationUnitCursor(unit);
-    //
-    //     clang_visitChildren(cursor, Visitor, &ctx);
-    // }
-    //
-    // for (auto& function : ctx.FunctionNames) {
-    //     HUH_ILOG(CudaBuilder, "Function Name: {}", function)
-    // }
-
-    if (output) {
-        std::ofstream test(output.Get() / "include" / "HUH" / "Cuda" / "Gen"
-                           / std::filesystem::path(libname.Get() + ".gen.h"));
-        test << "#pragma once" << std::endl;
-        test.close();
-
-        std::ofstream test2(output.Get() / std::filesystem::path(libname.Get() + ".gen.cpp"));
-        test2 << "#include <HUH/Cuda/Gen/" << libname.Get() << ".gen.h>";
-        test2.close();
+    HUH::Array<std::string> libraries;
+    for (auto& lib : libs) {
+        libraries.Emplace(HUH::Split(lib, " "));
     }
 
-    // for (auto& unit : units) {
-    //     clang_disposeTranslationUnit(unit);
-    // }
-    // clang_disposeIndex(Index);
+    HUH::Array<std::string> includes;
+    for (auto& inc : include) {
+        includes.Emplace(HUH::Split(inc, " "));
+    }
+    std::string cudaPathOption = "--cuda-path=" + cudaPath.Get();
+    std::string resourceDirOption = "-resource-dir=" + clangResourceDir.Get();
+
+    HUH::Array<const char*> clangOptions;
+    clangOptions.Emplace("-x");
+    clangOptions.Emplace("cuda");
+    clangOptions.Emplace("-std=c++20");
+    clangOptions.Emplace("--cuda-gpu-arch=sm_75");
+    clangOptions.Emplace(cudaPathOption.c_str());
+    clangOptions.Emplace(resourceDirOption.c_str());
+    for (auto& inc : includes) {
+        inc = "-I" + inc;
+        clangOptions.Emplace(inc.c_str());
+    }
+
+    HUH_ILOG(CudaBuilder, "Options for clang: ")
+    for (auto& option : clangOptions) {
+        HUH_ILOG(CudaBuilder, "{}", option)
+    }
+
+    CXIndex Index = clang_createIndex(0, 0);// Create index
+    HUH::Array<CXTranslationUnit> units;
+    HUH_ILOG(CudaBuilder, "Starting File Parse:")
+    for (auto& file : files) {
+        HUH_ILOG(CudaBuilder, "\tBuilding Translation Unit for: {}", file)
+        CXTranslationUnit unit = clang_parseTranslationUnit(
+            Index, file.c_str(), clangOptions.GetData(), static_cast<int>(clangOptions.Size()), nullptr, 0,
+            CXTranslationUnit_IncludeAttributedTypes | CXTranslationUnit_VisitImplicitAttributes
+                | CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_DetailedPreprocessingRecord);
+
+        if (unit == nullptr) {
+            HUH_ELOG(CudaBuilder, "\tFailed to parse translation unit");
+            continue;
+        }
+
+        for (unsigned i = 0; i < clang_getNumDiagnostics(unit); ++i) {
+            CXDiagnostic diag = clang_getDiagnostic(unit, i);
+
+            auto severity = clang_getDiagnosticSeverity(diag);
+
+            auto text =
+                ToString(clang_formatDiagnostic(diag,
+                                                CXDiagnostic_DisplaySourceLocation | CXDiagnostic_DisplayColumn
+                                                    | CXDiagnostic_DisplaySourceRanges | CXDiagnostic_DisplayOption));
+
+            if (severity == CXDiagnostic_Error || severity == CXDiagnostic_Fatal) {
+                HUH_ELOG(CudaBuilder, "\tError during translation unit creation: {}", text);
+                clang_disposeDiagnostic(diag);
+                clang_disposeTranslationUnit(unit);
+                continue;
+            }
+
+            if (severity == CXDiagnostic_Warning || severity == CXDiagnostic_Ignored) {
+                HUH_WLOG(CudaBuilder, "\tWarning during translation unit creation: {}", text);
+            }
+
+            if (severity == CXDiagnostic_Note) {
+                HUH_ILOG(CudaBuilder, "\tNote during translation unit creation: {}", text);
+            }
+
+            clang_disposeDiagnostic(diag);
+        }
+        units.Emplace(unit);
+    }
+
+    ClangCTX ctx;
+    for (auto& unit : units) {
+        ctx.InsideExternC = false;
+        CXCursor cursor = clang_getTranslationUnitCursor(unit);
+
+        clang_visitChildren(cursor, Visitor, &ctx);
+    }
+
+    for (auto& function : ctx.FunctionNames) {
+        HUH_ILOG(CudaBuilder, "Found function: {}", function.Name)
+    }
+
+    if (output) {
+        std::ofstream header(output.Get() / "include" / "HUH" / "Cuda" / "Gen"
+                             / std::filesystem::path(libname.Get() + ".gen.h"));
+        header << "#pragma once" << std::endl;
+        header << "#include <HUH/definitions.h>" << std::endl;
+        header << "#include <HUH/Cuda/module.h>" << std::endl;
+        header << "namespace HUH::Cuda::Gen::" << libname.Get() << " {" << std::endl;
+        auto api = toUpperUnderscore(libname.Get() + "-Gen_API");
+        for (auto& function : ctx.FunctionNames) {
+            auto staticName = "s_" + function.Name;
+            header << "extern " << api << " HUH::Cuda::Function " << staticName << ";" << std::endl << std::endl;
+            header << "template<";
+            std::stringstream ss;
+            for (auto& param : function.ParamNames) {
+                ss << "typename " << param << "Type,";
+            }
+            auto templates = ss.str();
+            templates.pop_back();
+            header << templates << ">" << std::endl;
+
+            header << "HUH_FORCE_INLINE bool " << function.Name << "(";
+            std::stringstream ss2;
+            ss2 << "const HUH::Vector3ui& gridDim,";
+            ss2 << "const HUH::Vector3ui& blocDim,";
+            for (auto& param : function.ParamNames) {
+                ss2 << param << "Type " << param << ", ";
+            }
+            ss2 << "size_t sharedMemorySize = 0,";
+            ss2 << "Stream* stream = nullptr";
+            header << ss2.str() << ") {" << std::endl;
+            header << std::setw(4) << " " << staticName << ".SetGrid(gridDim);" << std::endl;
+            header << std::setw(4) << " " << staticName << ".SetBlock(blocDim);" << std::endl;
+
+            header << std::setw(4) << " " << "if(sharedMemorySize) {" << std::endl;
+            header << std::setw(8) << " " << staticName << ".SetSharedMemory(sharedMemorySize);" << std::endl;
+            header << std::setw(4) << " " << "}" << std::endl;
+            header << std::setw(4) << " " << "if(stream) {" << std::endl;
+            header << std::setw(8) << " " << staticName << ".SetStream(stream);" << std::endl;
+            header << std::setw(4) << " " << "}" << std::endl;
+
+            header << std::setw(4) << " " << "return " << staticName << "(";
+
+            std::stringstream ss3;
+            for (auto& param : function.ParamNames) {
+                ss3 << param << ", ";
+            }
+            auto inputParams = ss3.str();
+            inputParams.pop_back();
+            inputParams.pop_back();
+            header << inputParams << ");" << std::endl;
+            header << "}" << std::endl << std::endl;
+        }
+
+        header << api << " bool Initialize(HUH::Cuda::Device* device);" << std::endl;
+
+        header << "}" << std::endl;
+        header.close();
+
+        std::ofstream source(output.Get() / std::filesystem::path(libname.Get() + ".gen.cpp"));
+        source << "#include <HUH/Cuda/Gen/" << libname.Get() << ".gen.h>" << std::endl << std::endl;
+        source << "namespace HUH::Cuda::Gen::" << libname.Get() << " {" << std::endl;
+        source << "inline HUH::LogCategory LogGen(\"" << libname.Get() << "-Gen" << "\");" << std::endl;
+        for (auto& function : ctx.FunctionNames) {
+            auto staticName = "s_" + function.Name;
+            source << api << " HUH::Cuda::Function " << staticName << ";" << std::endl << std::endl;
+        }
+
+        source << "HUH::Cuda::Module s_cudaModule;" << std::endl;
+        source << "HUH::Cuda::Linker s_linker;" << std::endl;
+
+        source << api << " bool Initialize(HUH::Cuda::Device* device) {" << std::endl;
+
+        source << std::setw(4) << " " << "if(!device) {" << std::endl;
+        source << std::setw(8) << " " << "return false;" << std::endl;
+        source << std::setw(4) << " " << "}" << std::endl;
+
+        source << std::setw(4) << " " << "s_linker.Init(*device);" << std::endl;
+        for (auto& lib : libraries) {
+            if (lib.ends_with(".ptx")) {
+                source << std::setw(4) << " " << "s_linker.AddPtx(\"" << lib << "\");" << std::endl;
+            }
+            if (lib.ends_with(".o")) {
+                source << std::setw(4) << " " << "s_linker.AddObject(\"" << lib << "\");" << std::endl;
+            }
+            if (lib.ends_with(".fatbin")) {
+                source << std::setw(4) << " " << "s_linker.AddFatbin(\"" << lib << "\");" << std::endl;
+            }
+            if (lib.ends_with(".dll") || lib.ends_with(".a") || lib.ends_with(".so") || lib.ends_with(".lib")) {
+                source << std::setw(4) << " " << "s_linker.AddLib(\"" << lib << "\");" << std::endl;
+            }
+        }
+
+        source << std::setw(4) << " " << "s_linker.Complete();" << std::endl;
+        source << std::setw(4) << " " << "if (!s_cudaModule.Load(s_linker)) {" << std::endl;
+        source << std::setw(8) << " " << "return false;" << std::endl;
+        source << std::setw(4) << " " << "}" << std::endl;
+
+        for (auto& function : ctx.FunctionNames) {
+            auto staticName = "s_" + function.Name;
+            source << std::setw(4) << " " << staticName << " = s_cudaModule.GetFunction(\"" << function.Name << "\");"
+                   << std::endl;
+            source << std::setw(4) << " " << "if (!" << staticName << ") {" << std::endl;
+            source << std::setw(8) << " " << "HUH_WLOG(LogGen,\"" << function.Name << " couldn't be loaded\");"
+                   << std::endl;
+            source << std::setw(4) << " " << "}" << std::endl;
+        }
+        source << std::setw(4) << " " << "return true;" << std::endl;
+        source << "}" << std::endl << std::endl;
+        source << "}" << std::endl;
+        source.close();
+    }
+
+    for (auto& unit : units) {
+        clang_disposeTranslationUnit(unit);
+    }
+    clang_disposeIndex(Index);
 
     return 0;
 }
