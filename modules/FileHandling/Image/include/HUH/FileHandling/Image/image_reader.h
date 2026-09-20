@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include <HUH/lib_defines.h>
 namespace HUH::FileHandling {
 
 Image HUH_FILEHANDLING_IMAGE_API ReadImageFromFile(const std::string& path);

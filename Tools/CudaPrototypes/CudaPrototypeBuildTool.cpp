@@ -142,7 +142,7 @@ int main(int argc, char* argv[]) {
 
     HUH_ILOG(CudaBuilder, "Options for clang: ")
     for (auto& option : clangOptions) {
-        HUH_ILOG(CudaBuilder, "{}", option)
+        HUH_ILOG(CudaBuilder, "\t\"{}\"", option)
     }
 
     CXIndex Index = clang_createIndex(0, 0);// Create index
@@ -164,25 +164,51 @@ int main(int argc, char* argv[]) {
             CXDiagnostic diag = clang_getDiagnostic(unit, i);
 
             auto severity = clang_getDiagnosticSeverity(diag);
+            CXSourceLocation location = clang_getDiagnosticLocation(diag);
 
-            auto text =
-                ToString(clang_formatDiagnostic(diag,
-                                                CXDiagnostic_DisplaySourceLocation | CXDiagnostic_DisplayColumn
-                                                    | CXDiagnostic_DisplaySourceRanges | CXDiagnostic_DisplayOption));
+            CXFile diagFile = nullptr;
+            unsigned line = 0;
+            unsigned column = 0;
+            unsigned offset = 0;
+
+            clang_getFileLocation(location, &diagFile, &line, &column, &offset);
+
+            auto text = ToString(clang_formatDiagnostic(diag, CXDiagnostic_DisplayOption));
 
             if (severity == CXDiagnostic_Error || severity == CXDiagnostic_Fatal) {
-                HUH_ELOG(CudaBuilder, "\tError during translation unit creation: {}", text);
+                if (diagFile) {
+
+                    HUH::Logging::AddLog(CudaBuilder, HUH::Logging::Error,
+                                         "\tError during translation unit creation: \"{}\"",
+                                         ToString(clang_getFileName(diagFile)), std::to_string(line), text);
+                    ;
+                } else {
+
+                    HUH_ELOG(CudaBuilder, "\tError during translation unit creation: \"{}\"", text);
+                }
                 clang_disposeDiagnostic(diag);
                 clang_disposeTranslationUnit(unit);
                 continue;
             }
 
             if (severity == CXDiagnostic_Warning || severity == CXDiagnostic_Ignored) {
-                HUH_WLOG(CudaBuilder, "\tWarning during translation unit creation: {}", text);
+                if (diagFile) {
+                    HUH::Logging::AddLog(CudaBuilder, HUH::Logging::Warning,
+                                         "\tWarning during translation unit creation: {}",
+                                         ToString(clang_getFileName(diagFile)), std::to_string(line), text);
+                } else {
+                    HUH_WLOG(CudaBuilder, "\tWarning during translation unit creation: {}", text);
+                }
             }
 
             if (severity == CXDiagnostic_Note) {
-                HUH_ILOG(CudaBuilder, "\tNote during translation unit creation: {}", text);
+                if (diagFile) {
+                    HUH::Logging::AddLog(CudaBuilder, HUH::Logging::Log, "\tNote during translation unit creation: {}",
+                                         ToString(clang_getFileName(diagFile)), std::to_string(line), text);
+                    ;
+                } else {
+                    HUH_ILOG(CudaBuilder, "\tNote during translation unit creation: {}", text);
+                }
             }
 
             clang_disposeDiagnostic(diag);
@@ -213,14 +239,16 @@ int main(int argc, char* argv[]) {
         for (auto& function : ctx.FunctionNames) {
             auto staticName = "s_" + function.Name;
             header << "extern " << api << " HUH::Cuda::Function " << staticName << ";" << std::endl << std::endl;
-            header << "template<";
             std::stringstream ss;
             for (auto& param : function.ParamNames) {
                 ss << "typename " << param << "Type,";
             }
             auto templates = ss.str();
-            templates.pop_back();
-            header << templates << ">" << std::endl;
+            if (!templates.empty()) {
+                templates.pop_back();
+                header << "template<";
+                header << templates << ">" << std::endl;
+            }
 
             header << "HUH_FORCE_INLINE bool " << function.Name << "(";
             std::stringstream ss2;
@@ -249,9 +277,14 @@ int main(int argc, char* argv[]) {
                 ss3 << "std::forward<" << param << "Type>(" << param << "), ";
             }
             auto inputParams = ss3.str();
-            inputParams.pop_back();
-            inputParams.pop_back();
-            header << inputParams << ");" << std::endl;
+            if (!inputParams.empty()) {
+
+                inputParams.pop_back();
+                inputParams.pop_back();
+                header << inputParams << ");" << std::endl;
+            } else {
+                header << ");" << std::endl;
+            }
             header << "}" << std::endl << std::endl;
         }
 

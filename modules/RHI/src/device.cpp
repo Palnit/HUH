@@ -21,9 +21,10 @@ void Device::Destroy() {
     for (auto fence : m_createdFences) {
         delete fence;
     }
-    for (auto barrier : m_createdBarriers) {
-        barrier->Destroy();
-    }
+    // This needs considerations
+    //  for (auto barrier : m_createdBarriers) {
+    //      barrier->Destroy();
+    //  }
     for (CommandPool* cmd : m_createdCommandBuffers) {
         cmd->Destroy();
         delete cmd;

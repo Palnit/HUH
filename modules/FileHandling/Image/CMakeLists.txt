@@ -14,7 +14,6 @@ set(SOURCE_FILES
 
 add_library(HUH-FileHandling-Image SHARED ${HEADER_FILES} ${SOURCE_FILES})
 add_library(HUH::FileHandling::Image ALIAS HUH-FileHandling-Image)
-huh_target_create_definition(HUH-FileHandling-Image)
 target_link_libraries(HUH-FileHandling-Image PUBLIC
         HUH::Core
         HUH::Math
@@ -49,4 +48,6 @@ if (libjpeg-turbo_FOUND)
     )
 endif ()
 
+
+huh_target_create_definition(HUH-FileHandling-Image)
 target_include_directories(HUH-FileHandling-Image PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")

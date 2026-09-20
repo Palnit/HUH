@@ -6,7 +6,6 @@
 #include <turbojpeg.h>
 #include <vector>
 
-#include <HUH/lib_defines.h>
 namespace HUH::FileHandling {
 
 class HUH_FILEHANDLING_IMAGE_API JpegReader {
