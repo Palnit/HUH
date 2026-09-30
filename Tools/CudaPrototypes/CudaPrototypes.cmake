@@ -115,11 +115,19 @@ function(huh_create_prototype)
         message(FATAL_ERROR "huh_create_prototype needs a cuda TARGET")
     endif ()
     find_package(Clang CONFIG REQUIRED)
+    find_package(Clang CONFIG REQUIRED)
+
+    find_program(CLANG_EXECUTABLE
+            NAMES clang clang.exe
+            PATHS "${LLVM_TOOLS_BINARY_DIR}"
+            NO_DEFAULT_PATH
+    )
+
     execute_process(
-            COMMAND clang -print-resource-dir
+            COMMAND "${CLANG_EXECUTABLE}" -print-resource-dir
             OUTPUT_VARIABLE CLANG_RESOURCE_DIR
             OUTPUT_STRIP_TRAILING_WHITESPACE
-            RESULT_VARIABLE CLANG_RESOURCE_DIR_RESULT
+            COMMAND_ERROR_IS_FATAL ANY
     )
     if (NOT TARGET HUHCudaPrototypeBuilder)
         find_package(args CONFIG REQUIRED)
@@ -151,7 +159,7 @@ function(huh_create_prototype)
             "-i" "${SOURCE_FILES}"
             "-l" "$<JOIN:$<REMOVE_DUPLICATES:$<LIST:TRANSFORM,${SHARED_LIB_NAMES},REPLACE,^.*[/\\],>>, >"
             "-l" "$<REMOVE_DUPLICATES:$<LIST:TRANSFORM,${CUDA_cudadevrt_LIBRARY},REPLACE,^.*[/\\],>>"
-            "-i" "$<JOIN:${INCLUDE_LIB_PATHS}, >" VERBATIM)
+            "-i" "$<JOIN:$<LIST:TRANSFORM,$<LIST:TRANSFORM,${INCLUDE_LIB_PATHS},PREPEND,\">,APPEND,\">, >" VERBATIM)
 
     add_library(${CreateOptions_TARGET}-Gen
             ${CMAKE_BINARY_DIR}/Generated/Cuda/${CreateOptions_TARGET}.gen.cpp

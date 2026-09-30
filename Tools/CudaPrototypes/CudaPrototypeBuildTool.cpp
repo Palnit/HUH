@@ -1,6 +1,5 @@
 #include "HUH/Types/array.h"
 #include "HUH/logging.h"
-#include "HUH/string_operations.h"
 
 #include <fstream>
 #include <iostream>
@@ -16,6 +15,42 @@ std::string ToString(CXString str) {
     std::string s = clang_getCString(str);
     clang_disposeString(str);
     return s;
+}
+
+HUH::Array<std::string> Split(const std::string& s, const std::string& delimiter) {
+    if (s.empty()) {
+        return {};
+    }
+
+    HUH::Array<std::string> tokens;
+
+    std::string token;
+    bool in_quotes = false;
+
+    for (size_t i = 0; i < s.size(); ++i) {
+        const char c = s[i];
+
+        if (c == '"') {
+            in_quotes = !in_quotes;
+            continue;
+        }
+
+        if (!in_quotes && s.compare(i, delimiter.length(), delimiter) == 0) {
+            tokens.Emplace(token);
+            token.clear();
+
+            i += delimiter.length() - 1;
+            continue;
+        }
+
+        token += c;
+    }
+
+    if (!token.empty()) {
+        tokens.Emplace(token);
+    }
+
+    return tokens;
 }
 
 struct FunctionData {
@@ -118,12 +153,12 @@ int main(int argc, char* argv[]) {
 
     HUH::Array<std::string> libraries;
     for (auto& lib : libs) {
-        libraries.Emplace(HUH::Split(lib, " "));
+        libraries.Emplace(Split(lib, " "));
     }
 
     HUH::Array<std::string> includes;
     for (auto& inc : include) {
-        includes.Emplace(HUH::Split(inc, " "));
+        includes.Emplace(Split(inc, " "));
     }
     std::string cudaPathOption = "--cuda-path=" + cudaPath.Get();
     std::string resourceDirOption = "-resource-dir=" + clangResourceDir.Get();

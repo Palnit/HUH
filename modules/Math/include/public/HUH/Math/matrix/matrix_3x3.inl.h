@@ -41,7 +41,7 @@ public:
     HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix(const RowType& r1, const RowType& r2, const RowType& r3) noexcept
         : data{r1, r2, r3} {}
 
-    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix(T v) noexcept : data{v, v, v, v} {}
+    HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix(T v) noexcept : data{v, v, v} {}
 
     HUH_NODISCARD HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE RowType& operator[](std::size_t index) noexcept {
         return data[index];

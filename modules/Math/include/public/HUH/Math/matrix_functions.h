@@ -3,7 +3,6 @@
 #include <HUH/Math/fwd.h>
 #include <HUH/definitions.h>
 #include <cmath>
-#include <iostream>
 
 namespace HUH {
 
@@ -33,13 +32,13 @@ HUH_FORCE_INLINE void MatrixMultiply(const Matrix4x4<float>& lhs,
 
 template<typename T, size_t R, size_t C>
 HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix<T, C, R> Transpose(const Matrix<T, R, C>& lhs) {
-    std::cout << "Transpose() R C" << std::endl;
+    // std::cout << "Transpose() R C" << std::endl;
     return Matrix<T, C, R>();
 }
 
 template<typename T, size_t N>
 HUH_HOST HUH_DEVICE HUH_CONSTEXPR_FORCE Matrix<T, N, N> Transpose(const Matrix<T, N, N>& lhs) {
-    std::cout << "Transpose() N" << std::endl;
+    // std::cout << "Transpose() N" << std::endl;
     return Matrix<T, N, N>(lhs.data);
 }
 

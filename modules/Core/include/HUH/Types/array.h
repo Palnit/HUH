@@ -131,8 +131,13 @@ public:
     }
 
     Array& operator=(const Array& other) noexcept {
-        if (this == &other || *this == other) {
+        if (this == &other) {
             return *this;
+        }
+        if constexpr (Comparable<Type>) {
+            if (*this == other) {
+                return *this;
+            }
         }
         DefaultDestruct(m_data, m_size);
         m_size = 0;
@@ -155,11 +160,11 @@ public:
         return *this;
     }
 
-    HUH_FORCE_INLINE bool operator==(const Array& other) const {
+    HUH_FORCE_INLINE bool operator==(const Array& other) const requires(Comparable<Type>) {
         return m_size == other.m_size && CompareArrays(m_data, other.m_data, m_size);
     }
 
-    HUH_FORCE_INLINE bool operator!=(const Array& other) const { return !operator==(other); }
+    HUH_FORCE_INLINE bool operator!=(const Array& other) const requires(Comparable<Type>) { return !operator==(other); }
 
     ~Array() {
         DefaultDestruct(m_data, m_size);
