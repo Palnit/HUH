@@ -136,6 +136,7 @@ int main(int argc, char* argv[]) {
     args::ValueFlag<std::filesystem::path> output(parser, "output", "The output directory of the bindings",
                                                   {'o', "output"});
 
+    HUH_ILOG(CudaBuilder, "Starting Cuda Binding Generation")
     try {
         parser.ParseCLI(argc, argv);
     } catch (const args::Help&) {

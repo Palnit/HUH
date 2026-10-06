@@ -27,6 +27,6 @@ private:
     Int32 m_color_type;
     Int32 m_channels;
     Int64 m_offset = 0;
-    png_bytep* m_row_pointers;
+    png_bytep* m_row_pointers = nullptr;
 };
 }// namespace HUH::FileHandling

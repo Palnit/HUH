@@ -6,8 +6,6 @@
 
 #include <png.h>
 
-namespace {}
-
 namespace HUH::FileHandling {
 
 PngReader::PngReader(const std::vector<HUH::Uint8>& bytes) : m_bytes(bytes) {

@@ -28,7 +28,7 @@ if (PNG_FOUND)
             src/png/png_reader.cpp
     )
     target_compile_definitions(HUH-FileHandling-Image PUBLIC HUH_IMAGE_READER_AVAILABLE_PNG)
-    target_sources(HUH-FileHandling-Image PUBLIC ${HEADER_FILES_PNG} ${SOURCE_FILES_PNG})
+    target_sources(HUH-FileHandling-Image PUBLIC ${HEADER_FILES_PNG} PRIVATE ${SOURCE_FILES_PNG})
     target_link_libraries(HUH-FileHandling-Image PUBLIC PNG::PNG)
 endif ()
 
@@ -42,7 +42,7 @@ if (libjpeg-turbo_FOUND)
             src/jpeg/jpeg_reader.cpp
     )
     target_compile_definitions(HUH-FileHandling-Image PUBLIC HUH_IMAGE_READER_AVAILABLE_JPEG)
-    target_sources(HUH-FileHandling-Image PUBLIC ${HEADER_FILES_JPEG} ${SOURCE_FILES_JPEG})
+    target_sources(HUH-FileHandling-Image PUBLIC ${HEADER_FILES_JPEG} PRIVATE ${SOURCE_FILES_JPEG})
     target_link_libraries(HUH-FileHandling-Image PUBLIC
             $<IF:$<TARGET_EXISTS:libjpeg-turbo::turbojpeg>,libjpeg-turbo::turbojpeg,libjpeg-turbo::turbojpeg-static>
     )

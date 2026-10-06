@@ -134,6 +134,17 @@ function(huh_create_prototype)
         add_executable(HUHCudaPrototypeBuilder "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/CudaPrototypeBuildTool.cpp")
         target_link_libraries(HUHCudaPrototypeBuilder PRIVATE taywee::args libclang HUH::Core)
         target_include_directories(HUHCudaPrototypeBuilder PRIVATE ${CLANG_INCLUDE_DIRS})
+
+        if (HUH_WIN)
+            add_custom_command(
+                    TARGET HUHCudaPrototypeBuilder
+                    POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "$<TARGET_FILE:libclang>"
+                    "$<TARGET_FILE_DIR:HUHCudaPrototypeBuilder>"
+                    VERBATIM
+            )
+        endif ()
     endif ()
 
     # TODO create try run to get number of files
