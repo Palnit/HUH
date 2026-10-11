@@ -73,8 +73,9 @@ CXChildVisitResult Visitor(CXCursor cursor, CXCursor parent, const CXClientData 
         return CXChildVisit_Continue;
     }
     if (clang_isDeclaration(kind)) {
-        if (!clang_Location_isFromMainFile(clang_getCursorLocation(cursor)))
+        if (!clang_Location_isFromMainFile(clang_getCursorLocation(cursor))) {
             return CXChildVisit_Continue;
+        }
     }
 
     const auto ctx = static_cast<ClangCTX*>(clientData);

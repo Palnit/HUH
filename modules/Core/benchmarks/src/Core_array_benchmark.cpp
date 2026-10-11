@@ -1,8 +1,21 @@
 #include <HUH/Types/array.h>
+
 #include <benchmark/benchmark.h>
 
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
+///
+/// DISCLAIMER CHATGPT GENERATED BENCHMARKS I wrote the bases for this but used ChatGPT to generate the rest.
+///
+
 struct Simple {
-    int a;
+    int a = 0;
+
     Simple& operator+=(const Simple& other) {
         a += other.a;
         return *this;
@@ -12,7 +25,7 @@ struct Simple {
 class Complex {
 public:
     Complex() : a(0), b(nullptr) {}
-    explicit Complex(int a) : a(a), b(new Simple(1)) {}
+    explicit Complex(int value) : a(value), b(new Simple{1}) {}
 
     Complex& operator+=(const Complex& other) {
         a += other.a;
@@ -33,6 +46,7 @@ public:
         }
         return *this;
     }
+
     ~Complex() { delete b; }
 
 private:
@@ -40,107 +54,192 @@ private:
     Simple* b;
 };
 
-template<typename T>
-static void BM_push_back_std(benchmark::State& state) {
-    for (auto _ : state) {
-        std::vector<T> v;
-        for (size_t i = 0; i < state.range(0); i++) {
-            v.emplace_back(i);
+struct LargeValue {
+    std::array<std::uint64_t, 8> words{};
+
+    LargeValue() = default;
+    explicit LargeValue(int value) { words[0] = static_cast<std::uint64_t>(value); }
+
+    LargeValue& operator+=(const LargeValue& rhs) {
+        for (std::size_t i = 0; i < words.size(); ++i) {
+            words[i] += rhs.words[i];
         }
+        return *this;
+    }
+};
+
+template<typename T, bool UseHuhArray>
+using Container = std::conditional_t<UseHuhArray, HUH::Array<T>, std::vector<T>>;
+
+template<typename T, bool UseHuhArray>
+static void Reserve(Container<T, UseHuhArray>& container, std::size_t count) {
+    if constexpr (UseHuhArray) {
+        container.Reserve(count);
+    } else {
+        container.reserve(count);
     }
 }
 
-template<typename T>
-static void BM_push_back_huh(benchmark::State& state) {
-    for (auto _ : state) {
-        HUH::Array<T> v;
-        for (size_t i = 0; i < state.range(0); i++) {
-            v.Emplace(i);
-        }
+template<typename T, bool UseHuhArray>
+static void Append(Container<T, UseHuhArray>& container, int value) {
+    if constexpr (UseHuhArray) {
+        container.Emplace(value);
+    } else {
+        container.emplace_back(value);
     }
 }
 
-template<typename T>
-static void BM_reserve_std(benchmark::State& state) {
-    for (auto _ : state) {
-        std::vector<T> v;
-        v.reserve(state.range(0));
-        for (size_t i = 0; i < state.range(0); i++) {
-            v.emplace_back(i);
-        }
+template<typename T, bool UseHuhArray>
+static void Clear(Container<T, UseHuhArray>& container) {
+    if constexpr (UseHuhArray) {
+        container.Clear();
+    } else {
+        container.clear();
     }
 }
 
-template<typename T>
-static void BM_reserve_huh(benchmark::State& state) {
+template<typename T, bool UseHuhArray>
+static void BM_PushBack(benchmark::State& state) {
+    const auto count = static_cast<std::size_t>(state.range(0));
     for (auto _ : state) {
-        HUH::Array<T> v;
-        v.Reserve(state.range(0));
-        for (size_t i = 0; i < state.range(0); i++) {
-            v.Emplace(i);
+        Container<T, UseHuhArray> container;
+        for (std::size_t i = 0; i < count; ++i) {
+            Append<T, UseHuhArray>(container, static_cast<int>(i));
         }
+        benchmark::DoNotOptimize(container.data());
+        benchmark::ClobberMemory();
     }
+    state.SetItemsProcessed(state.iterations() * static_cast<std::int64_t>(count));
 }
 
-template<typename T>
-static void BM_iteration_std(benchmark::State& state) {
+// Measures the common known-size construction path, including Reserve itself.
+template<typename T, bool UseHuhArray>
+static void BM_ReserveThenPushBack(benchmark::State& state) {
+    const auto count = static_cast<std::size_t>(state.range(0));
     for (auto _ : state) {
-        state.PauseTiming();
-        std::vector<T> v;
-        v.reserve(state.range(0));
-        for (size_t i = 0; i < state.range(0); i++) {
-            v.emplace_back(i);
+        Container<T, UseHuhArray> container;
+        Reserve<T, UseHuhArray>(container, count);
+        for (std::size_t i = 0; i < count; ++i) {
+            Append<T, UseHuhArray>(container, static_cast<int>(i));
         }
-        T test;
-        state.ResumeTiming();
-        for (auto& element : v) {
-            benchmark::DoNotOptimize(test += element);
-        }
+        benchmark::DoNotOptimize(container.data());
+        benchmark::ClobberMemory();
     }
+    state.SetItemsProcessed(state.iterations() * static_cast<std::int64_t>(count));
 }
 
-template<typename T>
-static void BM_iteration_huh(benchmark::State& state) {
+// Measures reuse of already-allocated storage: clear and refill on each iteration.
+template<typename T, bool UseHuhArray>
+static void BM_ClearAndRefill(benchmark::State& state) {
+    const auto count = static_cast<std::size_t>(state.range(0));
+    Container<T, UseHuhArray> container;
+    Reserve<T, UseHuhArray>(container, count);
+
     for (auto _ : state) {
-        state.PauseTiming();
-        HUH::Array<T> v;
-        v.Reserve(state.range(0));
-        for (size_t i = 0; i < state.range(0); i++) {
-            v.Emplace(i);
+        Clear<T, UseHuhArray>(container);
+        for (std::size_t i = 0; i < count; ++i) {
+            Append<T, UseHuhArray>(container, static_cast<int>(i));
         }
-        T test;
-        state.ResumeTiming();
-        for (auto& element : v) {
-            benchmark::DoNotOptimize(test += element);
-        }
+        benchmark::DoNotOptimize(container.data());
+        benchmark::ClobberMemory();
     }
+    state.SetItemsProcessed(state.iterations() * static_cast<std::int64_t>(count));
 }
 
-BENCHMARK(BM_push_back_std<int>)->RangeMultiplier(2)->Range(8, 8 << 15);
-BENCHMARK(BM_push_back_huh<int>)->RangeMultiplier(2)->Range(8, 8 << 15);
+// Setup is outside the timed loop so this isolates sequential traversal.
+template<typename T, bool UseHuhArray>
+static void BM_Iteration(benchmark::State& state) {
+    const auto count = static_cast<std::size_t>(state.range(0));
+    Container<T, UseHuhArray> container;
+    Reserve<T, UseHuhArray>(container, count);
+    for (std::size_t i = 0; i < count; ++i) {
+        Append<T, UseHuhArray>(container, static_cast<int>(i));
+    }
 
-BENCHMARK(BM_reserve_std<int>)->RangeMultiplier(2)->Range(8, 8 << 15);
-BENCHMARK(BM_reserve_huh<int>)->RangeMultiplier(2)->Range(8, 8 << 15);
+    for (auto _ : state) {
+        T total{};
+        for (const auto& value : container) {
+            total += value;
+        }
+        benchmark::DoNotOptimize(total);
+    }
+    state.SetItemsProcessed(state.iterations() * static_cast<std::int64_t>(count));
+}
 
-BENCHMARK(BM_iteration_std<int>)->RangeMultiplier(2)->Range(8, 8 << 15);
-BENCHMARK(BM_iteration_huh<int>)->RangeMultiplier(2)->Range(8, 8 << 15);
+template<typename T, bool UseHuhArray>
+static void BM_IndexedAccess(benchmark::State& state) {
+    const auto count = static_cast<std::size_t>(state.range(0));
+    Container<T, UseHuhArray> container;
+    Reserve<T, UseHuhArray>(container, count);
+    for (std::size_t i = 0; i < count; ++i) {
+        Append<T, UseHuhArray>(container, static_cast<int>(i));
+    }
 
-BENCHMARK(BM_push_back_std<Simple>)->RangeMultiplier(2)->Range(8, 8 << 15);
-BENCHMARK(BM_push_back_huh<Simple>)->RangeMultiplier(2)->Range(8, 8 << 15);
+    for (auto _ : state) {
+        T total{};
+        for (std::size_t i = 0; i < count; ++i) {
+            total += container[i];
+        }
+        benchmark::DoNotOptimize(total);
+    }
+    state.SetItemsProcessed(state.iterations() * static_cast<std::int64_t>(count));
+}
 
-BENCHMARK(BM_reserve_std<Simple>)->RangeMultiplier(2)->Range(8, 8 << 15);
-BENCHMARK(BM_reserve_huh<Simple>)->RangeMultiplier(2)->Range(8, 8 << 15);
+template<bool UseHuhArray>
+static void BM_CopyConstructionInt(benchmark::State& state) {
+    const auto count = static_cast<std::size_t>(state.range(0));
+    Container<int, UseHuhArray> source;
+    Reserve<int, UseHuhArray>(source, count);
+    for (std::size_t i = 0; i < count; ++i) {
+        Append<int, UseHuhArray>(source, static_cast<int>(i));
+    }
 
-BENCHMARK(BM_iteration_std<Simple>)->RangeMultiplier(2)->Range(8, 8 << 15);
-BENCHMARK(BM_iteration_huh<Simple>)->RangeMultiplier(2)->Range(8, 8 << 15);
+    for (auto _ : state) {
+        Container<int, UseHuhArray> copy(source);
+        benchmark::DoNotOptimize(copy.data());
+        benchmark::ClobberMemory();
+    }
+    state.SetItemsProcessed(state.iterations() * static_cast<std::int64_t>(count));
+}
 
-BENCHMARK(BM_push_back_std<Complex>)->RangeMultiplier(2)->Range(8, 8 << 15);
-BENCHMARK(BM_push_back_huh<Complex>)->RangeMultiplier(2)->Range(8, 8 << 15);
+#define HUH_REGISTER_TYPE_PAIR(functionName, typeName, maxRange)                  \
+    BENCHMARK_TEMPLATE(functionName, typeName, false)                             \
+        ->RangeMultiplier(2)->Range(8, maxRange);                                 \
+    BENCHMARK_TEMPLATE(functionName, typeName, true)                              \
+        ->RangeMultiplier(2)->Range(8, maxRange)
 
-BENCHMARK(BM_reserve_std<Complex>)->RangeMultiplier(2)->Range(8, 8 << 15);
-BENCHMARK(BM_reserve_huh<Complex>)->RangeMultiplier(2)->Range(8, 8 << 15);
+#define HUH_REGISTER_BOOL_PAIR(functionName, maxRange)                            \
+    BENCHMARK_TEMPLATE(functionName, false)->RangeMultiplier(2)->Range(8, maxRange); \
+    BENCHMARK_TEMPLATE(functionName, true)->RangeMultiplier(2)->Range(8, maxRange)
 
-BENCHMARK(BM_iteration_std<Complex>)->RangeMultiplier(2)->Range(8, 8 << 15);
-BENCHMARK(BM_iteration_huh<Complex>)->RangeMultiplier(2)->Range(8, 8 << 15);
+HUH_REGISTER_TYPE_PAIR(BM_PushBack, int, 8 << 15);
+HUH_REGISTER_TYPE_PAIR(BM_ReserveThenPushBack, int, 8 << 15);
+HUH_REGISTER_TYPE_PAIR(BM_ClearAndRefill, int, 8 << 15);
+HUH_REGISTER_TYPE_PAIR(BM_Iteration, int, 8 << 15);
+HUH_REGISTER_TYPE_PAIR(BM_IndexedAccess, int, 8 << 15);
+
+HUH_REGISTER_TYPE_PAIR(BM_PushBack, Simple, 8 << 15);
+HUH_REGISTER_TYPE_PAIR(BM_ReserveThenPushBack, Simple, 8 << 15);
+HUH_REGISTER_TYPE_PAIR(BM_ClearAndRefill, Simple, 8 << 15);
+HUH_REGISTER_TYPE_PAIR(BM_Iteration, Simple, 8 << 15);
+HUH_REGISTER_TYPE_PAIR(BM_IndexedAccess, Simple, 8 << 15);
+
+// Complex deliberately allocates a payload for every live element and is move-only.
+HUH_REGISTER_TYPE_PAIR(BM_PushBack, Complex, 8 << 12);
+HUH_REGISTER_TYPE_PAIR(BM_ReserveThenPushBack, Complex, 8 << 12);
+HUH_REGISTER_TYPE_PAIR(BM_ClearAndRefill, Complex, 8 << 12);
+HUH_REGISTER_TYPE_PAIR(BM_Iteration, Complex, 8 << 12);
+HUH_REGISTER_TYPE_PAIR(BM_IndexedAccess, Complex, 8 << 12);
+
+// A larger trivially movable value highlights bandwidth/cache effects.
+HUH_REGISTER_TYPE_PAIR(BM_PushBack, LargeValue, 8 << 13);
+HUH_REGISTER_TYPE_PAIR(BM_ReserveThenPushBack, LargeValue, 8 << 13);
+HUH_REGISTER_TYPE_PAIR(BM_Iteration, LargeValue, 8 << 13);
+HUH_REGISTER_TYPE_PAIR(BM_IndexedAccess, LargeValue, 8 << 13);
+
+HUH_REGISTER_BOOL_PAIR(BM_CopyConstructionInt, 8 << 15);
+
+#undef HUH_REGISTER_TYPE_PAIR
+#undef HUH_REGISTER_BOOL_PAIR
 
 BENCHMARK_MAIN();

@@ -96,12 +96,16 @@ public:
     };
 
     Array() noexcept : m_size(0), m_data(nullptr) {};
-    explicit Array(const size_t count) { AddDefaultConstructed(count); }
-    Array(std::initializer_list<Type> initializerList) {
+    explicit Array(const size_t count, AllocatorType&& allocator = AllocatorType()) : m_allocator(allocator) {
+        AddDefaultConstructed(count);
+    }
+    Array(std::initializer_list<Type> initializerList, AllocatorType&& allocator = AllocatorType())
+        : m_allocator(allocator) {
         CopyPtrDataToEmpty(initializerList.begin(), initializerList.size());
         m_size = initializerList.size();
     }
-    Array(const size_t count, const Type& inElement) {
+    Array(const size_t count, const Type& inElement, AllocatorType&& allocator = AllocatorType())
+        : m_allocator(allocator) {
         AddDefaultConstructed(count);
         for (auto& element : *this) {
             element = inElement;
@@ -149,6 +153,7 @@ public:
 
     Array& operator=(Array&& other) noexcept {
         DefaultDestruct(m_data, m_size);
+        m_allocator.Deallocate(m_data);
         m_size = other.m_size;
         m_max = other.m_max;
         m_data = std::move(other.m_data);
@@ -160,11 +165,17 @@ public:
         return *this;
     }
 
-    HUH_FORCE_INLINE bool operator==(const Array& other) const requires(Comparable<Type>) {
+    HUH_FORCE_INLINE bool operator==(const Array& other) const
+        requires(Comparable<Type>)
+    {
         return m_size == other.m_size && CompareArrays(m_data, other.m_data, m_size);
     }
 
-    HUH_FORCE_INLINE bool operator!=(const Array& other) const requires(Comparable<Type>) { return !operator==(other); }
+    HUH_FORCE_INLINE bool operator!=(const Array& other) const
+        requires(Comparable<Type>)
+    {
+        return !operator==(other);
+    }
 
     ~Array() {
         DefaultDestruct(m_data, m_size);
@@ -181,10 +192,12 @@ public:
     HUH_NODISCARD HUH_FORCE_INLINE ForwardIterator end() { return ForwardIterator(m_data + m_size); }
     HUH_NODISCARD HUH_FORCE_INLINE ConstForwardIterator end() const { return ConstForwardIterator(m_data + m_size); }
 
-    HUH_NODISCARD HUH_FORCE_INLINE BackwardIterator rbegin() { return BackwardIterator(m_data); }
-    HUH_NODISCARD HUH_FORCE_INLINE ConstBackwardIterator rbegin() const { return ConstBackwardIterator(m_data); }
-    HUH_NODISCARD HUH_FORCE_INLINE BackwardIterator rend() { return BackwardIterator(m_data + m_size); }
-    HUH_NODISCARD HUH_FORCE_INLINE ConstBackwardIterator rend() const { return ConstBackwardIterator(m_data + m_size); }
+    HUH_NODISCARD HUH_FORCE_INLINE BackwardIterator rbegin() { return BackwardIterator(m_data + m_size); }
+    HUH_NODISCARD HUH_FORCE_INLINE ConstBackwardIterator rbegin() const {
+        return ConstBackwardIterator(m_data + m_size);
+    }
+    HUH_NODISCARD HUH_FORCE_INLINE BackwardIterator rend() { return BackwardIterator(m_data); }
+    HUH_NODISCARD HUH_FORCE_INLINE ConstBackwardIterator rend() const { return ConstBackwardIterator(m_data); }
 
     HUH_NODISCARD Type& operator[](size_t index) {
         assert(index < m_size);
@@ -232,23 +245,21 @@ public:
         if (newMax > m_size) {
             AddDefaultConstructed(newMax - m_size);
         }
-        if (m_size < newMax) {
+        if (newMax < m_size) {
             Shrink(newMax);
         }
     }
 
     HUH_FORCE_INLINE void Resize(const size_t newMax, const Type& inElement) {
         if (newMax > m_size) {
+            auto oldSize = m_size;
             AddDefaultConstructed(newMax - m_size);
-            for (auto& element : *this) {
-                element = inElement;
+            for (Type *element = m_data + oldSize, *end = m_data + m_size; element != end; ++element) {
+                *element = inElement;
             }
         }
-        if (m_size < newMax) {
+        if (newMax < m_size) {
             Shrink(newMax);
-            for (auto& element : *this) {
-                element = inElement;
-            }
         }
     }
 
@@ -285,7 +296,7 @@ public:
         requires(std::constructible_from<Type, Args...>)
     HUH_FORCE_INLINE size_t Emplace(Args&&... args) {
         if (m_size == m_max) {
-            Grow(0);
+            return GrowConstruct(0, std::forward<Args>(args)...);
         }
 
         auto ptr = m_data + m_size;
@@ -366,11 +377,23 @@ private:
     HUH_FORCE_INLINE void Grow(const size_t newMax) {
         size_t result = 4;
         if (m_max) {
-            result = static_cast<size_t>(m_max * 1.5);
+            result += static_cast<size_t>(m_max * 1.5);
         } else if (newMax > result) {
             result = newMax;
         }
         ResizeAllocator(result);
+    }
+
+    template<typename... Args>
+        requires(std::constructible_from<Type, Args...>)
+    HUH_FORCE_INLINE size_t GrowConstruct(const size_t newMax, Args&&... args) {
+        size_t result = 4;
+        if (m_max) {
+            result += static_cast<size_t>(m_max * 1.5);
+        } else if (newMax > result) {
+            result = newMax;
+        }
+        return ResizeAllocatorConstruct(result, std::forward<Args>(args)...);
     }
 
     HUH_FORCE_INLINE void FixedGrow(const size_t newMax) {
@@ -381,18 +404,31 @@ private:
 
     HUH_FORCE_INLINE void Shrink(const size_t newMax) {
         if (m_size > newMax) {
-            DefaultDestruct(m_data + newMax + 1, m_size - newMax);
+            DefaultDestruct(m_data + newMax, m_size - newMax);
             m_size = newMax;
         }
         ResizeAllocator(newMax);
     }
 
-    void ResizeAllocator(const size_t newMax) {
-        m_max = newMax;
-        auto tmp = static_cast<Type*>(m_allocator.Allocate(sizeof(Type) * m_max));
+    HUH_FORCE_INLINE void ResizeAllocator(const size_t newMax) {
+        auto tmp = static_cast<Type*>(m_allocator.Allocate(sizeof(Type) * newMax));
         DefaultMove<Type>(tmp, m_data, m_size);
         m_allocator.Deallocate(m_data);
+        m_max = newMax;
         m_data = tmp;
+    }
+
+    template<typename... Args>
+        requires(std::constructible_from<Type, Args...>)
+    HUH_FORCE_INLINE size_t ResizeAllocatorConstruct(const size_t newMax, Args&&... args) {
+        auto tmp = static_cast<Type*>(m_allocator.Allocate(sizeof(Type) * newMax));
+        DefaultMove<Type>(tmp, m_data, m_size);
+        auto ptr = tmp + m_size;
+        (void)new (ptr) Type(std::forward<Args>(args)...);
+        m_allocator.Deallocate(m_data);
+        m_max = newMax;
+        m_data = tmp;
+        return m_size++;
     }
 
     size_t m_size = 0;

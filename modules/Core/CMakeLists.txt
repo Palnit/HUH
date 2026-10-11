@@ -63,6 +63,10 @@ target_include_directories(HUH-Core PUBLIC
         ${RAPIDHASH_INCLUDE_DIRS}
 )
 
+if (BUILD_TESTS)
+    add_subdirectory(tests)
+endif ()
+
 if (BUILD_BENCHMARKS)
     add_subdirectory(benchmarks)
 endif ()
