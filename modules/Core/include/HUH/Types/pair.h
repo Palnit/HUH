@@ -31,9 +31,29 @@ public:
 
     Pair() = default;
     Pair(Pair&&) = default;
-    Pair& operator=(Pair&&) = default;
     Pair(const Pair&) = default;
+    Pair& operator=(Pair&&) = default;
     Pair& operator=(const Pair&) = default;
+
+    Pair& operator=(const Pair& other)
+        requires requires(Pair& lhs, const Pair& rhs) {
+            { HUH::Assignable<decltype(lhs.first), decltype(rhs.first)> };
+            { HUH::Assignable<decltype(lhs.second), decltype(rhs.second)> };
+        }
+    {
+        Assign(*this, other);
+        return *this;
+    }
+
+    Pair& operator=(Pair&& other) noexcept
+        requires requires(Pair& lhs, Pair&& rhs) {
+            { HUH::Assignable<decltype(lhs.first), decltype(std::move(rhs.first))> };
+            { HUH::Assignable<decltype(lhs.second), decltype(std::move(rhs.second))> };
+        }
+    {
+        Assign(*this, std::move(other));
+        return *this;
+    }
 
     Pair(T1 first, T2 second) : first(first), second(second) {}
 
@@ -54,6 +74,12 @@ private:
         using Type = T;
     };
 
+    template<typename LhsTuple, typename RhsTuple>
+    static HUH_FORCE_INLINE void Assign(LhsTuple& lhs, RhsTuple&& rhs) {
+        lhs.template Get<0>() = std::forward<RhsTuple>(rhs).template Get<0>();
+        lhs.template Get<1>() = std::forward<RhsTuple>(rhs).template Get<1>();
+    }
+
 public:
     template<Uint64 Index>
         requires(Index < 2)
@@ -72,6 +98,50 @@ public:
         } else {
             return (second);
         }
+    }
+
+    template<HUH::Assignable<T1> Args1, HUH::Assignable<T2> Args2>
+        requires(!HUH::Same<Pair, Pair<Args1, Args2>>)
+    HUH_FORCE_INLINE Pair& operator=(const Pair<Args1, Args2>& other) {
+        Assign(*this, other);
+        return *this;
+    }
+
+    template<HUH::Assignable<T1> Args1, HUH::Assignable<T2> Args2>
+        requires(!HUH::Same<Pair, Pair<Args1, Args2>>)
+    HUH_FORCE_INLINE Pair& operator=(Pair<Args1, Args2>&& other) {
+        Assign(*this, std::move(other));
+        return *this;
+    }
+
+    template<HUH::ComparableWith<T1> Args1, HUH::ComparableWith<T2> Args2>
+    HUH_FORCE_INLINE bool operator==(const Pair<Args1, Args2>& other) const {
+        return this->Get<0>() == other.template Get<0>() && this->Get<1>() == other.template Get<1>();
+    }
+
+    template<HUH::ComparableWith<T1> Args1, HUH::ComparableWith<T2> Args2>
+    HUH_FORCE_INLINE bool operator!=(const Pair<Args1, Args2>& other) const {
+        return !(*this == other);
+    }
+
+    template<HUH::HasLessThan<T1> Args1, HUH::HasLessThan<T2> Args2>
+    HUH_FORCE_INLINE bool operator<(const Pair<Args1, Args2>& other) const {
+        return this->Get<0>() < other.template Get<0>() && this->Get<1>() < other.template Get<1>();
+    }
+
+    template<HUH::HasLessThanEqual<T1> Args1, HUH::HasLessThanEqual<T2> Args2>
+    HUH_FORCE_INLINE bool operator<=(const Pair<Args1, Args2>& other) const {
+        return this->Get<0>() <= other.template Get<0>() && this->Get<1>() <= other.template Get<1>();
+    }
+
+    template<HUH::HasGreaterThan<T1> Args1, HUH::HasGreaterThan<T2> Args2>
+    HUH_FORCE_INLINE bool operator>(const Pair<Args1, Args2>& other) const {
+        return this->Get<0>() > other.template Get<0>() && this->Get<1>() > other.template Get<1>();
+    }
+
+    template<HUH::HasGreaterThanEqual<T1> Args1, HUH::HasGreaterThanEqual<T2> Args2>
+    HUH_FORCE_INLINE bool operator>=(const Pair<Args1, Args2>& other) const {
+        return this->Get<0>() >= other.template Get<0>() && this->Get<1>() >= other.template Get<1>();
     }
 
     template<std::size_t Index>
