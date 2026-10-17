@@ -91,6 +91,14 @@ public:
             return temp;
         }
 
+        HUH_NODISCARD HUH_FORCE_INLINE size_t operator-(const Iterator& rhs) const {
+            if constexpr (Reverse) {
+                return rhs.m_ptr - m_ptr;
+            } else {
+                return m_ptr - rhs.m_ptr;
+            }
+        }
+
     private:
         IterType* m_ptr;
     };

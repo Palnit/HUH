@@ -92,6 +92,15 @@ concept RandomAccessIterator = BidirectionalIterator<T> && requires(T a, size_t 
     { a = -i } -> Same<T&>;
 };
 
+template<typename T>
+concept RangeIterable = requires(T a) {
+    { begin(a) };
+    { end(a) };
+} || requires(T a) {
+    { a.begin() };
+    { a.end() };
+};
+
 // Concepts for niche but helpful things
 
 template<typename T, typename... Type>

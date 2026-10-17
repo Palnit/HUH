@@ -17,6 +17,9 @@ set(CORE_HEADER_FILE
         ${CORE_INC_PATH}/memory_movement.h
         ${CORE_INC_PATH}/Types/tuple.h
         ${CORE_INC_PATH}/Types/pair.h
+        ${CORE_INC_PATH}/Types/iterators.h
+        ${CORE_INC_PATH}/Types/map.h
+        ${CORE_INC_PATH}/hash.h
 )
 set(CORE_SOURCE_FILES
         src/logging.cpp
