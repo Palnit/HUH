@@ -29,13 +29,13 @@ public:
     T1 first;
     T2 second;
 
-    Pair() = default;
-    Pair(Pair&&) = default;
-    Pair(const Pair&) = default;
-    Pair& operator=(Pair&&) = default;
-    Pair& operator=(const Pair&) = default;
+    HUH_CONSTEXPR_FORCE Pair() = default;
+    HUH_CONSTEXPR_FORCE Pair(Pair&&) = default;
+    HUH_CONSTEXPR_FORCE Pair(const Pair&) = default;
+    HUH_CONSTEXPR_FORCE Pair& operator=(Pair&&) = default;
+    HUH_CONSTEXPR_FORCE Pair& operator=(const Pair&) = default;
 
-    Pair& operator=(const Pair& other)
+    HUH_CONSTEXPR_FORCE Pair& operator=(const Pair& other)
         requires requires(Pair& lhs, const Pair& rhs) {
             { HUH::Assignable<decltype(lhs.first), decltype(rhs.first)> };
             { HUH::Assignable<decltype(lhs.second), decltype(rhs.second)> };
@@ -45,7 +45,7 @@ public:
         return *this;
     }
 
-    Pair& operator=(Pair&& other) noexcept
+    HUH_CONSTEXPR_FORCE Pair& operator=(Pair&& other) noexcept
         requires requires(Pair& lhs, Pair&& rhs) {
             { HUH::Assignable<decltype(lhs.first), decltype(std::move(rhs.first))> };
             { HUH::Assignable<decltype(lhs.second), decltype(std::move(rhs.second))> };
@@ -75,7 +75,7 @@ private:
     };
 
     template<typename LhsTuple, typename RhsTuple>
-    static HUH_FORCE_INLINE void Assign(LhsTuple& lhs, RhsTuple&& rhs) {
+    static HUH_CONSTEXPR_FORCE void Assign(LhsTuple& lhs, RhsTuple&& rhs) {
         lhs.template Get<0>() = std::forward<RhsTuple>(rhs).template Get<0>();
         lhs.template Get<1>() = std::forward<RhsTuple>(rhs).template Get<1>();
     }
@@ -86,13 +86,13 @@ public:
     using ElementType = ElementTypeHelper<Index, 0, T1, T2>::Type;
 
     template<PairType OtherPair>
-    explicit Pair(OtherPair&& other)
+    HUH_CONSTEXPR_FORCE explicit Pair(OtherPair&& other)
         : first(std::forward<OtherPair>(other).first),
           second(std::forward<OtherPair>(other).second) {}
 
     template<std::size_t Index>
         requires(Index < 2)
-    HUH_FORCE_INLINE constexpr decltype(auto) Get() & {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() & {
         if constexpr (Index == 0) {
             return (first);
         } else {
@@ -102,51 +102,51 @@ public:
 
     template<HUH::Assignable<T1> Args1, HUH::Assignable<T2> Args2>
         requires(!HUH::Same<Pair, Pair<Args1, Args2>>)
-    HUH_FORCE_INLINE Pair& operator=(const Pair<Args1, Args2>& other) {
+    HUH_CONSTEXPR_FORCE Pair& operator=(const Pair<Args1, Args2>& other) {
         Assign(*this, other);
         return *this;
     }
 
     template<HUH::Assignable<T1> Args1, HUH::Assignable<T2> Args2>
         requires(!HUH::Same<Pair, Pair<Args1, Args2>>)
-    HUH_FORCE_INLINE Pair& operator=(Pair<Args1, Args2>&& other) {
+    HUH_CONSTEXPR_FORCE Pair& operator=(Pair<Args1, Args2>&& other) {
         Assign(*this, std::move(other));
         return *this;
     }
 
     template<HUH::ComparableWith<T1> Args1, HUH::ComparableWith<T2> Args2>
-    HUH_FORCE_INLINE bool operator==(const Pair<Args1, Args2>& other) const {
+    HUH_CONSTEXPR_FORCE bool operator==(const Pair<Args1, Args2>& other) const {
         return this->Get<0>() == other.template Get<0>() && this->Get<1>() == other.template Get<1>();
     }
 
     template<HUH::ComparableWith<T1> Args1, HUH::ComparableWith<T2> Args2>
-    HUH_FORCE_INLINE bool operator!=(const Pair<Args1, Args2>& other) const {
+    HUH_CONSTEXPR_FORCE bool operator!=(const Pair<Args1, Args2>& other) const {
         return !(*this == other);
     }
 
     template<HUH::HasLessThan<T1> Args1, HUH::HasLessThan<T2> Args2>
-    HUH_FORCE_INLINE bool operator<(const Pair<Args1, Args2>& other) const {
+    HUH_CONSTEXPR_FORCE bool operator<(const Pair<Args1, Args2>& other) const {
         return this->Get<0>() < other.template Get<0>() && this->Get<1>() < other.template Get<1>();
     }
 
     template<HUH::HasLessThanEqual<T1> Args1, HUH::HasLessThanEqual<T2> Args2>
-    HUH_FORCE_INLINE bool operator<=(const Pair<Args1, Args2>& other) const {
+    HUH_CONSTEXPR_FORCE bool operator<=(const Pair<Args1, Args2>& other) const {
         return this->Get<0>() <= other.template Get<0>() && this->Get<1>() <= other.template Get<1>();
     }
 
     template<HUH::HasGreaterThan<T1> Args1, HUH::HasGreaterThan<T2> Args2>
-    HUH_FORCE_INLINE bool operator>(const Pair<Args1, Args2>& other) const {
+    HUH_CONSTEXPR_FORCE bool operator>(const Pair<Args1, Args2>& other) const {
         return this->Get<0>() > other.template Get<0>() && this->Get<1>() > other.template Get<1>();
     }
 
     template<HUH::HasGreaterThanEqual<T1> Args1, HUH::HasGreaterThanEqual<T2> Args2>
-    HUH_FORCE_INLINE bool operator>=(const Pair<Args1, Args2>& other) const {
+    HUH_CONSTEXPR_FORCE bool operator>=(const Pair<Args1, Args2>& other) const {
         return this->Get<0>() >= other.template Get<0>() && this->Get<1>() >= other.template Get<1>();
     }
 
     template<std::size_t Index>
         requires(Index < 2)
-    HUH_FORCE_INLINE constexpr decltype(auto) Get() const& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() const& {
         if constexpr (Index == 0) {
             return (first);
         } else {
@@ -156,7 +156,7 @@ public:
 
     template<std::size_t Index>
         requires(Index < 2)
-    HUH_FORCE_INLINE constexpr decltype(auto) Get() volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() volatile& {
         if constexpr (Index == 0) {
             return (first);
         } else {
@@ -166,7 +166,7 @@ public:
 
     template<std::size_t Index>
         requires(Index < 2)
-    HUH_FORCE_INLINE constexpr decltype(auto) Get() const volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() const volatile& {
         if constexpr (Index == 0) {
             return (first);
         } else {
@@ -176,7 +176,7 @@ public:
 
     template<std::size_t Index>
         requires(Index < 2)
-    HUH_FORCE_INLINE constexpr decltype(auto) Get() && {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() && {
         if constexpr (Index == 0) {
             return (static_cast<Pair&&>(*this).first);
         } else {
@@ -186,7 +186,7 @@ public:
 
     template<std::size_t Index>
         requires(Index < 2)
-    HUH_FORCE_INLINE constexpr decltype(auto) Get() const&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() const&& {
         if constexpr (Index == 0) {
             return (static_cast<const Pair&&>(*this).first);
         } else {
@@ -196,7 +196,7 @@ public:
 
     template<std::size_t Index>
         requires(Index < 2)
-    HUH_FORCE_INLINE constexpr decltype(auto) Get() volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() volatile&& {
         if constexpr (Index == 0) {
             return (static_cast<volatile Pair&&>(*this).first);
         } else {
@@ -206,7 +206,7 @@ public:
 
     template<std::size_t Index>
         requires(Index < 2)
-    HUH_FORCE_INLINE constexpr decltype(auto) Get() const volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() const volatile&& {
         if constexpr (Index == 0) {
             return (static_cast<const volatile Pair&&>(*this).first);
         } else {
@@ -219,42 +219,42 @@ public:
     /// @param args The arguments of the function before pair elements
     /// @return The return value of the function
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) & {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) & {
         return std::invoke(func, std::forward<Args>(args)..., static_cast<Pair&>(*this).first,
                            static_cast<Pair&>(*this).second);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) const& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) const& {
         return std::invoke(func, std::forward<Args>(args)..., static_cast<const Pair&>(*this).first,
                            static_cast<const Pair&>(*this).second);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) volatile& {
         return std::invoke(func, std::forward<Args>(args)..., static_cast<volatile Pair&>(*this).first,
                            static_cast<volatile Pair&>(*this).second);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) const volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) const volatile& {
         return std::invoke(func, std::forward<Args>(args)..., static_cast<const volatile Pair&>(*this).first,
                            static_cast<const volatile Pair&>(*this).second);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) && {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) && {
         return std::invoke(func, std::forward<Args>(args)..., static_cast<Pair&&>(*this).first,
                            static_cast<Pair&&>(*this).second);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) const&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) const&& {
         return std::invoke(func, std::forward<Args>(args)..., static_cast<const Pair&&>(*this).first,
                            static_cast<const Pair&&>(*this).second);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) volatile&& {
         return std::invoke(func, std::forward<Args>(args)..., static_cast<volatile Pair&&>(*this).first,
                            static_cast<volatile Pair&&>(*this).second);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) const volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) const volatile&& {
         return std::invoke(func, std::forward<Args>(args)..., static_cast<const volatile Pair&&>(*this).first,
                            static_cast<const volatile Pair&&>(*this).second);
     }
@@ -264,43 +264,43 @@ public:
     /// @param args The arguments of the function after pair elements
     /// @return The return value of the function
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) & {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) & {
         return std::invoke(func, static_cast<Pair&>(*this).first, static_cast<Pair&>(*this).second,
                            std::forward<Args>(args)...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) const& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) const& {
         return std::invoke(func, static_cast<const Pair&>(*this).first, static_cast<const Pair&>(*this).second,
                            std::forward<Args>(args)...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) volatile& {
         return std::invoke(func, static_cast<volatile Pair&>(*this).first, static_cast<volatile Pair&>(*this).second,
                            std::forward<Args>(args)...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) const volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) const volatile& {
         return std::invoke(func, static_cast<const volatile Pair&>(*this).first,
                            static_cast<const volatile Pair&>(*this).second, std::forward<Args>(args)...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) && {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) && {
         return std::invoke(func, static_cast<Pair&&>(*this).first, static_cast<Pair&&>(*this).second,
                            std::forward<Args>(args)...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) const&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) const&& {
         return std::invoke(func, static_cast<const Pair&&>(*this).first, static_cast<const Pair&&>(*this).second,
                            std::forward<Args>(args)...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) volatile&& {
         return std::invoke(func, static_cast<volatile Pair&&>(*this).first, static_cast<volatile Pair&&>(*this).second,
                            std::forward<Args>(args)...);
     }
 
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) const volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) const volatile&& {
         return std::invoke(func, static_cast<const volatile Pair&&>(*this).first,
                            static_cast<const volatile Pair&&>(*this).second, std::forward<Args>(args)...);
     }
@@ -308,7 +308,7 @@ public:
 
 template<Uint64 N, PairType Type>
     requires(N < 2)
-decltype(auto) get(Type&& tuple) {
+HUH_CONSTEXPR_FORCE decltype(auto) get(Type&& tuple) {
     return std::forward<Type>(tuple).template Get<N>();
 }
 

@@ -8,7 +8,7 @@
 namespace HUH {
 
 template<HUH::Aritmatic T>
-HUH::Uint64 Hash(const T& element, const size_t seed = 0) {
+HUH_NODISCARD HUH_CONSTEXPR_FORCE HUH::Uint64 Hash(const T& element, const size_t seed = 0) {
     return rapidhash_withSeed(&element, sizeof(T), seed);
 }
 

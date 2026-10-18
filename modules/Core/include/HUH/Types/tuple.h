@@ -140,49 +140,49 @@ public:
     /// @tparam Index The Index of the element we want
     template<Uint64 Index>
         requires(Index < sizeof...(Types))
-    HUH_FORCE_INLINE decltype(auto) Get() & {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() & {
         return TupleElementGetterByIndex<Index, sizeof...(Types)>::Get(static_cast<TupleBase&>(*this));
     }
 
     template<Uint64 Index>
         requires(Index < sizeof...(Types))
-    HUH_FORCE_INLINE decltype(auto) Get() const& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() const& {
         return TupleElementGetterByIndex<Index, sizeof...(Types)>::Get(static_cast<const TupleBase&>(*this));
     }
 
     template<Uint64 Index>
         requires(Index < sizeof...(Types))
-    HUH_FORCE_INLINE decltype(auto) Get() volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() volatile& {
         return TupleElementGetterByIndex<Index, sizeof...(Types)>::Get(static_cast<volatile TupleBase&>(*this));
     }
 
     template<Uint64 Index>
         requires(Index < sizeof...(Types))
-    HUH_FORCE_INLINE decltype(auto) Get() const volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() const volatile& {
         return TupleElementGetterByIndex<Index, sizeof...(Types)>::Get(static_cast<const volatile TupleBase&>(*this));
     }
 
     template<Uint64 Index>
         requires(Index < sizeof...(Types))
-    HUH_FORCE_INLINE decltype(auto) Get() && {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() && {
         return TupleElementGetterByIndex<Index, sizeof...(Types)>::Get(static_cast<TupleBase&&>(*this));
     }
 
     template<Uint64 Index>
         requires(Index < sizeof...(Types))
-    HUH_FORCE_INLINE decltype(auto) Get() const&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() const&& {
         return TupleElementGetterByIndex<Index, sizeof...(Types)>::Get(static_cast<const TupleBase&&>(*this));
     }
 
     template<Uint64 Index>
         requires(Index < sizeof...(Types))
-    HUH_FORCE_INLINE decltype(auto) Get() volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() volatile&& {
         return TupleElementGetterByIndex<Index, sizeof...(Types)>::Get(static_cast<volatile TupleBase&&>(*this));
     }
 
     template<Uint64 Index>
         requires(Index < sizeof...(Types))
-    HUH_FORCE_INLINE decltype(auto) Get() const volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() const volatile&& {
         return TupleElementGetterByIndex<Index, sizeof...(Types)>::Get(static_cast<const volatile TupleBase&&>(*this));
     }
 
@@ -190,49 +190,49 @@ public:
     /// @tparam T The type we are requesting from the tuple
     template<typename T>
         requires(TupleTypesCount<T, Types...> == 1)
-    HUH_FORCE_INLINE decltype(auto) Get() & {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() & {
         return TupleElementGetterByType<T, sizeof...(Types)>::Get(static_cast<TupleBase&>(*this));
     }
 
     template<typename T>
         requires(TupleTypesCount<T, Types...> == 1)
-    HUH_FORCE_INLINE decltype(auto) Get() const& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() const& {
         return TupleElementGetterByType<T, sizeof...(Types)>::Get(static_cast<const TupleBase&>(*this));
     }
 
     template<typename T>
         requires(TupleTypesCount<T, Types...> == 1)
-    HUH_FORCE_INLINE decltype(auto) Get() volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() volatile& {
         return TupleElementGetterByType<T, sizeof...(Types)>::Get(static_cast<volatile TupleBase&>(*this));
     }
 
     template<typename T>
         requires(TupleTypesCount<T, Types...> == 1)
-    HUH_FORCE_INLINE decltype(auto) Get() const volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() const volatile& {
         return TupleElementGetterByType<T, sizeof...(Types)>::Get(static_cast<const volatile TupleBase&>(*this));
     }
 
     template<typename T>
         requires(TupleTypesCount<T, Types...> == 1)
-    HUH_FORCE_INLINE decltype(auto) Get() && {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() && {
         return TupleElementGetterByType<T, sizeof...(Types)>::Get(static_cast<TupleBase&&>(*this));
     }
 
     template<typename T>
         requires(TupleTypesCount<T, Types...> == 1)
-    HUH_FORCE_INLINE decltype(auto) Get() const&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() const&& {
         return TupleElementGetterByType<T, sizeof...(Types)>::Get(static_cast<const TupleBase&&>(*this));
     }
 
     template<typename T>
         requires(TupleTypesCount<T, Types...> == 1)
-    HUH_FORCE_INLINE decltype(auto) Get() volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() volatile&& {
         return TupleElementGetterByType<T, sizeof...(Types)>::Get(static_cast<volatile TupleBase&&>(*this));
     }
 
     template<typename T>
         requires(TupleTypesCount<T, Types...> == 1)
-    HUH_FORCE_INLINE decltype(auto) Get() const volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) Get() const volatile&& {
         return TupleElementGetterByType<T, sizeof...(Types)>::Get(static_cast<const volatile TupleBase&&>(*this));
     }
 
@@ -241,38 +241,38 @@ public:
     /// @param args The arguments of the function before tuple elements
     /// @return The return value of the function
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) & {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) & {
         return std::invoke(func, std::forward<Args>(args)..., static_cast<TupleBase&>(*this).Get<Indices>()...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) const& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) const& {
         return std::invoke(func, std::forward<Args>(args)..., static_cast<const TupleBase&>(*this).Get<Indices>()...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) volatile& {
         return std::invoke(func, std::forward<Args>(args)...,
                            static_cast<volatile TupleBase&>(*this).Get<Indices>()...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) const volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) const volatile& {
         return std::invoke(func, std::forward<Args>(args)...,
                            static_cast<const volatile TupleBase&>(*this).Get<Indices>()...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) && {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) && {
         return std::invoke(func, std::forward<Args>(args)..., static_cast<TupleBase&&>(*this).Get<Indices>()...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) const&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) const&& {
         return std::invoke(func, std::forward<Args>(args)..., static_cast<const TupleBase&&>(*this).Get<Indices>()...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) volatile&& {
         return std::invoke(func, std::forward<Args>(args)...,
                            static_cast<volatile TupleBase&&>(*this).Get<Indices>()...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyAfter(Func&& func, Args... args) const volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyAfter(Func&& func, Args... args) const volatile&& {
         return std::invoke(func, std::forward<Args>(args)...,
                            static_cast<const volatile TupleBase&&>(*this).Get<Indices>()...);
     }
@@ -282,76 +282,76 @@ public:
     /// @param args The arguments of the function after tuple elements
     /// @return The return value of the function
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) & {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) & {
         return std::invoke(func, static_cast<TupleBase&>(*this).Get<Indices>()..., std::forward<Args>(args)...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) const& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) const& {
         return std::invoke(func, static_cast<const TupleBase&>(*this).Get<Indices>()..., std::forward<Args>(args)...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) volatile& {
         return std::invoke(func, static_cast<volatile TupleBase&>(*this).Get<Indices>()...,
                            std::forward<Args>(args)...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) const volatile& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) const volatile& {
         return std::invoke(func, static_cast<const volatile TupleBase&>(*this).Get<Indices>()...,
                            std::forward<Args>(args)...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) && {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) && {
         return std::invoke(func, static_cast<TupleBase&&>(*this).Get<Indices>()..., std::forward<Args>(args)...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) const&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) const&& {
         return std::invoke(func, static_cast<const TupleBase&&>(*this).Get<Indices>()..., std::forward<Args>(args)...);
     }
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) volatile&& {
         return std::invoke(func, static_cast<volatile TupleBase&&>(*this).Get<Indices>()...,
                            std::forward<Args>(args)...);
     }
 
     template<typename Func, typename... Args>
-    HUH_FORCE_INLINE decltype(auto) ApplyBefore(Func&& func, Args... args) const volatile&& {
+    HUH_CONSTEXPR_FORCE decltype(auto) ApplyBefore(Func&& func, Args... args) const volatile&& {
         return std::invoke(func, static_cast<const volatile TupleBase&&>(*this).Get<Indices>()...,
                            std::forward<Args>(args)...);
     }
 
     template<HUH::ComparableWith<Types>... Args>
-    HUH_FORCE_INLINE bool operator==(const Tuple<Args...>& other) const {
+    HUH_CONSTEXPR_FORCE bool operator==(const Tuple<Args...>& other) const {
         return ((this->Get<Indices>() == other.template Get<Indices>()) && ...);
     }
 
     template<HUH::ComparableWith<Types>... Args>
-    HUH_FORCE_INLINE bool operator!=(const Tuple<Args...>& other) const {
+    HUH_CONSTEXPR_FORCE bool operator!=(const Tuple<Args...>& other) const {
         return !(*this == other);
     }
 
     template<HUH::HasLessThan<Types>... Args>
-    HUH_FORCE_INLINE bool operator<(const Tuple<Args...>& other) const {
+    HUH_CONSTEXPR_FORCE bool operator<(const Tuple<Args...>& other) const {
         return ((this->Get<Indices>() < other.template Get<Indices>()) && ...);
     }
 
     template<HUH::HasLessThanEqual<Types>... Args>
-    HUH_FORCE_INLINE bool operator<=(const Tuple<Args...>& other) const {
+    HUH_CONSTEXPR_FORCE bool operator<=(const Tuple<Args...>& other) const {
         return ((this->Get<Indices>() <= other.template Get<Indices>()) && ...);
     }
 
     template<HUH::HasGreaterThan<Types>... Args>
-    HUH_FORCE_INLINE bool operator>(const Tuple<Args...>& other) const {
+    HUH_CONSTEXPR_FORCE bool operator>(const Tuple<Args...>& other) const {
         return ((this->Get<Indices>() > other.template Get<Indices>()) && ...);
     }
 
     template<HUH::HasGreaterThanEqual<Types>... Args>
-    HUH_FORCE_INLINE bool operator>=(const Tuple<Args...>& other) const {
+    HUH_CONSTEXPR_FORCE bool operator>=(const Tuple<Args...>& other) const {
         return ((this->Get<Indices>() >= other.template Get<Indices>()) && ...);
     }
 };
 
 template<typename LhsTuple, typename RhsTuple, Uint64... Indices>
-HUH_FORCE_INLINE void Assign(LhsTuple& lhs, RhsTuple&& rhs, std::integer_sequence<Uint64, Indices...>) {
+HUH_CONSTEXPR_FORCE void Assign(LhsTuple& lhs, RhsTuple&& rhs, std::integer_sequence<Uint64, Indices...>) {
     ((lhs.template Get<Indices>() = std::forward<RhsTuple>(rhs).template Get<Indices>()), ...);
 }
 
@@ -407,14 +407,14 @@ struct Tuple : Private::TupleBase<std::make_integer_sequence<Uint64, sizeof...(T
 
     template<HUH::Assignable<Types>... Args>
         requires(!HUH::Same<Tuple, Tuple<Args...>>)
-    HUH_FORCE_INLINE Tuple& operator=(const Tuple<Args...>& other) {
+    HUH_CONSTEXPR_FORCE Tuple& operator=(const Tuple<Args...>& other) {
         HUH::Private::Assign(*this, other, std::make_integer_sequence<Uint64, sizeof...(Types)>{});
         return *this;
     }
 
     template<HUH::Assignable<Types>... Args>
         requires(!HUH::Same<Tuple, Tuple<Args...>>)
-    HUH_FORCE_INLINE Tuple& operator=(Tuple<Args...>&& other) {
+    HUH_CONSTEXPR_FORCE Tuple& operator=(Tuple<Args...>&& other) {
         HUH::Private::Assign(*this, std::move(other), std::make_integer_sequence<Uint64, sizeof...(Types)>{});
         return *this;
     }
@@ -423,7 +423,7 @@ struct Tuple : Private::TupleBase<std::make_integer_sequence<Uint64, sizeof...(T
 template<Uint64 N, typename Type>
     requires(HUH::Private::TupleBaseType<std::remove_cvref_t<Type>>
              || HUH::Private::TupleType<std::remove_cvref_t<Type>>)
-decltype(auto) get(Type&& tuple) {
+HUH_CONSTEXPR_FORCE decltype(auto) get(Type&& tuple) {
     return std::forward<Type>(tuple).template Get<N>();
 }
 
