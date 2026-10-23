@@ -147,6 +147,20 @@ function(huh_create_prototype)
         endif ()
     endif ()
 
+    if (NOT CUDA_cudadevrt_LIBRARY)
+        find_library(CUDA_cudadevrt_LIBRARY
+                NAMES cudadevrt
+                HINTS
+                "${CUDAToolkit_LIBRARY_DIR}"
+                "${CUDAToolkit_TARGET_DIR}"
+                "${CUDAToolkit_LIBRARY_ROOT}"
+                PATH_SUFFIXES
+                lib
+                lib64
+                lib/x64
+        )
+    endif ()
+
     # TODO create try run to get number of files
     get_transitive_shared_library_names(${CreateOptions_TARGET} SHARED_LIB_NAMES)
     get_all_public_include_directories(${CreateOptions_TARGET} INCLUDE_LIB_PATHS)
@@ -164,7 +178,7 @@ function(huh_create_prototype)
             "-n" ${CreateOptions_TARGET}
             "-f" "$<FILTER:${SOURCE_FILES},INCLUDE,\\.(cu|cuh)$>"
             "-p" "$<JOIN:$<REMOVE_DUPLICATES:$<LIST:TRANSFORM,$<TARGET_OBJECTS:${CreateOptions_TARGET}>,REPLACE,^.*[/\\],>>, >"
-            "-c" "${CUDA_TOOLKIT_ROOT_DIR}"
+            "-c" "${CUDAToolkit_LIBRARY_ROOT}"
             "-r" "${CLANG_RESOURCE_DIR}"
             "-o" "${CMAKE_BINARY_DIR}/Generated/Cuda"
             "-i" "${SOURCE_FILES}"
