@@ -115,15 +115,12 @@ public:
         return temp;
     }
 
-    template<HUH::Aritmatic T2>
-    friend HUH_FORCE_INLINE CountIterator<T2>& begin(CountIterator<T2>& it) {
-        return it;
-    }
+    HUH_FORCE_INLINE CountIterator& begin() { return *this; }
 
-    template<HUH::Aritmatic T2>
-    friend HUH_FORCE_INLINE CountIterator<T2> end(CountIterator<T2> it) {
-        it.m_end = true;
-        return it;
+    HUH_FORCE_INLINE CountIterator end() const {
+        CountIterator temp = *this;
+        temp.m_end = true;
+        return temp;
     }
 
 private:
@@ -207,15 +204,12 @@ public:
         return temp;
     }
 
-    template<typename T2>
-    friend HUH_FORCE_INLINE CycleIterator<T2>& begin(CycleIterator<T2>& it) {
-        return it;
-    }
+    HUH_FORCE_INLINE CycleIterator& begin() { return *this; }
 
-    template<typename T2>
-    friend HUH_FORCE_INLINE CycleIterator<T2> end(CycleIterator<T2> it) {
-        it.m_end = true;
-        return it;
+    HUH_FORCE_INLINE CycleIterator end() {
+        CycleIterator tmp = *this;
+        tmp.m_end = true;
+        return tmp;
     }
 
 private:
@@ -296,15 +290,12 @@ public:
         return temp;
     }
 
-    template<typename T2>
-    friend HUH_FORCE_INLINE EnumerateIterator<T2>& begin(EnumerateIterator<T2>& it) {
-        return it;
-    }
+    HUH_FORCE_INLINE EnumerateIterator& begin() { return *this; }
 
-    template<typename T2>
-    friend HUH_FORCE_INLINE EnumerateIterator<T2> end(EnumerateIterator<T2> it) {
-        it.m_current_it = HUH::EndWrapper(it.m_iterable);
-        return it;
+    HUH_FORCE_INLINE EnumerateIterator end() {
+        EnumerateIterator tmp = *this;
+        tmp.m_current_it = HUH::EndWrapper(tmp.m_iterable);
+        return tmp;
     }
 
 private:

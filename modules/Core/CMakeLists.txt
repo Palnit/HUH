@@ -5,7 +5,6 @@ set(CORE_WIN_INC_PATH "platform/include/HUH/Windows")
 
 set(CORE_HEADER_FILE
         ${CORE_INC_PATH}/Singleton.h
-        ${CORE_INC_PATH}/array.h
         ${CORE_INC_PATH}/views.h
         ${CORE_INC_PATH}/Allocators/base_allocator.h
         ${CORE_INC_PATH}/Allocators/malloc_allocator.h
@@ -15,6 +14,7 @@ set(CORE_HEADER_FILE
         ${CORE_INC_PATH}/console_color.h
         ${CORE_INC_PATH}/event.h
         ${CORE_INC_PATH}/memory_movement.h
+        ${CORE_INC_PATH}/Types/array.h
         ${CORE_INC_PATH}/Types/tuple.h
         ${CORE_INC_PATH}/Types/pair.h
         ${CORE_INC_PATH}/Types/iterators.h

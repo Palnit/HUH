@@ -17,77 +17,47 @@
  * Licensed under the Apache License, Version 2.0.
  * See the project's LICENSE file for the full license text.
  */
-#ifndef INCLUDE_FASTRANGE_H
-#define INCLUDE_FASTRANGE_H
-#include <iso646.h>// mostly for Microsoft compilers
-#include <limits.h>// for size_t in C
-#include <stddef.h>// for size_t in C
-#include <stdint.h>// part of Visual Studio 2010 and better
+#pragma once
 
-/**
- * Given a value "word", produces an integer in [0,p) without division.
- * The function is as fair as possible in the sense that if you iterate
- * through all possible values of "word", then you will generate all
- * possible outputs as uniformly as possible.
- */
-static inline uint32_t fastrange32(uint32_t word, uint32_t p) {
-    return (uint32_t)(((uint64_t)word * (uint64_t)p) >> 32);
-}
+#include <HUH/definitions.h>
+#include <HUH/types.h>
 
-#if defined(_MSC_VER) && defined(_WIN64)
+#if defined(_MSC_VER) && defined(HUH_WIN)
 #include <intrin.h>// should be part of all recent Visual Studio
 #pragma intrinsic(_umul128)
-#endif// defined(_MSC_VER) && defined (_WIN64)
+#endif
 
-/**
- * Given a value "word", produces an integer in [0,p) without division.
- * The function is as fair as possible in the sense that if you iterate
- * through all possible values of "word", then you will generate all
- * possible outputs as uniformly as possible.
- */
-static inline uint64_t fastrange64(uint64_t word, uint64_t p) {
-#ifdef __SIZEOF_INT128__// then we know we have a 128-bit int
-    return (uint64_t)(((__uint128_t)word * (__uint128_t)p) >> 64);
-#elif defined(_MSC_VER) && defined(_WIN64)
-    // supported in Visual Studio 2005 and better
-    uint64_t highProduct;
-    _umul128(word, p, &highProduct);// ignore low product
+namespace HUH {
+
+HUH_NODISCARD HUH_CONSTEXPR_FORCE Uint8 FastRange(const Uint8 word, const Uint8 p) {
+    return static_cast<Uint8>((static_cast<Uint16>(word) * static_cast<Uint16>(p)) >> 8);
+}
+
+HUH_NODISCARD HUH_CONSTEXPR_FORCE Uint16 FastRange(const Uint16 word, const Uint16 p) {
+    return static_cast<Uint16>((static_cast<Uint32>(word) * static_cast<Uint32>(p)) >> 16);
+}
+
+HUH_NODISCARD HUH_CONSTEXPR_FORCE Uint32 FastRange(Uint32 word, Uint32 p) {
+    return static_cast<Uint32>((static_cast<Uint64>(word) * static_cast<Uint64>(p)) >> 32);
+}
+
+HUH_NODISCARD HUH_CONSTEXPR_FORCE Uint64 FastRange(Uint64 word, Uint64 p) {
+#if defined(__SIZEOF_INT128__)
+    return static_cast<Uint64>((static_cast<__uint128_t>(word) * static_cast<__uint128_t>(p)) >> 64);
+#elif defined(_MSC_VER) && defined(HUH_WIN)
+    Uint64 highProduct;
+    _umul128(word, p, &highProduct);
     return highProduct;
 #else
-    return word % p;// fallback
-#endif// __SIZEOF_INT128__
+    return word % p;
+#endif
 }
 
-#ifndef UINT32_MAX
-#define UINT32_MAX  (0xffffffff)
-#endif// UINT32_MAX
-
-/**
- * Given a value "word", produces an integer in [0,p) without division.
- * The function is as fair as possible in the sense that if you iterate
- * through all possible values of "word", then you will generate all
- * possible outputs as uniformly as possible.
- */
-static inline size_t fastrangesize(size_t word, size_t p) {
-#if (SIZE_MAX == UINT32_MAX)
-    return (size_t)fastrange32(word, p);
-#else // assume 64-bit
-    return (size_t)fastrange64(word, p);
-#endif// SIZE_MAX == UINT32_MAX
+template<HUH::Integral T>
+    requires(!HUH::Same<T, bool>)
+HUH_NODISCARD HUH_CONSTEXPR_FORCE T FastRange(T word, T p) {
+    using UT = std::make_unsigned_t<T>;
+    return static_cast<T>(FastRange(static_cast<UT>(word), static_cast<UT>(p)));
 }
 
-/**
- * Given a value "word", produces an integer in [0,p) without division.
- * The function is as fair as possible in the sense that if you iterate
- * through all possible values of "word", then you will generate all
- * possible outputs as uniformly as possible.
- */
-static inline int fastrangeint(int word, int p) {
-#if (SIZE_MAX == UINT32_MAX)
-    return (int)fastrange32(word, p);
-#else // assume 64-bit
-    return (int)fastrange64(word, p);
-#endif// (SIZE_MAX == UINT32_MAX)
-}
-
-#endif// INCLUDE_FASTRANGE_H
+}// namespace HUH
