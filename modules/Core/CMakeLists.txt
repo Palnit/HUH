@@ -28,6 +28,10 @@ set(CORE_SOURCE_FILES
         src/console_color.cpp
 )
 
+set(HUH_NATVIS
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Tools/Natvis/huh_map.natvis"
+)
+
 if (HUH_WIN)
     list(APPEND CORE_HEADER_FILES
             ${CORE_WIN_INC_PATH}/dynamic_library.h
@@ -49,7 +53,12 @@ endif ()
 
 find_path(RAPIDHASH_INCLUDE_DIRS "rapidhash.h")
 
-add_library(HUH-Core SHARED ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES})
+add_library(HUH-Core SHARED ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES} ${HUH_NATVIS})
+
+set_source_files_properties("${HUH_NATVIS}"
+        PROPERTIES
+        HEADER_FILE_ONLY TRUE
+)
 add_library(HUH::Core ALIAS HUH-Core)
 huh_target_compile_options(HUH-Core PUBLIC MSVC /Zc:preprocessor)
 if (HUH_LINUX)

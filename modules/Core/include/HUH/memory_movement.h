@@ -53,6 +53,16 @@ HUH_FORCE_INLINE void DefaultDestruct(Type* ptr, size_t size) {
     }
 }
 
+template<typename Type>
+    requires(TriviallyDestructable<Type>)
+HUH_FORCE_INLINE void DefaultDestruct(Type* ptr) {
+}
+
+template<typename Type>
+HUH_FORCE_INLINE void DefaultDestruct(Type* ptr) {
+    ptr->~Type();
+}
+
 template<typename DestType, typename SrcType>
     requires(Same<DestType, SrcType> && ZeroConstructable<DestType> && TriviallyDestructable<SrcType>)
 HUH_FORCE_INLINE void DefaultMove(void* dst, SrcType* src, const size_t size) {

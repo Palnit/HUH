@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+    <!--
+      Natvis view for HUH::Map<KeyType, ValueType, AllocatorType>.
+
+      Slots are shown by physical index [0]..[m_capacity - 1]. The control byte
+      determines whether m_keys[i] and m_values[i] contain live objects:
+        0x80 = Empty, 0xFE = Tombstone, 0x00..0x7F = occupied fingerprint.
+
+      IMPORTANT: only dereference keys/values for occupied slots. Empty and
+      tombstone slots do not contain live KeyType/ValueType objects.
+    -->
+    <Type Name="HUH::Map&lt;*,*,*&gt;">
+        <DisplayString Condition="m_control == nullptr">empty map</DisplayString>
+        <DisplayString>size={m_size}, capacity={m_capacity}, tombstones={m_tombstones}</DisplayString>
+
+        <Expand>
+            <Item Name="[size]">m_size</Item>
+            <Item Name="[capacity]">m_capacity</Item>
+            <Item Name="[groups]">m_groups</Item>
+            <Item Name="[tombstones]">m_tombstones</Item>
+
+            <!-- Sparse key slots. Empty/deleted positions retain their real indexes. -->
+            <Synthetic Name="[m_keys]">
+                <DisplayString>Keys by physical slot (sparse)</DisplayString>
+                <Expand>
+                    <CustomListItems MaxItemsPerView="10000">
+                        <Variable Name="index" InitialValue="0"/>
+                        <Size>m_capacity</Size>
+                        <Loop>
+                            <Break Condition="index &gt;= m_capacity"/>
+                            <Item Name="[{index}]" Condition="m_control[index] == 0x80">static_cast&lt;SlotType&gt;(m_control[index]),en</Item>
+                            <Item Name="[{index}]" Condition="m_control[index] == 0xFE">static_cast&lt;SlotType&gt;(m_control[index]),en</Item>
+                            <Item Name="[{index}]" Condition="m_control[index] &lt; 0x80">m_keys[index]</Item>
+                            <Item Name="[{index}]"
+                                  Condition="m_control[index] &gt;= 0x80 &amp;&amp; m_control[index] != 0x80 &amp;&amp; m_control[index] != 0xFE">
+                                "Invalid control state"
+                            </Item>
+                            <Exec>index++</Exec>
+                        </Loop>
+                    </CustomListItems>
+                </Expand>
+            </Synthetic>
+
+            <!-- Sparse value slots, aligned with the keys and control bytes. -->
+            <Synthetic Name="[m_values]">
+                <DisplayString>Values by physical slot (sparse)</DisplayString>
+                <Expand>
+                    <CustomListItems MaxItemsPerView="10000">
+                        <Variable Name="index" InitialValue="0"/>
+                        <Size>m_capacity</Size>
+                        <Loop>
+                            <Break Condition="index &gt;= m_capacity"/>
+                            <Item Name="[{index}]" Condition="m_control[index] == 0x80">static_cast&lt;SlotType&gt;(m_control[index]),en</Item>
+                            <Item Name="[{index}]" Condition="m_control[index] == 0xFE">static_cast&lt;SlotType&gt;(m_control[index]),en</Item>
+                            <Item Name="[{index}]" Condition="m_control[index] &lt; 0x80">m_values[index]</Item>
+                            <Item Name="[{index}]"
+                                  Condition="m_control[index] &gt;= 0x80 &amp;&amp; m_control[index] != 0x80 &amp;&amp; m_control[index] != 0xFE">
+                                "Invalid control state"
+                            </Item>
+                            <Exec>index++</Exec>
+                        </Loop>
+                    </CustomListItems>
+                </Expand>
+            </Synthetic>
+
+            <!-- Render Empty and Tombstone symbolically; occupied controls as numbers. -->
+            <Synthetic Name="[m_control]">
+                <DisplayString>Control bytes by physical slot</DisplayString>
+                <Expand>
+                    <CustomListItems MaxItemsPerView="10000">
+                        <Variable Name="index" InitialValue="0"/>
+                        <Size>m_capacity</Size>
+                        <Loop>
+                            <Break Condition="index &gt;= m_capacity"/>
+                            <Item Name="[{index}]" Condition="m_control[index] == 0x80">static_cast&lt;SlotType&gt;(m_control[index]),en</Item>
+                            <Item Name="[{index}]" Condition="m_control[index] == 0xFE">static_cast&lt;SlotType&gt;(m_control[index]),en</Item>
+                            <Item Name="[{index}]"
+                                  Condition="m_control[index] != 0x80 &amp;&amp; m_control[index] != 0xFE">(unsigned
+                                int)m_control[index]
+                            </Item>
+                            <Exec>index++</Exec>
+                        </Loop>
+                    </CustomListItems>
+                </Expand>
+            </Synthetic>
+        </Expand>
+    </Type>
+</AutoVisualizer>

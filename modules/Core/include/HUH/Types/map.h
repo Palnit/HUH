@@ -26,16 +26,26 @@ public:
     Map() = default;
 
     ~Map() {
+        KeyType* key = m_keys;
+        ValueType* value = m_values;
+        for (const Uint8 *control = m_control, *controlEnd = m_control + m_capacity; control != controlEnd;
+             ++control, ++key, ++value) {
+            if (*control >= static_cast<Uint8>(SlotType::Empty)) {
+                continue;
+            }
+            DefaultDestruct(key);
+            DefaultDestruct(value);
+        }
+
         DefaultDestruct(m_control, m_capacity);
-        DefaultDestruct(m_values, m_capacity);
-        DefaultDestruct(m_keys, m_capacity);
         m_allocator.Deallocate(m_control);
         m_allocator.Deallocate(m_values);
         m_allocator.Deallocate(m_keys);
     };
 
-    // template<typename K, typename V>
-    void Update(const KeyType& key, const ValueType& value) {
+    template<HUH::Constructable<KeyType> K, typename... V>
+        requires(std::constructible_from<ValueType, V...>)
+    void Update(K&& key, V&&... value) {
         CheckAndReHash();
 
         auto [h1, h2] = GetHash(key);
@@ -49,8 +59,8 @@ public:
                 const size_t index = offset + lane;
 
                 if (m_keys[index] == key) {
-                    DefaultDestruct(m_values + index, 1);
-                    DefaultCopy<ValueType>(m_values + index, &value, 1);
+                    DefaultDestruct(m_values + index);
+                    (void)new (m_values + index) ValueType(std::forward<V>(value)...);
                     return;
                 }
 
@@ -63,8 +73,8 @@ public:
                 const size_t index = offset + lane;
                 m_control[index] = h2;
                 ++m_size;
-                (void)new (m_keys + index) KeyType(std::forward<const KeyType&>(key));
-                (void)new (m_values + index) ValueType(std::forward<const ValueType&>(value));
+                (void)new (m_keys + index) KeyType(std::forward<K>(key));
+                (void)new (m_values + index) ValueType(std::forward<V>(value)...);
                 return;
             }
 
@@ -155,7 +165,14 @@ private:
             if (*control >= static_cast<Uint8>(SlotType::Empty)) {
                 continue;
             }
+            Update(std::move(*key), std::move(*value));
+            DefaultDestruct(key);
+            DefaultDestruct(value);
         }
+
+        m_allocator.Deallocate(oldControl);
+        m_allocator.Deallocate(oldValues);
+        m_allocator.Deallocate(oldKeys);
     }
 
     HUH_NODISCARD HUH_CONSTEXPR_FORCE Uint16 MatchH2(const size_t group, const Uint8 h2) const {
