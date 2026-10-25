@@ -89,9 +89,6 @@ HUH_FORCE_INLINE void MoveIterator(T& first, N toMove) {
 template<HUH::Aritmatic T>
 class CountIterator {
 public:
-    template<HUH::Aritmatic T2>
-    friend class CountIterator;
-
     explicit CountIterator(T start, T stepSize = 1) : m_current(start), m_stepSize(stepSize) {}
 
     HUH_NODISCARD HUH_FORCE_INLINE const T& operator*() const { return m_current; }
@@ -133,10 +130,6 @@ template<typename T>
     requires HUH::RangeIterable<std::remove_reference_t<T>>
 class CycleIterator {
 public:
-    template<typename T2>
-        requires HUH::RangeIterable<std::remove_reference_t<T2>>
-    friend class CycleIterator;
-
     explicit CycleIterator(T&& iterable)
         : m_iterable(std::forward<T>(iterable)),
           m_begin_it(HUH::BeginWrapper(m_iterable)),
@@ -228,10 +221,6 @@ template<typename T>
     requires HUH::RangeIterable<std::remove_reference_t<T>>
 class EnumerateIterator {
 public:
-    template<typename T2>
-        requires HUH::RangeIterable<std::remove_reference_t<T2>>
-    friend class EnumerateIterator;
-
     explicit EnumerateIterator(T&& iterable)
         : m_iterable(std::forward<T>(iterable)),
           m_current(0),

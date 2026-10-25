@@ -1,11 +1,13 @@
 #pragma once
 
-#include <string>
-#include <format>
-#include <vector>
-#include <HUH/templates.h>
-#include <HUH/concepts.h>
+#include "Types/array.h"
+
 #include <HUH/Types/tuple.h>
+#include <HUH/concepts.h>
+#include <HUH/templates.h>
+#include <format>
+#include <string>
+#include <vector>
 
 namespace HUH {
 
@@ -62,7 +64,7 @@ public:
     HUH_FORCE_INLINE ~IEventBase() override = default;
 
 protected:
-    Tuple<CommonArgs...> m_commonArgs;
+    [[no_unique_address]] Tuple<CommonArgs...> m_commonArgs;
 };
 
 template<typename RetType, typename... Args, typename FunctionType, typename... CommonArgs>
@@ -79,7 +81,7 @@ public:
     }
 
 private:
-    mutable std::remove_const_t<FunctionType> m_functor;
+    [[no_unique_address]] mutable std::remove_const_t<FunctionType> m_functor;
 };
 
 template<bool IsConst, typename RetType, typename... Args, typename ClassType, typename... CommonArgs>
@@ -103,7 +105,7 @@ public:
 
 private:
     ClassType* m_class;
-    FuncType m_function;
+    [[no_unique_address]] FuncType m_function;
 };
 
 template<typename RetType, typename... Args, typename... CommonArgs>
@@ -122,7 +124,7 @@ public:
     }
 
 private:
-    RawFunctionType* m_rawFunction = nullptr;
+    [[no_unique_address]] RawFunctionType* m_rawFunction = nullptr;
 };
 
 template<typename RetType, typename... Args>
@@ -130,6 +132,27 @@ class Event<RetType(Args...)> {
 public:
     Event() : m_event(nullptr), m_handler(EventHandler::GetNextEventId()) {}
     ~Event() { delete m_event; }
+
+    Event(const Event&) = delete;
+    Event& operator=(const Event&) = delete;
+
+    Event(Event&& other) noexcept : m_event(other.m_event), m_handler(other.m_handler) {
+        other.m_event = nullptr;
+        other.m_handler = EventHandler();
+    }
+
+    Event& operator=(Event&& other) noexcept {
+        if (this != &other) {
+            delete m_event;
+
+            m_event = other.m_event;
+            other.m_event = nullptr;
+            m_handler = other.m_handler;
+            other.m_handler = EventHandler();
+        }
+
+        return *this;
+    }
 
     template<typename FunctionType, typename... CommonArgs>
     HUH_FORCE_INLINE void Bind(FunctionType InFunction, CommonArgs&&... InCommonArgs) {
@@ -173,24 +196,24 @@ public:
     HUH_NODISCARD EventHandler GetHandler() const { return m_handler; }
 
 private:
-    ICommonEventBase<RetType(Args...)>* m_event = nullptr;
+    [[no_unique_address]] ICommonEventBase<RetType(Args...)>* m_event = nullptr;
     EventHandler m_handler;
 };
 
 template<typename RetType, typename... Args>
 class MultiEvent<RetType(Args...)> {
 public:
-    HUH_FORCE_INLINE ~MultiEvent() {
-        for (auto event : m_eventList) {
-            delete event;
-        }
-    }
+    // HUH_FORCE_INLINE ~MultiEvent() {
+    //     for (auto event : m_eventList) {
+    //         delete event;
+    //     }
+    // }
 
     template<typename FunctionType, typename... CommonArgs>
     HUH_FORCE_INLINE EventHandler Add(FunctionType&& InFunction, CommonArgs&&... InCommonArgs) {
-        m_eventList.push_back(new Event<RetType(Args...)>());
-        m_eventList.back()->Bind(std::forward<FunctionType>(InFunction), std::forward<CommonArgs>(InCommonArgs)...);
-        return m_eventList.back()->GetHandler();
+        m_eventList.emplace_back();
+        m_eventList.back().Bind(std::forward<FunctionType>(InFunction), std::forward<CommonArgs>(InCommonArgs)...);
+        return m_eventList.back().GetHandler();
     }
 
     template<typename ClassType, typename... CommonArgs, typename = std::enable_if_t<std::is_class_v<ClassType>>>
@@ -198,9 +221,9 @@ public:
     Add(ClassType* inClass,
         ClassFuncTypeHelper<false, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
         CommonArgs&&... inCommonArgs) {
-        m_eventList.push_back(new Event<RetType(Args...)>());
-        m_eventList.back()->Bind(inClass, inFunction, std::forward<CommonArgs>(inCommonArgs)...);
-        return m_eventList.back()->GetHandler();
+        m_eventList.emplace_back();
+        m_eventList.back().Bind(inClass, inFunction, std::forward<CommonArgs>(inCommonArgs)...);
+        return m_eventList.back().GetHandler();
     }
 
     template<typename ClassType, typename... CommonArgs, typename = std::enable_if_t<std::is_class_v<ClassType>>>
@@ -208,22 +231,22 @@ public:
     Add(ClassType* inClass,
         ClassFuncTypeHelper<true, ClassType, RetType(Args..., std::decay_t<CommonArgs>...)>::Type inFunction,
         CommonArgs&&... inCommonArgs) {
-        m_eventList.push_back(new Event<RetType(Args...)>());
-        m_eventList.back()->Bind(inClass, inFunction, std::forward<CommonArgs>(inCommonArgs)...);
-        return m_eventList.back()->GetHandler();
+        m_eventList.emplace_back();
+        m_eventList.back().Bind(inClass, inFunction, std::forward<CommonArgs>(inCommonArgs)...);
+        return m_eventList.back().GetHandler();
     }
 
     template<typename... CommonArgs>
     HUH_FORCE_INLINE EventHandler Add(RetType (*InFunction)(Args..., CommonArgs...), CommonArgs&&... commonArgs) {
-        m_eventList.push_back(new Event<RetType(Args...)>());
-        m_eventList.back()->Bind(InFunction, std::forward<CommonArgs>(commonArgs)...);
-        return m_eventList.back()->GetHandler();
+        m_eventList.emplace_back();
+        m_eventList.back().Bind(InFunction, std::forward<CommonArgs>(commonArgs)...);
+        return m_eventList.back().GetHandler();
     }
 
     HUH_FORCE_INLINE void Remove(const EventHandler& handler) {
         for (size_t i = 0; i < m_eventList.size(); ++i) {
-            if (m_eventList[i]->GetHandler() == handler) {
-                delete m_eventList[i];
+            if (m_eventList[i].GetHandler() == handler) {
+                // delete m_eventList[i];
                 m_eventList.erase(m_eventList.begin() + i);
             }
         }
@@ -234,15 +257,15 @@ public:
             return;
         }
         for (size_t i = m_eventList.size() - 1; i > 0; --i) {
-            m_eventList[i]->Execute(args...);
+            m_eventList[i].Execute(args...);
         }
-        m_eventList[0]->Execute(args...);
+        m_eventList[0].Execute(args...);
     }
 
     HUH_FORCE_INLINE void operator()(Args... args) const { ExecuteAll(args...); }
 
 private:
-    std::vector<Event<RetType(Args...)>*> m_eventList;
+    std::vector<Event<RetType(Args...)>> m_eventList;
 };
 
 }// namespace HUH

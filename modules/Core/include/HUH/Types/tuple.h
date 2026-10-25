@@ -35,7 +35,7 @@ struct TupleElement {
     TupleElement(const TupleElement&) = default;
     TupleElement& operator=(const TupleElement&) = default;
 
-    T m_element;
+    [[no_unique_address]] T m_element;
 };
 
 template<typename T, typename B>

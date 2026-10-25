@@ -20,7 +20,7 @@ public:
 
     enum class SlotType : Uint8 {
         Empty = 0x80,
-        Deleted = 0xFE,
+        Tombstone = 0xFE,
     };
 
     Map() = default;
@@ -34,6 +34,7 @@ public:
         m_allocator.Deallocate(m_keys);
     };
 
+    // template<typename K, typename V>
     void Update(const KeyType& key, const ValueType& value) {
         CheckAndReHash();
 
@@ -61,6 +62,7 @@ public:
                 const size_t lane = std::countr_zero(empties);
                 const size_t index = offset + lane;
                 m_control[index] = h2;
+                ++m_size;
                 (void)new (m_keys + index) KeyType(std::forward<const KeyType&>(key));
                 (void)new (m_values + index) ValueType(std::forward<const ValueType&>(value));
                 return;
@@ -120,16 +122,40 @@ private:
 
     HUH_CONSTEXPR_FORCE void CheckAndReHash() {
         if (m_control == nullptr) {
-            ResizeAllocator<&Map::m_control>(GroupWidth);
+            AllocateMemory<&Map::m_control>(GroupWidth);
             std::memset(m_control, static_cast<Uint8>(SlotType::Empty), sizeof(Uint8) * GroupWidth);
-            ResizeAllocator<&Map::m_values>(GroupWidth);
-            ResizeAllocator<&Map::m_keys>(GroupWidth);
+            AllocateMemory<&Map::m_values>(GroupWidth);
+            AllocateMemory<&Map::m_keys>(GroupWidth);
             m_capacity = GroupWidth;
             m_groups = 1;
         }
 
         const auto limit = GetMaxLoad();
-        // TODO Rehash and grow
+        if (m_tombstones + m_size + 1 < limit) {
+            return;
+        }
+        auto oldCapacity = m_capacity;
+        m_capacity *= 2;
+        m_groups *= 2;
+
+        auto oldControl = m_control;
+        auto oldValues = m_values;
+        auto oldKeys = m_keys;
+
+        AllocateMemory<&Map::m_control>(m_capacity);
+        std::memset(m_control, static_cast<Uint8>(SlotType::Empty), sizeof(Uint8) * m_capacity);
+        AllocateMemory<&Map::m_values>(m_capacity);
+        AllocateMemory<&Map::m_keys>(m_capacity);
+
+        m_size = 0, m_tombstones = 0;
+        KeyType* key = oldKeys;
+        ValueType* value = oldValues;
+        for (const Uint8 *control = oldControl, *controlEnd = oldControl + oldCapacity; control != controlEnd;
+             ++control, ++key, ++value) {
+            if (*control >= static_cast<Uint8>(SlotType::Empty)) {
+                continue;
+            }
+        }
     }
 
     HUH_NODISCARD HUH_CONSTEXPR_FORCE Uint16 MatchH2(const size_t group, const Uint8 h2) const {
@@ -148,25 +174,31 @@ private:
         return static_cast<Uint16>(_mm_movemask_epi8(_mm_cmpeq_epi8(metadata, fingerprint)));
     }
 
+    HUH_NODISCARD HUH_CONSTEXPR_FORCE Uint16 MatchTombstone(const size_t group) const {
+        const __m128i metadata = _mm_loadu_si128(reinterpret_cast<const __m128i*>(m_control + group));
+
+        const __m128i fingerprint = _mm_set1_epi8(static_cast<char>(SlotType::Tombstone));
+
+        return static_cast<Uint16>(_mm_movemask_epi8(_mm_cmpeq_epi8(metadata, fingerprint)));
+    }
+
     HUH_NODISCARD HUH_CONSTEXPR_FORCE size_t GetMaxLoad() const { return m_capacity - m_capacity * 0.125f; }
 
     template<auto T>
         requires(IsMemberPtr<T>)
-    HUH_CONSTEXPR_FORCE void ResizeAllocator(const size_t newMax) {
+    HUH_CONSTEXPR_FORCE void AllocateMemory(const size_t newMax) {
         using Type = std::remove_pointer_t<typename ClassMemberTypeHelper<T>::Type>;
-        auto tmp = static_cast<Type*>(m_allocator.Allocate(sizeof(Type) * newMax));
-        DefaultMove<Type>(tmp, this->*T, m_capacity);
-        m_allocator.Deallocate(this->*T);
-        this->*T = tmp;
+        this->*T = static_cast<Type*>(m_allocator.Allocate(sizeof(Type) * newMax));
     }
 
     Uint8* m_control = nullptr;
     KeyType* m_keys = nullptr;
     ValueType* m_values = nullptr;
-    AllocatorType m_allocator;
     size_t m_groups = 0;
     size_t m_capacity = 0;
     size_t m_tombstones = 0;
+    size_t m_size = 0;
+    [[no_unique_address]] AllocatorType m_allocator;
 };
 
 }// namespace HUH

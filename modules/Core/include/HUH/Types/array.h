@@ -103,7 +103,7 @@ public:
         IterType* m_ptr;
     };
 
-    Array() noexcept : m_size(0), m_data(nullptr) {};
+    Array(AllocatorType&& allocator = AllocatorType()) noexcept : m_size(0), m_data(nullptr), m_allocator(allocator) {};
     explicit Array(const size_t count, AllocatorType&& allocator = AllocatorType()) : m_allocator(allocator) {
         AddDefaultConstructed(count);
     }
@@ -442,7 +442,7 @@ private:
     size_t m_size = 0;
     size_t m_max = 0;
     Type* m_data = nullptr;
-    AllocatorType m_allocator;
+    [[no_unique_address]] AllocatorType m_allocator;
 };
 
 }// namespace HUH
