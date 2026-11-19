@@ -22,15 +22,16 @@
 
             <!-- Sparse key slots. Empty/deleted positions retain their real indexes. -->
             <Synthetic Name="[m_keys]">
-                <DisplayString>Keys by physical slot (sparse)</DisplayString>
                 <Expand>
-                    <CustomListItems MaxItemsPerView="10000">
+                    <CustomListItems MaxItemsPerView="256">
                         <Variable Name="index" InitialValue="0"/>
                         <Size>m_capacity</Size>
                         <Loop>
                             <Break Condition="index &gt;= m_capacity"/>
-                            <Item Name="[{index}]" Condition="m_control[index] == 0x80">static_cast&lt;SlotType&gt;(m_control[index]),en</Item>
-                            <Item Name="[{index}]" Condition="m_control[index] == 0xFE">static_cast&lt;SlotType&gt;(m_control[index]),en</Item>
+                            <Item Name="[{index}]" Condition="m_control[index] == 0x80">(SlotType)m_control[index],en
+                            </Item>
+                            <Item Name="[{index}]" Condition="m_control[index] == 0xFE">(SlotType)m_control[index],en
+                            </Item>
                             <Item Name="[{index}]" Condition="m_control[index] &lt; 0x80">m_keys[index]</Item>
                             <Item Name="[{index}]"
                                   Condition="m_control[index] &gt;= 0x80 &amp;&amp; m_control[index] != 0x80 &amp;&amp; m_control[index] != 0xFE">
@@ -44,15 +45,16 @@
 
             <!-- Sparse value slots, aligned with the keys and control bytes. -->
             <Synthetic Name="[m_values]">
-                <DisplayString>Values by physical slot (sparse)</DisplayString>
                 <Expand>
-                    <CustomListItems MaxItemsPerView="10000">
+                    <CustomListItems MaxItemsPerView="256">
                         <Variable Name="index" InitialValue="0"/>
                         <Size>m_capacity</Size>
                         <Loop>
                             <Break Condition="index &gt;= m_capacity"/>
-                            <Item Name="[{index}]" Condition="m_control[index] == 0x80">static_cast&lt;SlotType&gt;(m_control[index]),en</Item>
-                            <Item Name="[{index}]" Condition="m_control[index] == 0xFE">static_cast&lt;SlotType&gt;(m_control[index]),en</Item>
+                            <Item Name="[{index}]" Condition="m_control[index] == 0x80">(SlotType)m_control[index],en
+                            </Item>
+                            <Item Name="[{index}]" Condition="m_control[index] == 0xFE">(SlotType)m_control[index],en
+                            </Item>
                             <Item Name="[{index}]" Condition="m_control[index] &lt; 0x80">m_values[index]</Item>
                             <Item Name="[{index}]"
                                   Condition="m_control[index] &gt;= 0x80 &amp;&amp; m_control[index] != 0x80 &amp;&amp; m_control[index] != 0xFE">
@@ -66,15 +68,16 @@
 
             <!-- Render Empty and Tombstone symbolically; occupied controls as numbers. -->
             <Synthetic Name="[m_control]">
-                <DisplayString>Control bytes by physical slot</DisplayString>
                 <Expand>
-                    <CustomListItems MaxItemsPerView="10000">
+                    <CustomListItems MaxItemsPerView="256">
                         <Variable Name="index" InitialValue="0"/>
                         <Size>m_capacity</Size>
                         <Loop>
                             <Break Condition="index &gt;= m_capacity"/>
-                            <Item Name="[{index}]" Condition="m_control[index] == 0x80">static_cast&lt;SlotType&gt;(m_control[index]),en</Item>
-                            <Item Name="[{index}]" Condition="m_control[index] == 0xFE">static_cast&lt;SlotType&gt;(m_control[index]),en</Item>
+                            <Item Name="[{index}]" Condition="m_control[index] == 0x80">(SlotType)m_control[index],en
+                            </Item>
+                            <Item Name="[{index}]" Condition="m_control[index] == 0xFE">(SlotType)m_control[index],en
+                            </Item>
                             <Item Name="[{index}]"
                                   Condition="m_control[index] != 0x80 &amp;&amp; m_control[index] != 0xFE">(unsigned
                                 int)m_control[index]

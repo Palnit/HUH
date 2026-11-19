@@ -1,6 +1,7 @@
 #pragma once
 
-#include "templates.h"
+#include <HUH/templates.h>
+#include <HUH/types.h>
 
 #include <functional>
 #include <type_traits>

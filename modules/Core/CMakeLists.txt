@@ -29,7 +29,8 @@ set(CORE_SOURCE_FILES
 )
 
 set(HUH_NATVIS
-        "${CMAKE_CURRENT_SOURCE_DIR}/../../Tools/Natvis/huh_map.natvis"
+        "natvis/huh_map.natvis"
+        "natvis/huh_array.natvis"
 )
 
 if (HUH_WIN)

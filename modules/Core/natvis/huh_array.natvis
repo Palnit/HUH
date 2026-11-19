@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+    <Type Name="HUH::Array&lt;*&gt;">
+        <DisplayString>size = {m_size}</DisplayString>
+
+        <Expand>
+            <Item Name="[size]">m_size</Item>
+
+            <ArrayItems Condition="m_data != nullptr">
+                <Size>m_size</Size>
+                <ValuePointer>m_data</ValuePointer>
+            </ArrayItems>
+        </Expand>
+    </Type>
+
+</AutoVisualizer>
