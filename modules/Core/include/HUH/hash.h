@@ -5,6 +5,8 @@
 
 #include <rapidhash.h>
 
+#include <string>
+
 namespace HUH {
 
 template<HUH::Aritmatic T>

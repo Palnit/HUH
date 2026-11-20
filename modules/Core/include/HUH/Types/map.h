@@ -1,8 +1,9 @@
 #pragma once
 
-#include "HUH/fastrange.h"
+#include <HUH/fastrange.h>
 
 #include <HUH/Types/array.h>
+#include <HUH/Types/pair.h>
 #include <HUH/hash.h>
 
 #include <HUH/Types/Allocators/base_allocator.h>
@@ -32,11 +33,11 @@ public:
     template<HUH::Hashable KeyTypeIt, typename ValueTypeIt>
     class Iterator {
     public:
-        explicit Iterator(Uint8* control, KeyTypeIt* keys, ValueTypeIt* values, size_t capacity)
+        explicit Iterator(Uint8* control, KeyTypeIt* keys, ValueTypeIt* values, size_t capacity, bool end = false)
             : m_control(control),
               m_keys(keys),
               m_values(values),
-              m_pair(*m_keys, *m_values),// UB? Safe or not?
+              m_pair(end ? *(--m_keys) : *m_keys, end ? *(--m_values) : *m_values),
               m_capacity(capacity) {
             while (m_size != m_capacity
                    && (*m_control == static_cast<Uint8>(Map::SlotType::Empty)
@@ -127,7 +128,7 @@ public:
         ValueType* value = m_values;
         for (const Uint8 *control = m_control, *controlEnd = m_control + m_capacity; control != controlEnd;
              ++control, ++key, ++value) {
-            if (*control >= static_cast<Uint8>(SlotType::Empty)) {
+            if (*control == static_cast<Uint8>(SlotType::Empty)) {
                 continue;
             }
             DefaultDestruct(key);
@@ -146,7 +147,7 @@ public:
     ForwardIterator begin() { return ForwardIterator(m_control, m_keys, m_values, m_capacity); }
     ConstForwardIterator begin() const { return ConstForwardIterator(m_control, m_keys, m_values, m_capacity); }
     ForwardIterator end() {
-        return ForwardIterator(m_control + m_capacity, m_keys + m_capacity, m_values + m_capacity, m_capacity);
+        return ForwardIterator(m_control + m_capacity, m_keys + m_capacity, m_values + m_capacity, m_capacity, true);
     }
 
     template<HUH::Constructable<KeyType> K, typename... V>

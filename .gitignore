@@ -3,5 +3,6 @@ cmake-build*/
 .idea/
 .git/
 modules/Math/benchmarks/Plot/
+/modules/Core/plot/plots/
 imgui.ini
 /include/public/HUH/lib_defines.h
